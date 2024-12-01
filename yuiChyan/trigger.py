@@ -1,0 +1,155 @@
+import copy
+import re
+from typing import List, Iterable
+from typing import TYPE_CHECKING
+
+import pygtrie
+import zhconv
+from aiocqhttp import Event as CQEvent
+
+from yuiChyan import logger
+from yuiChyan.util import normalize_str
+
+if TYPE_CHECKING:
+    from yuiChyan.service import ServiceFunc
+
+
+# 基本触发器
+class BaseTrigger:
+
+    def add(self, x: str, sf: 'ServiceFunc'):
+        pass
+
+    def find_handler(self, ev: CQEvent) -> List['ServiceFunc']:
+        pass
+
+    # 转换简体
+    @staticmethod
+    def _convert_zh_hans(x: str) -> str:
+        return zhconv.convert(x, 'zh-hans')
+
+    # 添加触发器
+    @staticmethod
+    def _add(trie: pygtrie.CharTrie, x: str, sf: 'ServiceFunc'):
+        x = BaseTrigger._convert_zh_hans(x)
+        trie_list = trie.get(x, [])
+        trie_list.append(sf)
+        trie[x] = trie_list
+
+
+# 前缀匹配触发器
+class PrefixTrigger(BaseTrigger):
+
+    def __init__(self):
+        super().__init__()
+        self.trie = pygtrie.CharTrie()
+
+    def add(self, prefix_str: str, sf: 'ServiceFunc'):
+        super()._add(self.trie, prefix_str, sf)
+        logger.debug(f'Succeed to add prefix trigger [{prefix_str}]')
+
+    def find_handler(self, ev: CQEvent) -> Iterable['ServiceFunc']:
+        prefix_raw = ev.message[0]
+        if prefix_raw.type != 'text':
+            return
+        prefix_str = super()._convert_zh_hans(prefix_raw.data['text'].lstrip())
+        # 查找最长前缀
+        step = self.trie.longest_prefix(prefix_str)
+        if not step:
+            return
+
+        old_msg = copy.deepcopy(ev.message)
+        ev['prefix'] = step.key
+        prefix_str = prefix_str[len(step.key):].lstrip()
+        if not prefix_str and len(ev.message) > 1:
+            del ev.message[0]
+        else:
+            prefix_raw.data['text'] = prefix_str
+
+        # 遍历匹配到的前缀对应的服务函数
+        for service_func in step.value:
+            yield service_func
+
+        ev.message = old_msg
+
+
+# 后缀匹配触发器
+class SuffixTrigger(BaseTrigger):
+
+    def __init__(self):
+        super().__init__()
+        self.trie = pygtrie.CharTrie()
+
+    def add(self, suffix_str: str, sf: 'ServiceFunc'):
+        suffix_r = suffix_str[::-1]
+        super()._add(self.trie, suffix_r, sf)
+        logger.debug(f'Succeed to add suffix trigger [{suffix_str}]')
+
+    def find_handler(self, event: CQEvent) -> Iterable['ServiceFunc']:
+        suffix_raw = event.message[-1]
+        if suffix_raw.type != 'text':
+            return
+        suffix_str = super()._convert_zh_hans(suffix_raw.data['text'].rstrip())
+        item = self.trie.longest_prefix(suffix_str[::-1])
+        if not item:
+            return
+
+        old_msg = copy.deepcopy(event.message)
+        event['suffix'] = item.key[::-1]
+        last_text = suffix_str[: -len(item.key)].rstrip()
+        if not last_text and len(event.message) > 1:
+            del event.message[-1]
+        else:
+            suffix_raw.data['text'] = last_text
+
+        for service_func in item.value:
+            yield service_func
+
+        event.message = old_msg
+
+
+# 正则表达式匹配
+class RegularTrigger(BaseTrigger):
+
+    def __init__(self):
+        super().__init__()
+        self.regular_dict = {}
+
+    def add(self, x: re.Pattern, sf: 'ServiceFunc'):
+        trie_list = self.regular_dict.get(x, [])
+        trie_list.append(sf)
+        self.regular_dict[x] = trie_list
+        logger.debug(f'Succeed to add rex trigger [{x.pattern}]')
+
+    def find_handler(self, event: CQEvent) -> Iterable['ServiceFunc']:
+        for rex, sfs in self.regular_dict.items():
+            for service_func in sfs:
+                text = event.norm_text if service_func.normalize_text else event.plain_text
+                match = rex.search(text)
+                if match:
+                    event['match'] = match
+                    yield service_func
+
+
+class NormalTrigger(BaseTrigger):
+
+    def __init__(self):
+        super().__init__()
+
+    def find_handler(self, event: CQEvent):
+        event.plain_text = event.message.extract_plain_text().strip()
+        event.norm_text = normalize_str(event.plain_text)
+        return []
+
+
+prefix = PrefixTrigger()
+suffix = SuffixTrigger()
+regular = RegularTrigger()
+normal = NormalTrigger()
+
+trigger_chain: List[BaseTrigger] = [
+    prefix,
+    suffix,
+    regular,
+    normal
+]
