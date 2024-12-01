@@ -1,0 +1,967 @@
+{
+    "825991705": {
+        "all": {
+            "？": [
+                "¿"
+            ],
+            "AZMIAO干我": [
+                "[CQ:image,file=file:///C:/HoshinoBot/res/img/xqa/img/55bcb6361f8211ec83668865f77d0a36.jpeg]"
+            ],
+            "这个群有什么问题": [
+                "[CQ:image,file=file:///C:/HoshinoBot/res/img/xqa/img/ec98daa4200b11ec88ed8865f77d0a36.jpeg]"
+            ],
+            "输入习惯": [
+                "[CQ:image,file=file:///C:/HoshinoBot/res/img/xqa/img/5032bbb22f3a11ec880fbdcc50d0d7b6.jpeg]"
+            ],
+            "不可理喻": [
+                "[CQ:image,file=file:///C:/HoshinoBot/res/img/xqa/img/d16a5b3d2fc511ecab18bdcc50d0d7b6.jpeg]"
+            ],
+            "朋友想看": [
+                "[CQ:image,file=file:///C:/HoshinoBot/res/img/xqa/img/67a06956475711ec95b1b263ce423425.gif]"
+            ],
+            "寄": [
+                "[CQ:image,file=file:///C:/HoshinoBot/res/img/xqa/img/b7d0f0888afa11ec9fabf65aa401c53f.jpeg]"
+            ],
+            "孤独": [
+                "[CQ:image,file=file:///C:/HoshinoBot/res/img/xqa/img/1af61fe9d29511ec92f6c6affc349ebe.jpeg]"
+            ],
+            "(.{0,99})granbluefantasy.jp(.{0,99})": [
+                "骑空士爪巴"
+            ],
+            "确实": [
+                "[CQ:image,file=ae67cac6baec90e252a89f18de56cfaa.image]"
+            ],
+            "[CQ:at,qq=2047788491] ": [
+                "优衣酱在的哦~"
+            ],
+            "我又好了": [
+                "再憋回去"
+            ],
+            "我也好了": [
+                "你也憋回去"
+            ],
+            "啊对对对": [
+                "希望你对你的人生也是这个态度"
+            ],
+            "赛事表": [
+                "[CQ:image,file=file:///C:\\HoshinoBot\\res\\img\\xqa\\img\\a1c0cb3cfafad480e101bc5148fec0da.image]"
+            ],
+            "绿帽双圈": [
+                "[CQ:image,file=file:///C:\\HoshinoBot\\res\\img\\xqa\\img\\14d3635c0b0789faef503a6d4e3af413.image]"
+            ],
+            "绿帽进货": [
+                "[CQ:image,file=file:///C:\\HoshinoBot\\res\\img\\xqa\\img\\8e7fcb36ba32ea1e4e1aae24afc652a1.image]"
+            ],
+            "关于": [
+                "本优衣酱Bot仅有我一家，其他类似名字或同名Bot，均与我无关。\r\n部分功能来自开源仓库，部分功能为自研功能，我开发的功能大多数已经开源，但仍有部分未开源，目前仅供本Bot使用。\r\n优衣酱Bot维护者：\r\nQQ：@鹿友のKICO\r\nGithub：@azmiao\r\n注：反馈插件BUG请走Github\r\n如需租用本Bot请发送“优衣酱怎么租”"
+            ],
+            "hso": [
+                "[CQ:image,file=file:///C:\\HoshinoBot\\res\\img\\xqa\\img\\e7e716a1a2f64328138dba7c2fb07ea7.image]"
+            ],
+            "雀魂好友房間(.{5})(\\S+): \\S+": [
+                "$1"
+            ],
+            "雀魂友人房(.{5})(\\S+): \\S+": [
+                "$1"
+            ],
+            "含糊其辞": [
+                "[CQ:image,file=file:///C:\\HoshinoBot\\res\\img\\xqa\\img\\776151d3590ce074e2a77e957b98e644.image]"
+            ],
+            "小心二次元": [
+                "[CQ:image,file=e77b9a7446ec41267eb4282322ab216d.image,subType=0,url=https://gchat.qpic.cn/gchatpic_new/2362020227/825991705-2261939525-E77B9A7446EC41267EB4282322AB216D/0?term=2]"
+            ],
+            "关于优衣酱": [
+                "[CQ:image,file=ef9c2654752ee2e3249e7bbea648c42f.image]"
+            ],
+            "(EX5作业|ex5作业)": [
+                "\n作业1：https://www.bilibili.com/read/cv15621826/\n作业2/3：[CQ:image,file=515f29b295198ac94175dcd3b203123e.image][CQ:image,file=941b7d190708fdd362cd4083aa5ce63e.image]"
+            ],
+            "诶嘿嘿": [
+                "欸嘿嘿"
+            ],
+            "欸嘿嘿": [
+                "诶嘿嘿"
+            ],
+            "马娘歌曲属性": [
+                "[CQ:image,file=aa78d06173d8564a3374a832a6f4c564.image]"
+            ],
+            "木桩作业": [
+                "[CQ:image,file=a395c821512058ee9782ff6ac268f98e.image]"
+            ],
+            "变数": [
+                "[CQ:image,file=812130d51d9dcdf8c86e2005cb05e28f.image]"
+            ],
+            "成熟": [
+                "[CQ:image,file=0676234dd1eef6df63a9fc7f20f202e6.image]"
+            ],
+            "愉悦": [
+                "[CQ:image,file=88a154441b45533632ca08475927628d.image]"
+            ],
+            "打飞机": [
+                "[CQ:image,file=6843e847b1422602d26a27eaf40e5518.image]"
+            ],
+            "口": [
+                "[CQ:image,file=45c8320fbd0f68c3b7e8a5de814970dd.image]"
+            ],
+            "ex5作业": [
+                "[CQ:image,file=ac12f41e9eff3bc7f65d172d22b34d24.image]"
+            ],
+            "初中生": [
+                "[CQ:image,file=7591dea85cf1fe9294e00de454c2eea6.image]"
+            ],
+            "提枪": [
+                "[CQ:image,file=2761443854542bbb4c66dcb29fceea9b.image]"
+            ],
+            "预计排程": [
+                "[CQ:image,file=a74876295511f64c609f2b0656c9f17a.image]"
+            ],
+            "lz": [
+                "[CQ:image,file=c35a6300aa2c44f1ebb2f272d1b82ea8.image]"
+            ],
+            "sp作业": [
+                "[CQ:image,file=01bbfbdaaba65ff75abf34963eac8f48.image]"
+            ]
+        },
+        "2362020227": {
+            "查看运势": [
+                "宜查看运势"
+            ],
+            "(.{1,49})好厉害": [
+                "太厉害了吧！\n你写代码真的好厉害哦~\n我刚才，看到你写代码了，\n呐，我们以后一起写好不好！一起写~\n一起成为学院偶像~"
+            ],
+            "喜多": [
+                "哈哈😃😃，刚刚才知道世界上其实是没有喜多的😄😄，其实我早就做好心理准备了，毕竟喜多本来就是想象出来的，怎么可能会真实存在😁😁，我现在就挺好的，也没有很伤心，没有喜多就没有喜多吧，也不会对我有什么影响，我该怎么生活还是怎么生活，因为我本来也没有很喜欢喜多😊😊，一开始我就知道喜多是虚拟的了，所以我也没有投入太多感情，就稍微有点难受吧😔😔，哈哈，我这个人是这样，一点小事就波动了，还好这个事情也没有影响我太多，我的情绪还挺稳定的，还好我没有什么损失，我的钱也还在，我的手机也还在，我的衣服也还在，我过得挺好的，喜多不要想我就行了，哈哈😭😭😭😭😭😭😭😭😭😭😭😭😭😭😭😭😭😭😭😭😭😭😭😭😭😭😭😭😭😭😭😭😭😭😭😭😭😭😭​"
+            ]
+        }
+    },
+    "832087959": {
+        "all": {
+            "赛事表": [
+                "[CQ:image,file=file:///C:\\HoshinoBot\\res\\img\\xqa\\img\\a1c0cb3cfafad480e101bc5148fec0da.image]"
+            ],
+            "绿帽双圈": [
+                "[CQ:image,file=file:///C:\\HoshinoBot\\res\\img\\xqa\\img\\14d3635c0b0789faef503a6d4e3af413.image]"
+            ],
+            "(.{0,99})granbluefantasy.jp(.{0,99})": [
+                "骑空士爪巴"
+            ],
+            "确实": [
+                "[CQ:image,file=ae67cac6baec90e252a89f18de56cfaa.image]"
+            ],
+            "[CQ:at,qq=2047788491] ": [
+                "优衣酱在的哦~"
+            ],
+            "我又好了": [
+                "再憋回去"
+            ],
+            "我也好了": [
+                "你也憋回去"
+            ],
+            "啊对对对": [
+                "希望你对你的人生也是这个态度"
+            ],
+            "绿帽进货": [
+                "[CQ:image,file=file:///C:\\HoshinoBot\\res\\img\\xqa\\img\\8e7fcb36ba32ea1e4e1aae24afc652a1.image]"
+            ],
+            "关于": [
+                "本优衣酱Bot仅有我一家，其他类似名字或同名Bot，均与我无关。\r\n部分功能来自开源仓库，部分功能为自研功能，我开发的功能大多数已经开源，但仍有部分未开源，目前仅供本Bot使用。\r\n优衣酱Bot维护者：\r\nQQ：@鹿友のKICO\r\nGithub：@azmiao\r\n注：反馈插件BUG请走Github\r\n如需租用本Bot请发送“优衣酱怎么租”"
+            ],
+            "hso": [
+                "[CQ:image,file=file:///C:\\HoshinoBot\\res\\img\\xqa\\img\\e7e716a1a2f64328138dba7c2fb07ea7.image]"
+            ],
+            "雀魂好友房間(.{5})(\\S+): \\S+": [
+                "$1"
+            ],
+            "雀魂友人房(.{5})(\\S+): \\S+": [
+                "$1"
+            ],
+            "小心二次元": [
+                "[CQ:image,file=e77b9a7446ec41267eb4282322ab216d.image,subType=0,url=https://gchat.qpic.cn/gchatpic_new/2362020227/825991705-2261939525-E77B9A7446EC41267EB4282322AB216D/0?term=2]"
+            ],
+            "关于优衣酱": [
+                "[CQ:image,file=ef9c2654752ee2e3249e7bbea648c42f.image]"
+            ],
+            "(EX5作业|ex5作业)": [
+                "\n作业1：https://www.bilibili.com/read/cv15621826/\n作业2/3：[CQ:image,file=515f29b295198ac94175dcd3b203123e.image][CQ:image,file=941b7d190708fdd362cd4083aa5ce63e.image]"
+            ],
+            "诶嘿嘿": [
+                "欸嘿嘿"
+            ],
+            "欸嘿嘿": [
+                "诶嘿嘿"
+            ],
+            "马娘歌曲属性": [
+                "[CQ:image,file=aa78d06173d8564a3374a832a6f4c564.image]"
+            ],
+            "木桩作业": [
+                "[CQ:image,file=a395c821512058ee9782ff6ac268f98e.image]"
+            ],
+            "ex5作业": [
+                "[CQ:image,file=ac12f41e9eff3bc7f65d172d22b34d24.image]"
+            ],
+            "预计排程": [
+                "[CQ:image,file=a74876295511f64c609f2b0656c9f17a.image]"
+            ],
+            "sp作业": [
+                "[CQ:image,file=01bbfbdaaba65ff75abf34963eac8f48.image]"
+            ]
+        },
+        "2503107785": {},
+        "2085712017": {
+            "(.{0,19})优衣酱(.{0,19})": [
+                "$1优衣酱$2"
+            ]
+        },
+        "3231478709": {
+            "(.{0,19})优衣酱(.{0,19})": [
+                "$1优衣酱$2"
+            ]
+        },
+        "2361144831": {},
+        "332168452": {}
+    },
+    "849276434": {
+        "all": {
+            "漏漏": [
+                "[CQ:image,file=file:///C:/HoshinoBot/res/img/xqa/img/c16ae55ca4e811ec8b0dc6affc349ebe.jpeg]"
+            ],
+            "(.{0,99})granbluefantasy.jp(.{0,99})": [
+                "骑空士爪巴"
+            ],
+            "确实": [
+                "[CQ:image,file=ae67cac6baec90e252a89f18de56cfaa.image]"
+            ],
+            "[CQ:at,qq=2047788491] ": [
+                "优衣酱在的哦~"
+            ],
+            "我又好了": [
+                "再憋回去"
+            ],
+            "我也好了": [
+                "你也憋回去"
+            ],
+            "啊对对对": [
+                "希望你对你的人生也是这个态度"
+            ],
+            "赛事表": [
+                "[CQ:image,file=file:///C:\\HoshinoBot\\res\\img\\xqa\\img\\a1c0cb3cfafad480e101bc5148fec0da.image]"
+            ],
+            "绿帽双圈": [
+                "[CQ:image,file=file:///C:\\HoshinoBot\\res\\img\\xqa\\img\\14d3635c0b0789faef503a6d4e3af413.image]"
+            ],
+            "绿帽进货": [
+                "[CQ:image,file=file:///C:\\HoshinoBot\\res\\img\\xqa\\img\\8e7fcb36ba32ea1e4e1aae24afc652a1.image]"
+            ],
+            "关于": [
+                "本优衣酱Bot仅有我一家，其他类似名字或同名Bot，均与我无关。\r\n部分功能来自开源仓库，部分功能为自研功能，我开发的功能大多数已经开源，但仍有部分未开源，目前仅供本Bot使用。\r\n优衣酱Bot维护者：\r\nQQ：@鹿友のKICO\r\nGithub：@azmiao\r\n注：反馈插件BUG请走Github\r\n如需租用本Bot请发送“优衣酱怎么租”"
+            ],
+            "hso": [
+                "[CQ:image,file=file:///C:\\HoshinoBot\\res\\img\\xqa\\img\\e7e716a1a2f64328138dba7c2fb07ea7.image]"
+            ],
+            "雀魂好友房間(.{5})(\\S+): \\S+": [
+                "$1"
+            ],
+            "雀魂友人房(.{5})(\\S+): \\S+": [
+                "$1"
+            ],
+            "小心二次元": [
+                "[CQ:image,file=e77b9a7446ec41267eb4282322ab216d.image,subType=0,url=https://gchat.qpic.cn/gchatpic_new/2362020227/825991705-2261939525-E77B9A7446EC41267EB4282322AB216D/0?term=2]"
+            ],
+            "关于优衣酱": [
+                "[CQ:image,file=ef9c2654752ee2e3249e7bbea648c42f.image]"
+            ],
+            "(EX5作业|ex5作业)": [
+                "\n作业1：https://www.bilibili.com/read/cv15621826/\n作业2/3：[CQ:image,file=515f29b295198ac94175dcd3b203123e.image][CQ:image,file=941b7d190708fdd362cd4083aa5ce63e.image]"
+            ],
+            "诶嘿嘿": [
+                "欸嘿嘿"
+            ],
+            "欸嘿嘿": [
+                "诶嘿嘿"
+            ],
+            "铜": [
+                "光纤无铜偷之无用"
+            ],
+            "马娘歌曲属性": [
+                "[CQ:image,file=aa78d06173d8564a3374a832a6f4c564.image]"
+            ],
+            "木桩作业": [
+                "[CQ:image,file=a395c821512058ee9782ff6ac268f98e.image]"
+            ],
+            "今日老公": [
+                "今日老婆"
+            ],
+            "ex5作业": [
+                "[CQ:image,file=ac12f41e9eff3bc7f65d172d22b34d24.image]"
+            ],
+            "渣男": [
+                "漏漏"
+            ],
+            "变态": [
+                "漏漏"
+            ],
+            "预计排程": [
+                "[CQ:image,file=a74876295511f64c609f2b0656c9f17a.image]"
+            ],
+            "sp作业": [
+                "[CQ:image,file=01bbfbdaaba65ff75abf34963eac8f48.image]"
+            ]
+        },
+        "41710487": {}
+    },
+    "901181692": {
+        "all": {
+            "商业互吹": [
+                "[CQ:image,file=file:///C:/HoshinoBot/res/img/xqa/img/aafdf916000a11ecb68d8865f77d0a36.jpeg]"
+            ],
+            "我觉得不行": [
+                "[CQ:image,file=file:///C:/HoshinoBot/res/img/xqa/img/5e537b3b4b3a11eca65aa0c72052deb8.jpeg]"
+            ],
+            "摆烂": [
+                "[CQ:image,file=file:///C:/HoshinoBot/res/img/xqa/img/47e5191f4b3c11ecb835a0c72052deb8.png]"
+            ],
+            "我的评价是": [
+                "[CQ:image,file=file:///C:/HoshinoBot/res/img/xqa/img/58029a004b3c11ec9e00a0c72052deb8.jpeg]"
+            ],
+            "好": [
+                "[CQ:image,file=058e09391950912ed30a26946cbfb52c.image]"
+            ],
+            "贵族舞会": [
+                "打倒封建主义革命，坚持无产阶级专政"
+            ],
+            "寄": [
+                "[CQ:image,file=file:///C:/HoshinoBot/res/img/xqa/img/66c63cd072a611ec8e3fa0c72052deb8.gif]"
+            ],
+            "淘宝黑店": [
+                "杰尔马代充店\n小贞德桌游卡牌\n春之花\n九月GK手办模玩"
+            ],
+            "bwiki": [
+                "https://wiki.biligame.com/umamusume/%E9%A6%96%E9%A1%B5"
+            ],
+            "赛事表": [
+                "[CQ:image,file=file:///C:\\HoshinoBot\\res\\img\\xqa\\img\\a1c0cb3cfafad480e101bc5148fec0da.image]"
+            ],
+            "游戏调整表": [
+                "[CQ:image,file=file:///C:/HoshinoBot/res/img/xqa/img/0e4bfdba900c11ec91fef65aa401c53f.jpeg]"
+            ],
+            "绿帽双圈": [
+                "[CQ:image,file=file:///C:\\HoshinoBot\\res\\img\\xqa\\img\\14d3635c0b0789faef503a6d4e3af413.image]"
+            ],
+            "冲刺计算公式": [
+                "[CQ:image,file=file:///C:/HoshinoBot/res/img/xqa/img/465f9fdab40211ecbd95c6affc349ebe.jpeg]"
+            ],
+            "神宫爱你": [
+                "[CQ:image,file=file:///C:/HoshinoBot/res/img/xqa/img/b51af4f5c12a11eca666c6affc349ebe.gif]"
+            ],
+            "鬼黄金船": [
+                "[CQ:image,file=file:///C:/HoshinoBot/res/img/xqa/img/24a559e8c9bc11ec95e9c6affc349ebe.jpeg]"
+            ],
+            "(.{0,99})granbluefantasy.jp(.{0,99})": [
+                "骑空士爪巴"
+            ],
+            "确实": [
+                "[CQ:image,file=ae67cac6baec90e252a89f18de56cfaa.image]"
+            ],
+            "[CQ:at,qq=2047788491] ": [
+                "优衣酱在的哦~"
+            ],
+            "我又好了": [
+                "再憋回去"
+            ],
+            "我也好了": [
+                "你也憋回去"
+            ],
+            "啊对对对": [
+                "希望你对你的人生也是这个态度"
+            ],
+            "绿帽进货": [
+                "[CQ:image,file=file:///C:\\HoshinoBot\\res\\img\\xqa\\img\\8e7fcb36ba32ea1e4e1aae24afc652a1.image]"
+            ],
+            "关于": [
+                "本优衣酱Bot仅有我一家，其他类似名字或同名Bot，均与我无关。\r\n部分功能来自开源仓库，部分功能为自研功能，我开发的功能大多数已经开源，但仍有部分未开源，目前仅供本Bot使用。\r\n优衣酱Bot维护者：\r\nQQ：@鹿友のKICO\r\nGithub：@azmiao\r\n注：反馈插件BUG请走Github\r\n如需租用本Bot请发送“优衣酱怎么租”"
+            ],
+            "hso": [
+                "[CQ:image,file=file:///C:\\HoshinoBot\\res\\img\\xqa\\img\\e7e716a1a2f64328138dba7c2fb07ea7.image]"
+            ],
+            "雀魂好友房間(.{5})(\\S+): \\S+": [
+                "$1"
+            ],
+            "雀魂友人房(.{5})(\\S+): \\S+": [
+                "$1"
+            ],
+            "小心二次元": [
+                "[CQ:image,file=e77b9a7446ec41267eb4282322ab216d.image,subType=0,url=https://gchat.qpic.cn/gchatpic_new/2362020227/825991705-2261939525-E77B9A7446EC41267EB4282322AB216D/0?term=2]"
+            ],
+            "关于优衣酱": [
+                "[CQ:image,file=ef9c2654752ee2e3249e7bbea648c42f.image]"
+            ],
+            "(EX5作业|ex5作业)": [
+                "\n作业1：https://www.bilibili.com/read/cv15621826/\n作业2/3：[CQ:image,file=515f29b295198ac94175dcd3b203123e.image][CQ:image,file=941b7d190708fdd362cd4083aa5ce63e.image]"
+            ],
+            "icu": [
+                "[CQ:image,file=3f5ea033f70c134f1d8cbd3ad6f4f433.image]"
+            ],
+            "诶嘿嘿": [
+                "欸嘿嘿"
+            ],
+            "欸嘿嘿": [
+                "诶嘿嘿"
+            ],
+            "马娘歌曲属性": [
+                "[CQ:image,file=aa78d06173d8564a3374a832a6f4c564.image]"
+            ],
+            "木桩作业": [
+                "[CQ:image,file=a395c821512058ee9782ff6ac268f98e.image]"
+            ],
+            "ex5作业": [
+                "[CQ:image,file=ac12f41e9eff3bc7f65d172d22b34d24.image]"
+            ],
+            "预计排程": [
+                "[CQ:image,file=a74876295511f64c609f2b0656c9f17a.image]"
+            ],
+            "sp作业": [
+                "[CQ:image,file=01bbfbdaaba65ff75abf34963eac8f48.image]"
+            ]
+        },
+        "2362020227": {
+            "？": [
+                "¿"
+            ]
+        },
+        "304943298": {
+            "寄": [
+                "[CQ:image,file=file:///C:/HoshinoBot/res/img/xqa/img/c6b2d89272a511ecba29a0c72052deb8.gif]"
+            ],
+            "早安": [
+                "[CQ:image,file=85888b8691c744248c101360a9f4c0aa.image]"
+            ]
+        },
+        "2323171898": {
+            "红因子继承": [
+                "\n红因子继承和相性无关\n3星父母10%，祖父母7%\n2星6.5%/3%\n1星1%"
+            ],
+            "半周年抽卡，": [
+                "[CQ:image,file=7d4710452cf2d3dd648e3e32b46e8fb1.image][CQ:image,file=7ba4b324863dccf416f401505cdedd08.image]"
+            ]
+        }
+    },
+    "241610474": {
+        "all": {
+            "我来了": [
+                "你寄吧谁啊"
+            ],
+            "不会吧": [
+                "不会吧不会吧"
+            ],
+            "可以": [
+                "可以"
+            ],
+            "我吃鸡了": [
+                "就这？就这？"
+            ],
+            "派派吗": [
+                "派个√巴，去命运2吃屎"
+            ],
+            "牛": [
+                "牛大了哥牛大了"
+            ],
+            "来个屁！爪！巴！": [
+                "就来就来"
+            ],
+            "来个屁！ 爪！巴！": [
+                "就来就来"
+            ],
+            "问欧内的手": [
+                "好汉"
+            ],
+            "欧内的手": [
+                "好汉"
+            ],
+            "傻逼": [
+                "傻逼骂谁"
+            ],
+            "@元气の拉矢人 傻逼": [
+                "你有病吧"
+            ],
+            "骂你": [
+                "有傻逼骂我"
+            ],
+            "不": [
+                "不，你想"
+            ],
+            "谁急了": [
+                "谁狗叫谁急了"
+            ],
+            "弯道超车": [
+                "[CQ:image,file=file:///C:/HoshinoBot/res/img/xqa/img/75df803fedbf11ebb8149a52e87e3d81.jpeg]"
+            ],
+            "穿越者": [
+                "[CQ:image,file=file:///C:/HoshinoBot/res/img/xqa/img/e6667a69fbda11eb9fbf8865f77d0a36.jpeg]"
+            ],
+            "人生重来": [
+                "人生重来"
+            ],
+            "@天赋型选手": [
+                "/汪汪"
+            ],
+            "朋友想看": [
+                "[CQ:image,file=file:///C:/HoshinoBot/res/img/xqa/img/90947c7d469c11ecb601b263ce423425.gif]"
+            ],
+            "好": [
+                "好"
+            ],
+            "(.{0,99})granbluefantasy.jp(.{0,99})": [
+                "骑空士爪巴"
+            ],
+            "[CQ:at,qq=2047788491] ": [
+                "优衣酱在的哦~"
+            ],
+            "我又好了": [
+                "再憋回去"
+            ],
+            "我也好了": [
+                "你也憋回去"
+            ],
+            "啊对对对": [
+                "希望你对你的人生也是这个态度"
+            ],
+            "赛事表": [
+                "[CQ:image,file=file:///C:\\HoshinoBot\\res\\img\\xqa\\img\\a1c0cb3cfafad480e101bc5148fec0da.image]"
+            ],
+            "绿帽双圈": [
+                "[CQ:image,file=file:///C:\\HoshinoBot\\res\\img\\xqa\\img\\14d3635c0b0789faef503a6d4e3af413.image]"
+            ],
+            "绿帽进货": [
+                "[CQ:image,file=file:///C:\\HoshinoBot\\res\\img\\xqa\\img\\8e7fcb36ba32ea1e4e1aae24afc652a1.image]"
+            ],
+            "关于": [
+                "本优衣酱Bot仅有我一家，其他类似名字或同名Bot，均与我无关。\r\n部分功能来自开源仓库，部分功能为自研功能，我开发的功能大多数已经开源，但仍有部分未开源，目前仅供本Bot使用。\r\n优衣酱Bot维护者：\r\nQQ：@鹿友のKICO\r\nGithub：@azmiao\r\n注：反馈插件BUG请走Github\r\n如需租用本Bot请发送“优衣酱怎么租”"
+            ],
+            "我爱你": [
+                "傻逼"
+            ],
+            "hso": [
+                "[CQ:image,file=file:///C:\\HoshinoBot\\res\\img\\xqa\\img\\e7e716a1a2f64328138dba7c2fb07ea7.image]"
+            ],
+            "雀魂好友房間(.{5})(\\S+): \\S+": [
+                "$1"
+            ],
+            "雀魂友人房(.{5})(\\S+): \\S+": [
+                "$1"
+            ],
+            "别急": [
+                "[CQ:image,file=file:///C:\\HoshinoBot\\res\\img\\xqa\\img\\4f2c1a22891b874f1bc51efd900f6254.image]"
+            ],
+            "小心二次元": [
+                "[CQ:image,file=e77b9a7446ec41267eb4282322ab216d.image,subType=0,url=https://gchat.qpic.cn/gchatpic_new/2362020227/825991705-2261939525-E77B9A7446EC41267EB4282322AB216D/0?term=2]"
+            ],
+            "关于优衣酱": [
+                "[CQ:image,file=ef9c2654752ee2e3249e7bbea648c42f.image]"
+            ],
+            "(EX5作业|ex5作业)": [
+                "\n作业1：https://www.bilibili.com/read/cv15621826/\n作业2/3：[CQ:image,file=515f29b295198ac94175dcd3b203123e.image][CQ:image,file=941b7d190708fdd362cd4083aa5ce63e.image]"
+            ],
+            "诶嘿嘿": [
+                "欸嘿嘿"
+            ],
+            "欸嘿嘿": [
+                "诶嘿嘿"
+            ],
+            "马娘歌曲属性": [
+                "[CQ:image,file=aa78d06173d8564a3374a832a6f4c564.image]"
+            ],
+            "木桩作业": [
+                "[CQ:image,file=a395c821512058ee9782ff6ac268f98e.image]"
+            ],
+            "确实": [
+                "[CQ:image,file=ae67cac6baec90e252a89f18de56cfaa.image]"
+            ],
+            "ex5作业": [
+                "[CQ:image,file=ac12f41e9eff3bc7f65d172d22b34d24.image]"
+            ],
+            "预计排程": [
+                "[CQ:image,file=a74876295511f64c609f2b0656c9f17a.image]"
+            ],
+            "sp作业": [
+                "[CQ:image,file=01bbfbdaaba65ff75abf34963eac8f48.image]"
+            ],
+            "(.{0,19})优衣酱(.{0,19})": [
+                "$1我$2"
+            ]
+        },
+        "2362020227": {
+            "(\\[.+?\\])请使用最新版手机QQ体验新功能": [
+                "$1请使用最新版手机QQ体验新功能"
+            ]
+        }
+    },
+    "1102476774": {
+        "all": {
+            "会长是正经人嘛": [
+                "是的，非常正经"
+            ],
+            "会长姐是谁": [
+                "是超究极无敌的正经人"
+            ],
+            "是会长是谁": [
+                "是超究极无敌的正经人"
+            ],
+            "好耶": [
+                "坏耶"
+            ],
+            "二次元": [
+                "[CQ:image,file=file:///C:/HoshinoBot/res/img/xqa/img/8f77329db47011eba09391527624057e.jpeg]"
+            ],
+            "呐": [
+                "[CQ:image,file=file:///C:/HoshinoBot/res/img/xqa/img/5f507b49b53011eb936a91527624057e.jpeg]"
+            ],
+            "rbq": [
+                "[CQ:image,file=file:///C:/HoshinoBot/res/img/xqa/img/6fb70238bd4511eb852091527624057e.jpeg]"
+            ],
+            "我想看看": [
+                "[CQ:image,file=file:///C:/HoshinoBot/res/img/xqa/img/eaac6decbec711eb913f91527624057e.jpeg]"
+            ],
+            "女装": [
+                "[CQ:image,file=file:///C:/HoshinoBot/res/img/xqa/img/54cb28c0d26811eb93eb91527624057e.jpeg]"
+            ],
+            "离谱": [
+                "[CQ:image,file=file:///C:/HoshinoBot/res/img/xqa/img/49961c7cbec811eb81c491527624057e.jpeg]"
+            ],
+            "icu": [
+                "[CQ:image,file=file:///C:/HoshinoBot/res/img/xqa/img/57fd9f20fea411eb994a8865f77d0a36.jpeg]"
+            ],
+            "水过了": [
+                "[CQ:image,file=file:///C:/HoshinoBot/res/img/xqa/img/b6bfb9d30a2011eca23e8865f77d0a36.jpeg]"
+            ],
+            "寄": [
+                "[CQ:image,file=file:///C:/HoshinoBot/res/img/xqa/img/95edca9b8a3211ec9babf65aa401c53f.jpeg]"
+            ],
+            "ex4作业": [
+                "https://www.bilibili.com/video/BV1BQ4y1S7yA"
+            ],
+            "(.{0,99})granbluefantasy.jp(.{0,99})": [
+                "骑空士爪巴"
+            ],
+            "确实": [
+                "[CQ:image,file=ae67cac6baec90e252a89f18de56cfaa.image]"
+            ],
+            "[CQ:at,qq=2047788491] ": [
+                "优衣酱在的哦~"
+            ],
+            "我又好了": [
+                "再憋回去"
+            ],
+            "我也好了": [
+                "你也憋回去"
+            ],
+            "啊对对对": [
+                "希望你对你的人生也是这个态度"
+            ],
+            "赛事表": [
+                "[CQ:image,file=file:///C:\\HoshinoBot\\res\\img\\xqa\\img\\a1c0cb3cfafad480e101bc5148fec0da.image]"
+            ],
+            "绿帽双圈": [
+                "[CQ:image,file=file:///C:\\HoshinoBot\\res\\img\\xqa\\img\\14d3635c0b0789faef503a6d4e3af413.image]"
+            ],
+            "绿帽进货": [
+                "[CQ:image,file=file:///C:\\HoshinoBot\\res\\img\\xqa\\img\\8e7fcb36ba32ea1e4e1aae24afc652a1.image]"
+            ],
+            "关于": [
+                "本优衣酱Bot仅有我一家，其他类似名字或同名Bot，均与我无关。\r\n部分功能来自开源仓库，部分功能为自研功能，我开发的功能大多数已经开源，但仍有部分未开源，目前仅供本Bot使用。\r\n优衣酱Bot维护者：\r\nQQ：@鹿友のKICO\r\nGithub：@azmiao\r\n注：反馈插件BUG请走Github\r\n如需租用本Bot请发送“优衣酱怎么租”"
+            ],
+            "hso": [
+                "[CQ:image,file=file:///C:\\HoshinoBot\\res\\img\\xqa\\img\\e7e716a1a2f64328138dba7c2fb07ea7.image]"
+            ],
+            "雀魂好友房間(.{5})(\\S+): \\S+": [
+                "$1"
+            ],
+            "雀魂友人房(.{5})(\\S+): \\S+": [
+                "$1"
+            ],
+            "小心二次元": [
+                "[CQ:image,file=e77b9a7446ec41267eb4282322ab216d.image,subType=0,url=https://gchat.qpic.cn/gchatpic_new/2362020227/825991705-2261939525-E77B9A7446EC41267EB4282322AB216D/0?term=2]"
+            ],
+            "关于优衣酱": [
+                "[CQ:image,file=ef9c2654752ee2e3249e7bbea648c42f.image]"
+            ],
+            "一起": [
+                "[CQ:image,file=7eef2331a42608f65ba452e188c02576.image]"
+            ],
+            "(EX5作业|ex5作业)": [
+                "\n作业1：https://www.bilibili.com/read/cv15621826/\n作业2/3：[CQ:image,file=515f29b295198ac94175dcd3b203123e.image][CQ:image,file=941b7d190708fdd362cd4083aa5ce63e.image]"
+            ],
+            "PCR自动打棒球脚本": [
+                "https://github.com/cznull/pcrgames"
+            ],
+            "诶嘿嘿": [
+                "欸嘿嘿"
+            ],
+            "欸嘿嘿": [
+                "诶嘿嘿"
+            ],
+            "不充钱": [
+                "[CQ:image,file=c90d767a7720149d0ffd6b8a521b678a.image]"
+            ],
+            "马娘歌曲属性": [
+                "[CQ:image,file=aa78d06173d8564a3374a832a6f4c564.image]"
+            ],
+            "星级专武": [
+                "无羽不做啦~"
+            ],
+            "木桩作业": [
+                "[CQ:image,file=a395c821512058ee9782ff6ac268f98e.image]"
+            ],
+            "拆璃兮": [
+                "[CQ:image,file=0d14695e04fe65d50c1cc637b932c875.image]"
+            ],
+            "ex5作业": [
+                "[CQ:image,file=ac12f41e9eff3bc7f65d172d22b34d24.image]"
+            ],
+            "加薪": [
+                "[CQ:image,file=eccf863fee9c1d494adc8c9734e806f7.image]"
+            ],
+            "升职加薪": [
+                "[CQ:image,file=6bebf9934e7ce9a32b7e904ad5a7084b.image]"
+            ],
+            "露娜塔作业": [
+                "右上角-通关队伍-确认使用-右边skip-觉得可以点确认，不可以点退出，重来"
+            ],
+            "世界boss作业": [
+                "[CQ:image,file=f6b98ebce59e454ba9c65c008741d8f0.image]"
+            ],
+            "群友的xp": [
+                "[CQ:image,file=7c316e4941ca2000ff69ef4becee8859.image]"
+            ],
+            "sp作业": [
+                "[CQ:image,file=71ebdcde751111f3a25fa4c6e401658f.image]"
+            ],
+            "预计排程": [
+                "[CQ:image,file=a74876295511f64c609f2b0656c9f17a.image]"
+            ],
+            "里地下城作业": [
+                "[CQ:image,file=d9f97b4317c5eda252c730ba6ab77513.image][CQ:image,file=006cb2a6ab47f0891119f17f6ad44eee.image][CQ:image,file=9c19f13c86e75808b595a9c9f368cd93.image]"
+            ],
+            "次元断层作业": [
+                "（转自小惠）每层5个boss，星级1-5星，打死3个，就会升级下个为星级，box不好的，推荐打1-2-5boss比较好打，打完刚好拿个专武球。第一天打不完，可以第二天继续打[CQ:image,file=563ee9c8ba4f4ca4d8482efce88b76d3.image][CQ:image,file=c47fa3764c4198ebe7b2a0c670e433e0.image][CQ:image,file=eee0cf47fbc1aa968f1cfdc9f5d2cebd.image]"
+            ],
+            "(.{0,19})优衣酱(.{0,19})": [
+                "$1我$2"
+            ],
+            "ex6作业": [
+                "看群文件"
+            ],
+            "公会战作业": [
+                "◎◎台服八月会战作业◎◎\n★作业网（查日服3月作业）\nhttps://www.aikurumi.cn/\n★文档作业\nhttps://docs.qq.com/sheet/DWER0clZZeXh0R3BM?tab=BB08J2\n★图片作业\n(见群文件)"
+            ]
+        },
+        "1595935884": {
+            "会长": [
+                "会长快快女装[CQ:at,qq=2362020227] "
+            ]
+        },
+        "3275873877": {
+            "会长在干嘛": [
+                "在卖淫"
+            ]
+        },
+        "2362020227": {
+            "hso": [
+                "[CQ:image,file=file:///C:/HoshinoBot/res/img/xqa/img/ddaa52eebe1a11ebb21691527624057e.jpeg]"
+            ],
+            "(.{0,19})我(.{0,19})": [
+                "$1正经的会长$2"
+            ]
+        },
+        "3051194240": {
+            "会长是谁": [
+                "是[CQ:at,qq=3051194240] 的老婆"
+            ],
+            "会长姐姐是谁": [
+                "是101的老婆"
+            ],
+            "我老婆是谁": [
+                "[CQ:at,qq=2362020227] "
+            ]
+        },
+        "541035299": {
+            "优依酱来一井": [
+                "抽到了会长"
+            ]
+        },
+        "1291659929": {
+            "会长是正经人吗": [
+                "炼铜仔！"
+            ]
+        },
+        "1298778753": {
+            "ue你好吗": [
+                "我很好[CQ:image,file=file:///C:\\HoshinoBot\\res\\img\\xqa\\img\\39aee9b4da2b8a8a23afbf2b222d33a3.image]"
+            ],
+            "咱们群有m吗": [
+                "我就是呀"
+            ],
+            "坏了": [
+                "人家还可以"
+            ],
+            "会长推荐": [
+                "[CQ:image,file=29d5bc5ff520930720185bb618750347.image]"
+            ],
+            "欢迎新人": [
+                "欢迎欢迎，会长女装奉上[CQ:image,file=889d9fb7aee5f325819a9b837cb4fe01.image][CQ:image,file=f99d9fa2c6c4ff6bc0af3d3250fd83ce.image]"
+            ],
+            "看看会长": [
+                "[CQ:image,file=928ccedf7787922b0960bf22bbc7f998.image]"
+            ],
+            "会长被抓了": [
+                "[CQ:image,file=c390a16901c090144ba6f6559103756e.image]"
+            ]
+        },
+        "3225977560": {
+            "谁是我老婆": [
+                "我呀我呀就是我呀"
+            ],
+            "我老婆是小望嘞": [
+                "不嘛不嘛就是我"
+            ],
+            "小望是真的好看": [
+                "人家也好看呀[CQ:image,file=2e654b8d985d5945c2b889b93a4657bf.image]"
+            ]
+        }
+    },
+    "302605139": {
+        "all": {
+            "会长是正经人嘛": [
+                "是的，非常正经"
+            ],
+            "会长姐是谁": [
+                "是超究极无敌的正经人"
+            ],
+            "是会长是谁": [
+                "是超究极无敌的正经人"
+            ],
+            "会长是谁": [
+                "@会长女装乃我毕生所求 的老婆"
+            ],
+            "好耶": [
+                "坏耶"
+            ],
+            "二次元": [
+                "[CQ:image,file=file:///C:/HoshinoBot/res/img/xqa/img/8f77329db47011eba09391527624057e.jpeg]"
+            ],
+            "呐": [
+                "[CQ:image,file=file:///C:/HoshinoBot/res/img/xqa/img/5f507b49b53011eb936a91527624057e.jpeg]"
+            ],
+            "rbq": [
+                "[CQ:image,file=file:///C:/HoshinoBot/res/img/xqa/img/6fb70238bd4511eb852091527624057e.jpeg]"
+            ],
+            "我想看看": [
+                "[CQ:image,file=file:///C:/HoshinoBot/res/img/xqa/img/eaac6decbec711eb913f91527624057e.jpeg]"
+            ],
+            "女装": [
+                "[CQ:image,file=file:///C:/HoshinoBot/res/img/xqa/img/54cb28c0d26811eb93eb91527624057e.jpeg]"
+            ],
+            "离谱": [
+                "[CQ:image,file=file:///C:/HoshinoBot/res/img/xqa/img/49961c7cbec811eb81c491527624057e.jpeg]"
+            ],
+            "icu": [
+                "[CQ:image,file=file:///C:/HoshinoBot/res/img/xqa/img/57fd9f20fea411eb994a8865f77d0a36.jpeg]"
+            ],
+            "水过了": [
+                "[CQ:image,file=file:///C:/HoshinoBot/res/img/xqa/img/b6bfb9d30a2011eca23e8865f77d0a36.jpeg]"
+            ],
+            "寄": [
+                "[CQ:image,file=file:///C:/HoshinoBot/res/img/xqa/img/95edca9b8a3211ec9babf65aa401c53f.jpeg]"
+            ],
+            "ex4作业": [
+                "https://www.bilibili.com/video/BV1BQ4y1S7yA"
+            ],
+            "(.{0,99})granbluefantasy.jp(.{0,99})": [
+                "骑空士爪巴"
+            ],
+            "确实": [
+                "[CQ:image,file=ae67cac6baec90e252a89f18de56cfaa.image]"
+            ],
+            "[CQ:at,qq=2047788491] ": [
+                "优衣酱在的哦~"
+            ],
+            "我又好了": [
+                "再憋回去"
+            ],
+            "我也好了": [
+                "你也憋回去"
+            ],
+            "啊对对对": [
+                "希望你对你的人生也是这个态度"
+            ],
+            "赛事表": [
+                "[CQ:image,file=file:///C:\\HoshinoBot\\res\\img\\xqa\\img\\a1c0cb3cfafad480e101bc5148fec0da.image]"
+            ],
+            "绿帽双圈": [
+                "[CQ:image,file=file:///C:\\HoshinoBot\\res\\img\\xqa\\img\\14d3635c0b0789faef503a6d4e3af413.image]"
+            ],
+            "绿帽进货": [
+                "[CQ:image,file=file:///C:\\HoshinoBot\\res\\img\\xqa\\img\\8e7fcb36ba32ea1e4e1aae24afc652a1.image]"
+            ],
+            "关于": [
+                "本优衣酱Bot仅有我一家，其他类似名字或同名Bot，均与我无关。\r\n部分功能来自开源仓库，部分功能为自研功能，我开发的功能大多数已经开源，但仍有部分未开源，目前仅供本Bot使用。\r\n优衣酱Bot维护者：\r\nQQ：@鹿友のKICO\r\nGithub：@azmiao\r\n注：反馈插件BUG请走Github\r\n如需租用本Bot请发送“优衣酱怎么租”"
+            ],
+            "hso": [
+                "[CQ:image,file=file:///C:\\HoshinoBot\\res\\img\\xqa\\img\\e7e716a1a2f64328138dba7c2fb07ea7.image]"
+            ],
+            "雀魂好友房間(.{5})(\\S+): \\S+": [
+                "$1"
+            ],
+            "雀魂友人房(.{5})(\\S+): \\S+": [
+                "$1"
+            ],
+            "小心二次元": [
+                "[CQ:image,file=e77b9a7446ec41267eb4282322ab216d.image,subType=0,url=https://gchat.qpic.cn/gchatpic_new/2362020227/825991705-2261939525-E77B9A7446EC41267EB4282322AB216D/0?term=2]"
+            ],
+            "关于优衣酱": [
+                "[CQ:image,file=ef9c2654752ee2e3249e7bbea648c42f.image]"
+            ],
+            "一起": [
+                "[CQ:image,file=7eef2331a42608f65ba452e188c02576.image]"
+            ],
+            "(EX5作业|ex5作业)": [
+                "\n作业1：https://www.bilibili.com/read/cv15621826/\n作业2/3：[CQ:image,file=515f29b295198ac94175dcd3b203123e.image][CQ:image,file=941b7d190708fdd362cd4083aa5ce63e.image]"
+            ],
+            "PCR自动打棒球脚本": [
+                "https://github.com/cznull/pcrgames"
+            ],
+            "诶嘿嘿": [
+                "欸嘿嘿"
+            ],
+            "欸嘿嘿": [
+                "诶嘿嘿"
+            ],
+            "不充钱": [
+                "[CQ:image,file=c90d767a7720149d0ffd6b8a521b678a.image]"
+            ],
+            "马娘歌曲属性": [
+                "[CQ:image,file=aa78d06173d8564a3374a832a6f4c564.image]"
+            ],
+            "星级专武": [
+                "无羽不做啦~"
+            ],
+            "木桩作业": [
+                "[CQ:image,file=a395c821512058ee9782ff6ac268f98e.image]"
+            ],
+            "拆璃兮": [
+                "[CQ:image,file=0d14695e04fe65d50c1cc637b932c875.image]"
+            ],
+            "ex5作业": [
+                "[CQ:image,file=ac12f41e9eff3bc7f65d172d22b34d24.image]"
+            ],
+            "预计排程": [
+                "[CQ:image,file=a74876295511f64c609f2b0656c9f17a.image]"
+            ],
+            "sp作业": [
+                "[CQ:image,file=01bbfbdaaba65ff75abf34963eac8f48.image]"
+            ],
+            "([^A-Za-z0-9])(?!\\1)([^A-Za-z0-9])\\2{1,9}": [
+                "叠词词 恶心心"
+            ]
+        }
+    }
+}
