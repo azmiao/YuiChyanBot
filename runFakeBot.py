@@ -93,9 +93,9 @@ async def connect_ws(ws_url, reconnect_interval, rate_limiter, headers):
                     data = {
                         'echo': echo,
                         'data': {'message_id': msg_id},
-                        'retcode': 1200,
-                        'status': 'fail',
-                        'message': 'aaaaa'
+                        'retcode': 0,
+                        'status': 'ok',
+                        'message': ''
                     }
                     await ws.send(json.dumps(data))
         except asyncio.CancelledError:

@@ -46,6 +46,20 @@ IS_BASE64 = False
 
 # ==================== ↑ 可修改的配置 ↑ ====================
 
+# XQA配置，启动！
+group_auth_path = os.path.join(os.path.dirname(__file__), 'group_auth.json')
+if not os.path.exists(group_auth_path):
+    with open(group_auth_path, 'w', encoding='UTF-8') as f:
+        json.dump({}, f, indent=4, ensure_ascii=False)
+
+
+# 判断是否启用个人问答功能
+async def judge_enable_self(group_id: str):
+    with open(group_auth_path, 'r', encoding='UTF-8') as file:
+        group_auth = dict(json.load(file))
+    auth_config = group_auth.get(group_id, {})
+    return auth_config.get('self', True)
+
 
 # 判断是否在群里
 async def judge_ismember(bot, group_id: str, user_id: str) -> bool:
