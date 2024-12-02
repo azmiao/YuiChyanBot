@@ -1,12 +1,8 @@
-from yuiChyan.service import Service
-from yuiChyan.permission import *
 from yuiChyan.exception import *
-
+from yuiChyan.permission import *
+from yuiChyan.service import Service
 from .operate_msg import *
 from .util import *
-
-
-
 
 # 帮助文本
 sv_help = '''
@@ -164,20 +160,21 @@ async def delete_question(bot, ev):
         msg = '没有在任何群里找到该问题呢' if msg == f'' else msg.strip()
         await bot.send(ev, msg)
         return
+
     # 有人问和我问的删除
     if user:
         user_id_at = str(re.findall(r'[0-9]+', user)[0])
-        if str(user_id_at) != str(ev.self_id) and priv.get_user_priv(ev) < 21:
-            await bot.send(ev, f'删除他人问答仅限群管理员呢')
-            return
+        if str(user_id_at) != str(ev.self_id) and get_user_permission(ev) < ADMIN:
+            raise LakePermissionException(ev, f'删除他人问答仅限群管理员呢')
         if str(user_id_at) != str(ev.self_id) and not await judge_ismember(bot, group_id, user_id):
-            await bot.send(ev, f'该成员{user_id}不在该群')
-            return
+            raise FunctionException(ev, f'该成员{user_id}不在该群')
         user_id = user_id if str(user_id_at) == str(ev.self_id) else user_id_at
+
     # 仅调整不要回答的问题中的图片
     no_que_str = await adjust_img(bot, no_que_str, False, False)
-    msg, del_image = await del_que(group_id, user_id, no_que_str, True, priv.get_user_priv(ev) < 21)
+    msg, del_image = await del_que(group_id, user_id, no_que_str, True, get_user_permission(ev) < ADMIN)
     await bot.send(ev, msg)
+    # 删除图片
     await delete_img(del_image)
 
 
@@ -210,112 +207,55 @@ async def xqa(bot, ev):
 
 
 # 复制问答
-@sv.on_prefix('复制问答from')
+@sv.on_prefix('XQA复制问答from')
 async def copy_question(bot, ev):
-    if not priv.check_priv(ev, priv.SUPERUSER):
-        await bot.send(ev, f'该功能限维护组')
+    match = re.match(r'^([0-9]+)to([0-9]+)(full|self)?$', str(ev.message))
+    if not match:
         return
-    msg_list = str(ev.message).split('-')
-    try:
-        msg_0, msg_1 = str(msg_list[0]), str(msg_list[1])
-    except:
-        msg_0, msg_1 = str(msg_list[0]), ''
-    group_list = msg_0.split('to')
-    try:
-        group_1, group_2 = str(int(group_list[0])), str(int(group_list[1]))
-    except:
-        await bot.send(ev, f'请输入正确的格式！')
-        return
+
+    if not check_permission(ev, SUPERUSER):
+        raise LakePermissionException(ev, f'该功能限维护组')
+
+    group_1, group_2, copy_type = match.group(1), match.group(2), match.group(3)
     group_list = await get_g_list(bot)
     if (group_1 not in group_list) or (group_2 not in group_list):
-        await bot.send(ev, f'群号输入错误！请检查')
-        return
-    msg = await copy_que(group_1, group_2, msg_1)
+        raise FunctionException(ev, f'群号输入错误！请检查')
+    msg = await copy_que(group_1, group_2, copy_type)
     await bot.send(ev, msg)
-
-
-# 添加敏感词
-@sv.on_prefix('XQA添加敏感词')
-async def add_sensitive_words(bot, ev):
-    if not priv.check_priv(ev, priv.SUPERUSER):
-        await bot.send(ev, f'该功能限维护组')
-        return
-    info = ev.message.extract_plain_text().strip()
-    infolist = info.split(' ')
-    for i in infolist:
-        file = os.path.join(os.path.dirname(__file__), 'textfilter/sensitive_words.txt')
-        with open(file, 'a+', encoding='utf-8') as lf:
-            lf.write(i + '\n')
-    await bot.send(ev, f'添加完毕')
-
-
-# 删除敏感词
-@sv.on_prefix('XQA删除敏感词')
-async def del_sensitive_words(bot, ev):
-    if not priv.check_priv(ev, priv.SUPERUSER):
-        await bot.send(ev, f'该功能限维护组')
-        return
-    info = ev.message.extract_plain_text().strip()
-    infolist = info.split(' ')
-    for i in infolist:
-        file = os.path.join(os.path.dirname(__file__), 'textfilter/sensitive_words.txt')
-        with open(file, "r", encoding='utf-8') as lf:
-            lines = lf.readlines()
-        with open(file, "w", encoding='utf-8') as lf:
-            for line in lines:
-                if line.strip("\n") != i:
-                    lf.write(line)
-    await bot.send(ev, f'删除完毕')
 
 
 # 分群控制个人问答权限-禁用我问
 @sv.on_fullmatch('XQA禁用我问')
 async def xqa_disable_self(bot, ev):
-    if not priv.check_priv(ev, priv.SUPERUSER):
-        await bot.send(ev, f'该功能限维护组')
-        return
-    group_id = str(ev.group_id)
-    with open(group_auth_path, 'r', encoding='UTF-8') as file:
-        group_auth = dict(json.load(file))
-    auth_config = group_auth.get(group_id, {})
-    self_enable = auth_config.get('self', True)
-    if not self_enable:
-        await bot.send(ev, f'本群已经禁用了个人问答哦，无需再次禁用')
-        return
-    auth_config['self'] = False
-    group_auth[group_id] = auth_config
-    with open(group_auth_path, 'w', encoding='UTF-8') as file:
-        json.dump(group_auth, file, indent=4, ensure_ascii=False)
-    await bot.send(ev, f'本群已成功禁用个人问答功能！')
+    if not check_permission(ev, SUPERUSER):
+        raise LakePermissionException(ev, f'该功能限维护组')
+
+    msg = await modify_enable_self(str(ev.group_id), False)
+    if msg:
+        await bot.send(ev, msg)
+    else:
+        await bot.send(ev, f'本群已成功禁用个人问答功能！')
 
 
 # 分群控制个人问答权限-启用我问
 @sv.on_fullmatch('XQA启用我问')
 async def xqa_enable_self(bot, ev):
-    if not priv.check_priv(ev, priv.SUPERUSER):
-        await bot.send(ev, f'该功能限维护组')
-        return
-    group_id = str(ev.group_id)
-    with open(group_auth_path, 'r', encoding='UTF-8') as file:
-        group_auth = dict(json.load(file))
-    auth_config = group_auth.get(group_id, {})
-    self_enable = auth_config.get('self', True)
-    if self_enable:
-        await bot.send(ev, f'本群已经启用了个人问答哦，无需再次启用')
-        return
-    auth_config['self'] = True
-    group_auth[group_id] = auth_config
-    with open(group_auth_path, 'w', encoding='UTF-8') as file:
-        json.dump(group_auth, file, indent=4, ensure_ascii=False)
-    await bot.send(ev, f'本群已成功启用个人问答功能！')
+    if not check_permission(ev, SUPERUSER):
+        raise LakePermissionException(ev, f'该功能限维护组')
+
+    msg = await modify_enable_self(str(ev.group_id), True)
+    if msg:
+        await bot.send(ev, msg)
+    else:
+        await bot.send(ev, f'本群已成功启用个人问答功能！')
 
 
 # 清空本群所有我问
 @sv.on_fullmatch('XQA清空本群所有我问')
 async def xqa_delete_self(bot, ev):
-    if not priv.check_priv(ev, priv.SUPERUSER):
-        await bot.send(ev, f'该功能限维护组')
-        return
+    if not check_permission(ev, SUPERUSER):
+        raise LakePermissionException(ev, f'该功能限维护组')
+
     group_id = str(ev.group_id)
     try:
         await delete_all(group_id, True)
@@ -328,9 +268,9 @@ async def xqa_delete_self(bot, ev):
 # 清空本群所有有人问
 @sv.on_fullmatch('XQA清空本群所有有人问')
 async def xqa_delete_all(bot, ev):
-    if not priv.check_priv(ev, priv.SUPERUSER):
-        await bot.send(ev, f'该功能限维护组')
-        return
+    if not check_permission(ev, SUPERUSER):
+        raise LakePermissionException(ev, f'该功能限维护组')
+
     group_id = str(ev.group_id)
     try:
         await delete_all(group_id, False)
@@ -338,3 +278,23 @@ async def xqa_delete_all(bot, ev):
     except Exception as e:
         msg = '所有有人问清空失败：' + str(e)
     await bot.send(ev, msg)
+
+
+# 提取数据
+@sv.on_fullmatch('XQA提取数据')
+async def xqa_export_data(bot, ev):
+    if not check_permission(ev, SUPERUSER):
+        raise LakePermissionException(ev, f'该功能限维护组')
+
+    await export_json()
+    await bot.send(ev, 'XQA提取完成，请检查日志')
+
+
+# 重建数据
+@sv.on_fullmatch('XQA重建数据')
+async def xqa_export_data(bot, ev):
+    if not check_permission(ev, SUPERUSER):
+        raise LakePermissionException(ev, f'该功能限维护组')
+
+    await import_json()
+    await bot.send(ev, 'XQA重建完成，新数据将存在"data_temp.sqlite"中，请自行备份替换')
