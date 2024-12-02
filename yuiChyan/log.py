@@ -17,8 +17,8 @@ error_handler.setFormatter(formatter)
 
 
 def new_logger(name, debug=True):
-    logger = logging.getLogger(name)
-    logger.addHandler(default_handler)
-    logger.addHandler(error_handler)
-    logger.setLevel(logging.DEBUG if debug else logging.INFO)
-    return logger
+    _logger = logging.getLogger(name)
+    _logger.addHandler(default_handler)
+    _logger.addHandler(error_handler)
+    _logger.setLevel(logging.DEBUG if debug else logging.INFO)
+    return _logger

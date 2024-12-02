@@ -292,7 +292,7 @@ async def xqa_export_data(bot, ev):
 
 # 重建数据
 @sv.on_fullmatch('XQA重建数据')
-async def xqa_export_data(bot, ev):
+async def xqa_import_data(bot, ev):
     if not check_permission(ev, SUPERUSER):
         raise LakePermissionException(ev, f'该功能限维护组')
 

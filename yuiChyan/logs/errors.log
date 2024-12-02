@@ -299,3 +299,46 @@ Traceback (most recent call last):
   File "D:\miniconda3\envs\yuiChyan\Lib\site-packages\aiocqhttp\api_impl.py", line 108, in fetch
     raise NetworkError('WebSocket API call timeout')
 aiocqhttp.exceptions.NetworkError: WebSocket API call timeout
+[2024-12-02 13:53:14,408 XQA] ERROR: <class 'aiocqhttp.exceptions.NetworkError'> occurred when set_question handling message 97776314.
+[2024-12-02 13:53:14,409 XQA] ERROR: WebSocket API call timeout
+Traceback (most recent call last):
+  File "D:\miniconda3\envs\yuiChyan\Lib\asyncio\tasks.py", line 520, in wait_for
+    return await fut
+           ^^^^^^^^^
+asyncio.exceptions.CancelledError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "D:\miniconda3\envs\yuiChyan\Lib\site-packages\aiocqhttp\api_impl.py", line 104, in fetch
+    return await asyncio.wait_for(future, timeout_sec)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\miniconda3\envs\yuiChyan\Lib\asyncio\tasks.py", line 519, in wait_for
+    async with timeouts.timeout(timeout):
+  File "D:\miniconda3\envs\yuiChyan\Lib\asyncio\timeouts.py", line 115, in __aexit__
+    raise TimeoutError from exc_val
+TimeoutError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "E:\workspace\0000-其他\YuiChyanBot\yuiChyan\service.py", line 137, in wrapper
+    return await func(self.bot, ctx)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\workspace\0000-其他\YuiChyanBot\yuiChyan\core\xqa\__init__.py", line 72, in set_question
+    await bot.send(ev, msg)
+  File "D:\miniconda3\envs\yuiChyan\Lib\site-packages\aiocqhttp\__init__.py", line 269, in send
+    return await self.send_msg(**params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\miniconda3\envs\yuiChyan\Lib\site-packages\aiocqhttp\__init__.py", line 236, in call_action
+    return await self._api.call_action(action=action, **params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\miniconda3\envs\yuiChyan\Lib\site-packages\aiocqhttp\api_impl.py", line 178, in call_action
+    result = await self._wsr_api.call_action(action, **params)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\miniconda3\envs\yuiChyan\Lib\site-packages\aiocqhttp\api_impl.py", line 153, in call_action
+    return _handle_api_result(await
+                              ^^^^^
+  File "D:\miniconda3\envs\yuiChyan\Lib\site-packages\aiocqhttp\api_impl.py", line 108, in fetch
+    raise NetworkError('WebSocket API call timeout')
+aiocqhttp.exceptions.NetworkError: WebSocket API call timeout

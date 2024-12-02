@@ -7,7 +7,7 @@ import pygtrie
 import zhconv
 from aiocqhttp import Event as CQEvent
 
-from yuiChyan import logger
+import yuiChyan
 from yuiChyan.util import normalize_str
 
 if TYPE_CHECKING:
@@ -46,7 +46,7 @@ class PrefixTrigger(BaseTrigger):
 
     def add(self, prefix_str: str, sf: 'ServiceFunc'):
         super()._add(self.trie, prefix_str, sf)
-        logger.debug(f'Succeed to add prefix trigger [{prefix_str}]')
+        yuiChyan.logger.debug(f'Succeed to add prefix trigger [{prefix_str}]')
 
     def find_handler(self, ev: CQEvent) -> Iterable['ServiceFunc']:
         prefix_raw = ev.message[0]
@@ -83,7 +83,7 @@ class SuffixTrigger(BaseTrigger):
     def add(self, suffix_str: str, sf: 'ServiceFunc'):
         suffix_r = suffix_str[::-1]
         super()._add(self.trie, suffix_r, sf)
-        logger.debug(f'Succeed to add suffix trigger [{suffix_str}]')
+        yuiChyan.logger.debug(f'Succeed to add suffix trigger [{suffix_str}]')
 
     def find_handler(self, event: CQEvent) -> Iterable['ServiceFunc']:
         suffix_raw = event.message[-1]
@@ -119,7 +119,7 @@ class RegularTrigger(BaseTrigger):
         trie_list = self.regular_dict.get(x, [])
         trie_list.append(sf)
         self.regular_dict[x] = trie_list
-        logger.debug(f'Succeed to add rex trigger [{x.pattern}]')
+        yuiChyan.logger.debug(f'Succeed to add rex trigger [{x.pattern}]')
 
     def find_handler(self, event: CQEvent) -> Iterable['ServiceFunc']:
         for rex, sfs in self.regular_dict.items():
@@ -144,12 +144,12 @@ class NormalTrigger(BaseTrigger):
 
 prefix = PrefixTrigger()
 suffix = SuffixTrigger()
-regular = RegularTrigger()
 normal = NormalTrigger()
+regular = RegularTrigger()
 
 trigger_chain: List[BaseTrigger] = [
     prefix,
     suffix,
-    regular,
-    normal
+    normal,
+    regular
 ]

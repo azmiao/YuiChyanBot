@@ -9,7 +9,7 @@ from aiocqhttp.message import Message
 # 所有配置
 config = {
     'bot_id': 3100271297,
-    'sender_id': 123456789,
+    'sender_id': 2362020227,
     'group_name': '测试群',
     'group_id': 66666666,
     'ws_url': 'ws://127.0.0.1:2333/ws/',
@@ -74,6 +74,8 @@ async def connect_ws(ws_url, reconnect_interval, rate_limiter, headers):
                 await rate_limit_middleware(rate_limiter, ws.send(json.dumps(data)))
         except asyncio.CancelledError:
             pass
+        except Exception as error:
+            print(error)
 
     async def receive_messages(ws):
         try:
@@ -100,6 +102,8 @@ async def connect_ws(ws_url, reconnect_interval, rate_limiter, headers):
                     await ws.send(json.dumps(data))
         except asyncio.CancelledError:
             pass
+        except Exception as error:
+            print(error)
 
     while True:
         try:
@@ -116,6 +120,8 @@ async def connect_ws(ws_url, reconnect_interval, rate_limiter, headers):
         except (websockets.ConnectionClosed, ConnectionRefusedError, websockets.exceptions.InvalidStatus) as e:
             print(f'连接[{ws_url}]失败[{str(e)}]，将于{reconnect_interval}秒后重试...')
             await asyncio.sleep(reconnect_interval)
+        except Exception as e:
+            print(e)
 
 
 async def main():

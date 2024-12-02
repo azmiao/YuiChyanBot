@@ -62,8 +62,7 @@ class Service:
         self.visible = service_config.get('visible') or visible
         self.include_group = service_config.get('include_group', [])
         self.exclude_group = service_config.get('exclude_group', [])
-        logger = new_logger(name, config.DEBUG)
-
+        logger = new_logger(name, False)
         self.logger = logger
 
         # 载入缓存

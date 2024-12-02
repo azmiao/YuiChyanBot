@@ -9,8 +9,8 @@ import zhconv
 from aiocqhttp import Event as CQEvent, Message, Union
 from aiocqhttp.exceptions import ActionFailed
 
+import yuiChyan
 from .textfilter import *
-from .. import get_bot, logger, config
 
 # 初始化敏感词
 search = StringSearch()
@@ -22,25 +22,25 @@ search.SetKeywords(sen_word.split('\n'))
 
 async def delete_msg(ev: CQEvent):
     try:
-        await get_bot().delete_msg(self_id=ev.self_id, message_id=ev.message_id)
+        await yuiChyan.get_bot().delete_msg(self_id=ev.self_id, message_id=ev.message_id)
     except ActionFailed as e:
-        logger.error(f'撤回失败: {e}')
+        yuiChyan.logger.error(f'撤回失败: {e}')
     except Exception as e:
-        logger.exception(e)
+        yuiChyan.logger.exception(e)
 
 
 async def silence(ev: CQEvent, ban_time, skip_su=True):
     try:
-        if skip_su and ev.user_id in config.SUPERUSERS:
+        if skip_su and ev.user_id in yuiChyan.config.SUPERUSERS:
             return
-        await get_bot().set_group_ban(self_id=ev.self_id, group_id=ev.group_id, user_id=ev.user_id, duration=ban_time)
+        await yuiChyan.get_bot().set_group_ban(self_id=ev.self_id, group_id=ev.group_id, user_id=ev.user_id, duration=ban_time)
     except ActionFailed as e:
         if 'NOT_MANAGEABLE' in str(e):
             return
         else:
-            logger.error(f'禁言失败 {e}')
+            yuiChyan.logger.error(f'禁言失败 {e}')
     except Exception as e:
-        logger.exception(e)
+        yuiChyan.logger.exception(e)
 
 
 def normalize_str(string) -> str:
