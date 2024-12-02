@@ -52,7 +52,8 @@ class Service:
             permission: NORMAL | PRIVATE | ADMIN | OWNER | SUPERUSER = NORMAL,  # use permission
             manage: NORMAL | PRIVATE | ADMIN | OWNER | SUPERUSER = ADMIN,  # manage permission
             use_exclude: bool = True,  # use exclude group: similar with blacklist, otherwise use whitelist
-            visible: bool = True  # visible or not
+            visible: bool = True,  # visible or not
+            need_auth: bool = True # need bot auth
     ):
         service_config = _read_service_config(name)
         self.name = name
@@ -60,6 +61,7 @@ class Service:
         self.manage = service_config.get('manage') if service_config.get('manage') else manage
         self.use_exclude = service_config.get('use_exclude') or use_exclude
         self.visible = service_config.get('visible') or visible
+        self.need_auth = service_config.get('need_auth') or need_auth
         self.include_group = service_config.get('include_group', [])
         self.exclude_group = service_config.get('exclude_group', [])
         logger = new_logger(name, False)
@@ -163,7 +165,7 @@ class Service:
 
         return deco
 
-    def on_fullmatch(self, *word, only_to_me=False) -> Callable:
+    def on_match(self, *word, only_to_me=False) -> Callable:
         if len(word) == 1 and not isinstance(word[0], str):
             word = word[0]
 
@@ -323,6 +325,7 @@ def _save_service_config(service: Service):
                 'manage': service.manage,
                 'use_exclude': service.use_exclude,
                 'visible': service.visible,
+                'need_auth': service.need_auth,
                 'include_group': service.include_group,
                 'exclude_group': service.exclude_group
             },

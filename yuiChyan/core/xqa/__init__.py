@@ -28,7 +28,7 @@ sv = Service('XQA')
 
 
 # 帮助界面
-@sv.on_fullmatch('问答帮助')
+@sv.on_match('问答帮助')
 async def get_help(bot, ev):
     await bot.send(ev, sv_help)
 
@@ -225,7 +225,7 @@ async def copy_question(bot, ev):
 
 
 # 分群控制个人问答权限-禁用我问
-@sv.on_fullmatch('XQA禁用我问')
+@sv.on_match('XQA禁用我问')
 async def xqa_disable_self(bot, ev):
     if not check_permission(ev, SUPERUSER):
         raise LakePermissionException(ev, f'该功能限维护组')
@@ -238,7 +238,7 @@ async def xqa_disable_self(bot, ev):
 
 
 # 分群控制个人问答权限-启用我问
-@sv.on_fullmatch('XQA启用我问')
+@sv.on_match('XQA启用我问')
 async def xqa_enable_self(bot, ev):
     if not check_permission(ev, SUPERUSER):
         raise LakePermissionException(ev, f'该功能限维护组')
@@ -251,7 +251,7 @@ async def xqa_enable_self(bot, ev):
 
 
 # 清空本群所有我问
-@sv.on_fullmatch('XQA清空本群所有我问')
+@sv.on_match('XQA清空本群所有我问')
 async def xqa_delete_self(bot, ev):
     if not check_permission(ev, SUPERUSER):
         raise LakePermissionException(ev, f'该功能限维护组')
@@ -266,7 +266,7 @@ async def xqa_delete_self(bot, ev):
 
 
 # 清空本群所有有人问
-@sv.on_fullmatch('XQA清空本群所有有人问')
+@sv.on_match('XQA清空本群所有有人问')
 async def xqa_delete_all(bot, ev):
     if not check_permission(ev, SUPERUSER):
         raise LakePermissionException(ev, f'该功能限维护组')
@@ -281,7 +281,7 @@ async def xqa_delete_all(bot, ev):
 
 
 # 提取数据
-@sv.on_fullmatch('XQA提取数据')
+@sv.on_match('XQA提取数据')
 async def xqa_export_data(bot, ev):
     if not check_permission(ev, SUPERUSER):
         raise LakePermissionException(ev, f'该功能限维护组')
@@ -291,7 +291,7 @@ async def xqa_export_data(bot, ev):
 
 
 # 重建数据
-@sv.on_fullmatch('XQA重建数据')
+@sv.on_match('XQA重建数据')
 async def xqa_import_data(bot, ev):
     if not check_permission(ev, SUPERUSER):
         raise LakePermissionException(ev, f'该功能限维护组')

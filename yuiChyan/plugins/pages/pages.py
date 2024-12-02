@@ -27,7 +27,7 @@ sv = Service(
     help_ = sv_help #帮助文本
     )
 
-@sv.on_fullmatch(["帮助网页端"])
+@sv.on_match(["帮助网页端"])
 async def bangzhu(bot, ev):
     await bot.send(ev, sv_help, at_sender=True)
     
@@ -50,7 +50,7 @@ async def index():
         init()
     return await render_template('help.html', services=service_help)
 
-@sv.on_fullmatch('help', '帮助', '菜单',only_to_me=False)
+@sv.on_match('help', '帮助', '菜单', only_to_me=False)
 async def get_uploader_url(bot, ev):
     cfg = config.__bot__
     img = R.img(f'help.jpg').cqcode

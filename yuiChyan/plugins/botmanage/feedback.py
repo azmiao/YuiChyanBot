@@ -25,7 +25,7 @@ sv = Service(
 )
 
 
-@sv.on_fullmatch(["问题反馈帮助"])
+@sv.on_match(["问题反馈帮助"])
 async def bangzhu(bot, ev):
     await bot.send(ev, sv_help, at_sender=True)
 
