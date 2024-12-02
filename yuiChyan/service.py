@@ -1,18 +1,18 @@
 import asyncio
+import functools
 import json
 import os
 import random
 import re
-from functools import wraps
 from typing import Dict, Callable, List, Union, Any
 
 import nonebot
 import pytz
-from aiocqhttp import Event as CQEvent, MessageSegment
+from aiocqhttp import MessageSegment
 from nonebot import CQHttpError
 from sqlitedict import SqliteDict
 
-from yuiChyan import get_bot, YuiChyan, trigger, config
+from yuiChyan import get_bot, YuiChyan, trigger, config, logger as bot_logger
 from yuiChyan.exception import *
 from yuiChyan.log import current_dir, new_logger
 from yuiChyan.permission import NORMAL, PRIVATE, ADMIN, OWNER, SUPERUSER
@@ -23,6 +23,27 @@ os.makedirs(service_config_dir, exist_ok=True)
 loaded_services: Dict[str, 'Service'] = {}
 
 
+# 异常拦截处理
+def exception_handler(func) -> Callable:
+    @functools.wraps(func)
+    async def wrapper(*args, **kwargs):
+        service_instance = args[0] if args else None
+        try:
+            return await func(*args, **kwargs)
+        except BotException as e:
+            if e.ev:
+                await get_bot().send(e.ev, e.message)
+            else:
+                # 优先使用 service_instance.logger 进行日志记录
+                if service_instance and service_instance.logger:
+                    service_instance.logger.error(e.message)
+                else:
+                    bot_logger.error(e.message)
+            return
+    return wrapper
+
+
+# 服务实现类
 class Service:
 
     def __init__(
@@ -108,7 +129,8 @@ class Service:
 
     def on_message(self, event='group') -> Callable:
         def deco(func) -> Callable:
-            @wraps(func)
+            @functools.wraps(func)
+            @exception_handler
             async def wrapper(ctx: CQEvent):
                 if self.judge_enable(int(ctx.group_id)):
                     try:
@@ -127,6 +149,11 @@ class Service:
             prefix = prefix[0]
 
         def deco(func) -> Callable:
+            @functools.wraps(func)
+            @exception_handler
+            async def wrapper(event):
+                return await func(event)
+
             service_func = ServiceFunc(self, func, only_to_me)
             for p in prefix:
                 if isinstance(p, str):
@@ -142,7 +169,8 @@ class Service:
             word = word[0]
 
         def deco(func) -> Callable:
-            @wraps(func)
+            @functools.wraps(func)
+            @exception_handler
             async def wrapper(bot, event: CQEvent):
                 if len(event.message) != 1 or event.message[0].data.get('text'):
                     self.logger.info(f'Message {event.message_id} is ignored by fullmatch condition.')
@@ -164,10 +192,15 @@ class Service:
             suffix = suffix[0]
 
         def deco(func) -> Callable:
-            sf = ServiceFunc(self, func, only_to_me)
+            @functools.wraps(func)
+            @exception_handler
+            async def wrapper(event):
+                return await func(event)
+
+            service_func = ServiceFunc(self, func, only_to_me)
             for s in suffix:
                 if isinstance(s, str):
-                    trigger.suffix.add(s, sf)
+                    trigger.suffix.add(s, service_func)
                 else:
                     self.logger.error(f'Failed to add suffix trigger [{s}], expecting [str] but [{type(s)}] given!')
             return func
@@ -179,6 +212,11 @@ class Service:
             rex = re.compile(rex)
 
         def deco(func) -> Callable:
+            @functools.wraps(func)
+            @exception_handler
+            async def wrapper(event):
+                return await func(event)
+
             sf = ServiceFunc(self, func, only_to_me, normalize)
             if isinstance(rex, re.Pattern):
                 trigger.regular.add(rex, sf)
@@ -193,7 +231,8 @@ class Service:
         kwargs['only_to_me'] = only_to_me
 
         def deco(func) -> Callable:
-            @wraps(func)
+            @functools.wraps(func)
+            @exception_handler
             async def wrapper(session: nonebot.CommandSession):
                 if session.ctx['message_type'] != 'group':
                     return
@@ -223,7 +262,7 @@ class Service:
         kwargs.setdefault('coalesce', True)
 
         def deco(func: Callable[[], Any]) -> Callable:
-            @wraps(func)
+            @functools.wraps(func)
             async def wrapper():
                 try:
                     self.logger.info(f'Scheduled job {func.__name__} start.')
@@ -277,6 +316,7 @@ def _read_service_config(service_name: str):
 def _save_service_config(service: Service):
     config_file = os.path.join(service_config_dir, f'{service.name}.json')
     with open(config_file, 'w', encoding='utf8') as f:
+        # noinspection PyTypeChecker
         json.dump(
             {
                 'name': service.name,
@@ -313,7 +353,7 @@ def su_command(name, force_private=True, **kwargs) -> Callable:
     kwargs['only_to_me'] = False
 
     def deco(func) -> Callable:
-        @wraps(func)
+        @functools.wraps(func)
         async def wrapper(session: nonebot.CommandSession):
             if session.event.user_id not in config.SUPERUSERS:
                 return

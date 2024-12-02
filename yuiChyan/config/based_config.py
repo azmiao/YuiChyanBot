@@ -11,4 +11,4 @@ NICKNAME = '优衣酱'
 COMMAND_START = {''}
 COMMAND_SEP = set()
 
-MODULES_ON = ['XQA']
+MODULES_ON = []

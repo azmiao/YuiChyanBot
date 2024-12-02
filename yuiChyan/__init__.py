@@ -1,7 +1,8 @@
 import importlib
 from typing import Optional, List
 
-from nonebot import NoneBot, load_plugins, Scheduler
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from nonebot import NoneBot, load_plugins
 
 import yuiChyan.config
 from yuiChyan.exception import *
@@ -27,7 +28,7 @@ logger = new_logger('YuiChyan', config.DEBUG)
 
 # 启动nonebot计时器
 async def _start_scheduler():
-    scheduler = Scheduler()
+    scheduler = AsyncIOScheduler()
     if not scheduler.running:
         scheduler.configure(config.APSCHEDULER_CONFIG)
         scheduler.start()
@@ -42,11 +43,27 @@ def create_instance() -> YuiChyan:
 
     # 加载插件
     config_logger = new_logger('config', config.DEBUG)
+
+    # 内置核心插件
+    config_logger.info("=== Start to load core plugins ===")
+    core_dir = os.path.join(current_dir, 'core')
+    listdir = os.listdir(core_dir)
+    for core_plugin in listdir:
+        try:
+            importlib.import_module('yuiChyan.config.' + core_plugin + '_config')
+            config_logger.info(f'> Succeeded to load core config of "{core_plugin}_config"')
+        except ModuleNotFoundError:
+            pass
+        load_plugins(str(os.path.join(os.path.dirname(__file__), 'core', core_plugin)),
+                     f'yuiChyan.core.{core_plugin}')
+        config_logger.info(f'> Succeeded to load core plugin of "{core_plugin}"')
+
+    # 外置插件
     config_logger.info("=== Start to load plugins ===")
     for plugin_name in config.MODULES_ON:
         # 插件配置
         try:
-            importlib.import_module('yuiChyan.config.' + plugin_name)
+            importlib.import_module('yuiChyan.config.plugins.' + plugin_name)
             config_logger.info(f'> Succeeded to load config of "{plugin_name}"')
         except ModuleNotFoundError:
             pass

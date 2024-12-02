@@ -4,14 +4,12 @@ import json
 import os
 import random
 import re
-from _typeshed import SupportsWrite
-from typing import cast
 from urllib import request
 
 from sqlitedict import SqliteDict
 
 from yuiChyan import logger
-from yuiChyan.config.xqa import *
+from yuiChyan.config.xqa_config import *
 from yuiChyan.util import filter_message
 
 # 数据存储目录
@@ -22,7 +20,8 @@ FILE_PATH = os.path.dirname(__file__)
 group_auth_path = os.path.join(FILE_PATH, 'group_auth.json')
 if not os.path.exists(group_auth_path):
     with open(group_auth_path, 'w', encoding='UTF-8') as f:
-        json.dump({}, cast(SupportsWrite[str], f), indent=4, ensure_ascii=False)
+        # noinspection PyTypeChecker
+        json.dump({}, f, indent=4, ensure_ascii=False)
 
 
 # 判断是否启用个人问答功能
@@ -48,7 +47,8 @@ async def modify_enable_self(group_id: str, enable: bool) -> str:
     auth_config['self'] = enable
     group_auth[group_id] = auth_config
     with open(group_auth_path, 'w', encoding='UTF-8') as file:
-        json.dump(group_auth, cast(SupportsWrite[str], file), indent=4, ensure_ascii=False)
+        # noinspection PyTypeChecker
+        json.dump(group_auth, file, indent=4, ensure_ascii=False)
     return ''
 
 
@@ -83,7 +83,8 @@ async def export_json():
     db = await get_database()
     db_json_path = os.path.join(FILE_PATH, 'db.json')
     with open(db_json_path, 'w', encoding='UTF-8') as file:
-        json.dump(dict(db), cast(SupportsWrite[str], file), indent=4, ensure_ascii=False)
+        # noinspection PyTypeChecker
+        json.dump(dict(db), file, indent=4, ensure_ascii=False)
 
 
 # JSON文件转换回数据库文件
