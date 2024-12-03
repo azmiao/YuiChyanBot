@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>优衣酱BOT</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            text-align: center;
+            color: #333;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            max-width: 800px;
+            width: 100%;
+        }
+        h1, h2, h3 {
+            color: #333;
+        }
+        .gradient-text {
+            background: linear-gradient(to right, #87CEEB, #FF69B4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        input[type="text"] {
+            width: 80%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 2px solid #ddd;
+            border-radius: 50px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        input[type="text"]:focus {
+            border-color: #007BFF;
+            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
+            outline: none;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            background: linear-gradient(to right, #87CEEB, #FF69B4);
+            color: white;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 16px;
+            transition: box-shadow 0.3s;
+        }
+        button:hover {
+            box-shadow: 0 2px 10px rgba(135, 206, 235, 0.5);
+        }
+        .accordion .card-header {
+            background-color: #f8f9fa;
+            border: none;
+            border-bottom: 1px solid #e1e1e1;
+        }
+        .accordion .btn-link {
+            font-size: 18px;
+            text-decoration: none;
+            color: #007BFF;
+        }
+        .accordion .btn-link:hover {
+            text-decoration: underline;
+        }
+        .about-box {
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            padding: 20px;
+            background-color: #fafafa;
+            margin-top: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body style="width:100%;">
+    <div id="content">
+        <div class="container text-center">
+            <!-- 标题 -->
+            <h1 class="no-bottom gradient-text"><strong>> 优衣酱 <</strong></h1>
+            <!-- 搜索框 -->
+            <form class="row" id="form_subscribe" method="get" onsubmit="return search();">
+                <div class="col text-center">
+                    <input class="form-control" id="searchInput" placeholder="搜索功能或指令" type="text">
+                    <button type="submit" id="btn-submit"><i class="arrow_right"></i> 搜索</button>
+                </div>
+            </form>
+            <!-- 命令文档 -->
+            <div class="command-box">
+                <h2>命令文档</h2>
+                <div class="accordion" id="instructions">
+                    {% for service in services %}
+                    <div class="card">
+                        <div class="card-header" id="heading-{{service.id}}">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link" data-toggle="collapse" data-target="#collapse-{{service.id}}" aria-expanded="true" aria-controls="collapse-{{service.id}}">
+                                    {{ service.name }}
+                                </button>
+                            </h5>
+                        </div>
+                        <div id="collapse-{{service.id}}" class="collapse" aria-labelledby="heading-{{service.id}}" data-parent="#instructions">
+                            <div class="card-body">
+                                {{ service.help }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <!-- 关于 -->
+            <div class="about-box">
+                <h3>关于</h3>
+                <table class="table">
+                    <tbody>
+                        <tr>
+                            <td>Power By YuiChyanBot</td>
+                        </tr>
+                        <tr>
+                            <td>Author: Github @azmiao</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

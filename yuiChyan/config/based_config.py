@@ -10,5 +10,9 @@ SUPERUSERS = [2362020227]
 NICKNAME = '优衣酱'
 COMMAND_START = {''}
 COMMAND_SEP = set()
+# 外网协议
+PUBLIC_PROTOCOL = 'http'
+# 外网域名
+PUBLIC_DOMAIN = ''
 
 MODULES_ON = []
