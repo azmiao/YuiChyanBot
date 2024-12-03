@@ -9,6 +9,8 @@ from .util import *
 # 查询本群授权
 @sv.on_match('查询授权')
 async def query_group_auth(bot, ev):
+    if not ENABLE_AUTH:
+        return
     group_id = ev.group_id
     self_id = ev.self_id
     auth_db = await get_database()
@@ -22,6 +24,9 @@ async def query_group_auth(bot, ev):
 # 超管查询授权列表
 @su_command('授权列表')
 async def auth_group_list(session):
+    if not ENABLE_AUTH:
+        await session.send('当前BOT未启用授权管理系统')
+        return
     # 页数
     if not session.current_arg.strip():
         page = 1
@@ -47,9 +52,28 @@ async def auth_group_list(session):
     await session.send(msg)
 
 
+# 超管查询好友列表
+@su_command('好友列表')
+async def friend_list(session):
+    gl = await session.bot.get_friend_list(self_id=session.event.self_id)
+    msg_list = ['- {user_id}: {nickname}'.format_map(g) for g in gl]
+    msg = f'> 共{len(gl)}个好友:\n' + '\n'.join(msg_list)
+    await session.send(msg)
+
+
+# 超管查询BOT列表
+@su_command('BOT列表')
+async def friend_list(session):
+    self_ids = session.bot.get_self_ids()
+    await session.send(f"> 共{len(self_ids)}个bot:\n{"\n".join(self_ids)}")
+
+
 # 变更授权
 @su_command('变更授权')
 async def modify_time_chat(session):
+    if not ENABLE_AUTH:
+        await session.send('当前BOT未启用授权管理系统')
+        return
     self_id = session.event.self_id
     origin = session.current_arg.strip()
     pattern = re.compile(r'^(\d{5,15})([+-]\d{1,5})$')

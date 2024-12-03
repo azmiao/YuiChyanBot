@@ -37,6 +37,32 @@ async def leave_notice(session: NoticeSession):
     await session.send(f"{name}({ev.user_id})偷偷地退群了")
 
 
+# 进群欢迎
+@on_notice('group_increase')
+async def group_welcome(session: NoticeSession):
+    ev = session.event
+    # 排除自己
+    if ev.user_id == ev.self_id:
+        return
+
+    # 查询陌生人信息
+    info = await session.bot.get_stranger_info(self_id=ev.self_id, user_id=ev.user_id)
+
+    # 昵称
+    name = info['nickname'] if info['nickname'] else '未知'
+    # 性别
+    match info['sex']:
+        case 'male':
+            sex_info = '男'
+        case 'female':
+            sex_info = '女'
+        case _:
+            sex_info = '已隐藏'
+
+    msg = f'> 欢迎新大佬入群！\n昵称：{name}\nQQ：{ev.user_id}\n性别：{sex_info}\n\n> 我是{NICKNAME}~\n发送"菜单"可以查看功能列表哦'
+    await session.send(msg, at_sender=True)
+
+
 # 被邀请提示
 @on_request('group.invite')
 async def handle_group_invite(session: RequestSession):
