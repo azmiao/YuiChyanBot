@@ -21,4 +21,5 @@ def new_logger(name, debug=True):
     _logger.addHandler(default_handler)
     _logger.addHandler(error_handler)
     _logger.setLevel(logging.DEBUG if debug else logging.INFO)
+    _logger.propagate = False
     return _logger

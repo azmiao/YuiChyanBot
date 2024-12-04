@@ -5,7 +5,7 @@ import nonebot
 
 from yuiChyan import get_bot, logger
 from yuiChyan.exception import *
-from yuiChyan.service import su_command
+from .util import sv
 
 
 class Broadcast:
@@ -58,26 +58,26 @@ def parse_command(command_raw: str):
 
 
 # 广播消息 | 仅添加队列
-@su_command('broadcast', aliases=('bc', '广播'))
-async def broadcast(session: nonebot.CommandSession):
-    command_raw = str(session.current_arg).strip()
+@sv.on_command('广播', force_private=True)
+async def broadcast(bot, ev):
+    command_raw = str(ev.message).strip()
     try:
         bc_sv_name, bc_msg = parse_command(command_raw)
     except CommandErrorException:
-        await session.send('命令格式错误，请参考' + bc_example)
+        await bot.send(ev, '命令格式错误，请参考' + bc_example)
         return
     yui_bot = get_bot()
     self_id_list = yui_bot.get_self_ids()
     for self_id in self_id_list:
         match self_id:
             case 'all':
-                _group_id_list = await session.bot.get_group_list(self_id=self_id)
+                _group_id_list = await bot.get_group_list(self_id=self_id)
                 group_id_list = [int(group['group_id']) for group in _group_id_list]
             case x if x.startswith('g-'):
                 bc_l = bc_sv_name.replace('g-', '')
                 group_id_list = [int(x) for x in bc_l.split(r'/')]
             case x if x.startswith('exg-'):
-                _group_id_list = await session.bot.get_group_list(self_id=self_id)
+                _group_id_list = await bot.get_group_list(self_id=self_id)
                 group_id_list = [int(group['group_id']) for group in _group_id_list]
                 bc_l = bc_sv_name.replace('exg-', '')
                 exclude_gl = [int(x) for x in bc_l.split(r'/')]
@@ -105,19 +105,3 @@ async def send_broadcast():
         logger.info(f'> Broadcast[{self_id}, {group_id}, {msg}] send success, message id is [{msg_obj["message_id"]}].')
     except Exception as e:
         logger.error(f'> Broadcast[{self_id}, {group_id}, {msg}] send failed：{str(e)}')
-
-
-@su_command('broadcast_list', aliases=('bc_list', '群列表'))
-async def broadcast_list(session: nonebot.CommandSession):
-    yui_bot = get_bot()
-    self_id_list = yui_bot.get_self_ids()
-    msg_list = []
-    for self_id in self_id_list:
-        group_list = await session.bot.get_group_list(self_id=self_id)
-        msg = f'> {str(self_id)}已加入的群聊和对应群号：'
-        for group in group_list:
-            group_name = group['group_name']
-            group_id = group['group_id']
-            msg += f'\n{group_name}: {group_id}'
-        msg_list.append(msg)
-    await session.send('\n'.join(msg_list))

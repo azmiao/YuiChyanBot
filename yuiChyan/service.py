@@ -12,6 +12,7 @@ from aiocqhttp import MessageSegment
 from nonebot import CQHttpError
 from sqlitedict import SqliteDict
 
+import yuiChyan.config
 from yuiChyan import get_bot, YuiChyan, trigger, config, logger as bot_logger
 from yuiChyan.exception import *
 from yuiChyan.log import current_dir, new_logger
@@ -53,7 +54,7 @@ class Service:
             manage: NORMAL | PRIVATE | ADMIN | OWNER | SUPERUSER = ADMIN,  # manage permission
             use_exclude: bool = True,  # use exclude group: similar with blacklist, otherwise use whitelist
             visible: bool = True,  # visible or not
-            need_auth: bool = True # need bot auth
+            need_auth: bool = True  # need bot auth
     ):
         service_config = _read_service_config(name)
         self.name = name
@@ -64,8 +65,7 @@ class Service:
         self.need_auth = service_config.get('need_auth') or need_auth
         self.include_group = service_config.get('include_group', [])
         self.exclude_group = service_config.get('exclude_group', [])
-        logger = new_logger(name, False)
-        self.logger = logger
+        self.logger = new_logger(name, yuiChyan.config.DEBUG)
 
         # 载入缓存
         assert self.name not in loaded_services, f'Service [{self.name}] is already exist!'
@@ -228,32 +228,29 @@ class Service:
 
         return deco
 
-    def on_command(self, name, *, only_to_me=False, deny_tip=None, **kwargs) -> Callable:
-        kwargs['only_to_me'] = only_to_me
+    def on_command(self, *name, only_to_me=False, force_private=False) -> Callable:
+        if len(name) == 1 and not isinstance(name[0], str):
+            name = name[0]
 
         def deco(func) -> Callable:
             @functools.wraps(func)
             @exception_handler
-            async def wrapper(session: nonebot.CommandSession):
-                if session.ctx['message_type'] != 'group':
-                    return
-                if not self.judge_enable(int(session.ctx.group_id)):
-                    self.logger.debug(f'Message {session.ctx.message_id} is command of a disabled service, ignored.')
-                    if deny_tip:
-                        await session.send(deny_tip, at_sender=True)
-                    return
-                try:
-                    ret = await func(session)
-                    self.logger.info(f'Message {session.ctx.message_id} is handled as command by {func.__name__}.')
-                    return ret
-                except (nonebot.message.CanceledException, nonebot.command.SwitchException) as e:
-                    raise e
-                except Exception as e:
-                    self.logger.error(f'{type(e)} occurred when {func.__name__} '
-                                      f'handling message {session.ctx.message_id}.')
-                    self.logger.exception(e)
+            async def wrapper(bot, event: CQEvent):
+                # 私聊只支持超管
+                if force_private and event.user_id not in config.SUPERUSERS:
+                    raise nonebot.command.SwitchException(nonebot.message.Message(event.raw_message))
+                # 校验是否是私聊
+                if force_private and event.detail_type != 'private':
+                    raise FunctionException(event, '> 该命令只支持私聊')
+                return await func(bot, event)
 
-            return nonebot.on_command(name, **kwargs)(wrapper)
+            service_func = ServiceFunc(self, wrapper, only_to_me)
+            for n in name:
+                if isinstance(n, str):
+                    trigger.prefix.add(n, service_func)
+                else:
+                    self.logger.error(f'Failed to add command trigger [{n}], expecting [str] but [{type(n)}] given!')
+            return func
 
         return deco
 
@@ -283,13 +280,11 @@ class Service:
         if isinstance(msgs, (str, MessageSegment, nonebot.message.Message)):
             msgs = (msgs,)
         groups = await self.get_enable_groups()
-        group_dict = SqliteDict(
-            os.path.join(os.path.dirname(__file__),
-                         'plugins/authMS_lite/config/group.sqlite'),
-            flag='r')
+        auth_db_path = os.path.join(os.path.dirname(__file__), 'core', 'manager', 'config', 'auth.sqlite')
+        auth_db = SqliteDict(auth_db_path, encode=json.dumps, decode=json.loads, autocommit=True)
         for gid, self_id_list in groups.items():
-            if gid not in group_dict:
-                self.logger.error(f'群{gid} 投递{tag}失败：该群授权已过期')
+            if gid not in auth_db:
+                self.logger.info(f'群{gid} 不会投递{tag}：该群授权已过期')
                 continue
             try:
                 for msg in msgs:
@@ -345,31 +340,3 @@ class ServiceFunc:
 
     def __call__(self, *args, **kwargs):
         return self.func(*args, **kwargs)
-
-
-su_logger = new_logger('SU', config.DEBUG)
-
-
-def su_command(name, force_private=True, **kwargs) -> Callable:
-    kwargs['privileged'] = True
-    kwargs['only_to_me'] = False
-
-    def deco(func) -> Callable:
-        @functools.wraps(func)
-        async def wrapper(session: nonebot.CommandSession):
-            if session.event.user_id not in config.SUPERUSERS:
-                return
-            if force_private and session.event.detail_type != 'private':
-                await session.send('> This command should only be used in private session.')
-                return
-            try:
-                return await func(session)
-            except (nonebot.message.CanceledException, nonebot.command.SwitchException):
-                raise
-            except Exception as e:
-                su_logger.error(f'{type(e)} occurred when {func.__name__} handling message {session.event.message_id}.')
-                su_logger.exception(e)
-
-        return nonebot.on_command(name, **kwargs)(wrapper)
-
-    return deco

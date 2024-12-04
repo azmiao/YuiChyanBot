@@ -8,8 +8,6 @@ DEBUG = False
 SUPERUSERS = [2362020227]
 # 机器人昵称
 NICKNAME = '优衣酱'
-COMMAND_START = {''}
-COMMAND_SEP = set()
 # 外网协议
 PUBLIC_PROTOCOL = 'http'
 # 外网域名

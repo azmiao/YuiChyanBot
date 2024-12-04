@@ -32,7 +32,7 @@ logger = new_logger('YuiChyan', config.DEBUG)
 def get_bot() -> YuiChyan:
     global yui_bot
     if yui_bot is None:
-        raise YuiNotFoundException('yuiChyan bot has not been created yet!')
+        raise YuiNotFoundException('YuiChyan bot has not been created yet!')
     return yui_bot
 
 
@@ -42,13 +42,21 @@ async def _start_scheduler():
     if not scheduler.running:
         scheduler.configure(config.APSCHEDULER_CONFIG)
         scheduler.start()
-        logger.debug('> yuiChyan scheduler started')
+        logger.debug('> YuiChyan scheduler started')
+
+
+# 设置一些Nonebot的基础参数
+def _set_default_config():
+    config.COMMAND_START = {''}
+    config.COMMAND_SEP = set()
 
 
 # 创建 YuiChyanBot 实例
 def create_instance() -> YuiChyan:
     global yui_bot
+
     # 使用基础配置启动
+    _set_default_config()
     yui_bot = YuiChyan(config)
     yui_bot.server_app.before_serving(_start_scheduler)
 
@@ -57,9 +65,9 @@ def create_instance() -> YuiChyan:
     _load_core_plugins(config_logger)
     _load_external_plugins(config_logger)
 
-    # 装载消息处理触发器
-    @message_preprocessor
-    async def handle_message(bot: YuiChyan, event: CQEvent, _):
+    # 装载消息处理触发器和处理器
+    @_message_preprocessor
+    async def _handle_message(bot: YuiChyan, event: CQEvent, _):
         await _process_message(bot, event)
 
     return yui_bot
@@ -83,39 +91,37 @@ def _load_core_plugins(config_logger):
 
 # 加载第三方插件
 def _load_external_plugins(config_logger):
-    config_logger.info("=== Start to load plugins ===")
+    config_logger.info("=== Start to load external plugins ===")
     for plugin_name in config.MODULES_ON:
         try:
             importlib.import_module('yuiChyan.config.plugins.' + plugin_name)
-            config_logger.info(f'> Succeeded to load config of "{plugin_name}"')
+            config_logger.info(f'> Succeeded to load external config of "{plugin_name}"')
         except ModuleNotFoundError:
             pass
         load_plugins(str(os.path.join(os.path.dirname(__file__), 'plugins', plugin_name)),
                      f'yuiChyan.plugins.{plugin_name}')
-        config_logger.info(f'> Succeeded to load plugin of "{plugin_name}"')
+        config_logger.info(f'> Succeeded to load external plugin of "{plugin_name}"')
     config_logger.info("=== Plugin loading completed ===")
 
 
 # 消息处理装饰器
-def message_preprocessor(func):
+def _message_preprocessor(func):
     mp = nonebot.message.MessagePreprocessor(func)
     nonebot.message.MessagePreprocessorManager.add_message_preprocessor(mp)
     return func
 
 
 # 处理消息
-async def _process_message(bot: 'YuiChyan', event: CQEvent):
-    if event.detail_type != 'group':
-        return
-
+async def _process_message(bot: YuiChyan, event: CQEvent):
     for _trigger in trigger_chain:
         for service_func in _trigger.find_handler(event):
             if service_func.only_to_me and not event['to_me']:
                 continue
 
-            group_id = int(event.group_id)
-            if not service_func.sv.judge_enable(group_id):
-                continue
+            if event.group_id:
+                group_id = int(event.group_id)
+                if not service_func.sv.judge_enable(group_id):
+                    continue
 
             service_func.sv.logger.info(f'Message {event.message_id} triggered {service_func.__name__}.')
             try:

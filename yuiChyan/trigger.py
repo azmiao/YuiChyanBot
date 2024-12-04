@@ -124,7 +124,7 @@ class RegularTrigger(BaseTrigger):
     def find_handler(self, event: CQEvent) -> Iterable['ServiceFunc']:
         for rex, sfs in self.regular_dict.items():
             for service_func in sfs:
-                text = event.norm_text if service_func.normalize_text else event.plain_text
+                text = event.normal_text if service_func.normalize_text else event.plain_text
                 match = rex.search(text)
                 if match:
                     event['match'] = match
@@ -138,7 +138,7 @@ class NormalTrigger(BaseTrigger):
 
     def find_handler(self, event: CQEvent):
         event.plain_text = event.message.extract_plain_text().strip()
-        event.norm_text = normalize_str(event.plain_text)
+        event.normal_text = normalize_str(event.plain_text)
         return []
 
 

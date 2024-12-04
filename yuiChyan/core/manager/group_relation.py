@@ -1,11 +1,10 @@
 import re
 
-from nonebot import on_notice, NoticeSession, on_request, RequestSession, CommandSession
+from nonebot import on_notice, NoticeSession, on_request, RequestSession
 
 from yuiChyan.config import *
-from yuiChyan.service import su_command
 from yuiChyan.util import *
-from .util import group_notice
+from .util import group_notice, sv
 
 
 # 被踢提醒
@@ -73,15 +72,15 @@ async def handle_group_invite(session: RequestSession):
 
 
 # 主动退群命令
-@su_command('退群')
-async def quit_group(session: CommandSession):
-    strip = str(session.current_arg_text).strip()
+@sv.on_command('退群', force_private=True)
+async def quit_group(bot, ev):
+    strip = str(ev.message).strip()
     if not strip:
-        await session.send('命令错误，实例：退群 123456 管理员操作')
+        await bot.send(ev, '命令错误，实例：退群 123456 管理员操作')
         return
     split = strip.split(' ')
     if not re.fullmatch(r'^\d+$', split[0]):
-        await session.send('命令错误，实例：退群 123456 管理员操作')
+        await bot.send(ev, '命令错误，实例：退群 123456 管理员操作')
         return
 
     # 退群原因
@@ -90,6 +89,6 @@ async def quit_group(session: CommandSession):
     reason = f'> {NICKNAME}即将退出本群，感谢您的使用~\n退群原因:{leave_reason}'
     await group_notice(int(split[0]), reason)
     # 退群
-    await session.bot.set_group_leave(self_id=session.event.self_id, group_id=int(split[0]))
+    await bot.set_group_leave(self_id=ev.self_id, group_id=int(split[0]))
     msg = f'> 已成功退出群：{str(split[0])} | 原因：{leave_reason}'
-    await session.send(msg)
+    await bot.send(ev, msg)
