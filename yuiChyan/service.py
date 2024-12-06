@@ -1,7 +1,5 @@
 import asyncio
 import functools
-import json
-import os
 import random
 import re
 from typing import Dict, Callable, List, Union, Any
@@ -13,14 +11,12 @@ from nonebot import CQHttpError
 
 import yuiChyan.config
 from yuiChyan import get_bot, YuiChyan, trigger, config, logger as bot_logger
-from yuiChyan.resources import auth_db_ as auth_db
 from yuiChyan.exception import *
-from yuiChyan.log import current_dir, new_logger
+from yuiChyan.log import new_logger
 from yuiChyan.permission import NORMAL, PRIVATE, ADMIN, OWNER, SUPERUSER
+from yuiChyan.resources import auth_db_ as auth_db, service_db_ as service_db
 
-# 服务配置
-service_config_dir = os.path.abspath(os.path.join(current_dir, 'config', 'service_config'))
-os.makedirs(service_config_dir, exist_ok=True)
+# 全局服务配置缓存
 loaded_services: Dict[str, 'Service'] = {}
 
 
@@ -299,33 +295,21 @@ class Service:
 
 # 读取服务配置
 def _read_service_config(service_name: str):
-    config_file = os.path.join(service_config_dir, f'{service_name}.json')
-    if not os.path.exists(config_file):
-        return {}
-    with open(config_file, 'r', encoding='utf-8') as f:
-        return json.load(f)
+    return service_db.get(service_name, {})
 
 
 # 保存服务配置
 def _save_service_config(service: Service):
-    config_file = os.path.join(service_config_dir, f'{service.name}.json')
-    with open(config_file, 'w', encoding='utf8') as f:
-        # noinspection PyTypeChecker
-        json.dump(
-            {
-                'name': service.name,
-                'permission': service.permission,
-                'manage': service.manage,
-                'use_exclude': service.use_exclude,
-                'visible': service.visible,
-                'need_auth': service.need_auth,
-                'include_group': service.include_group,
-                'exclude_group': service.exclude_group
-            },
-            f,
-            ensure_ascii=False,
-            indent=4
-        )
+    service_db[service.name] = {
+        'name': service.name,
+        'permission': service.permission,
+        'manage': service.manage,
+        'use_exclude': service.use_exclude,
+        'visible': service.visible,
+        'need_auth': service.need_auth,
+        'include_group': service.include_group,
+        'exclude_group': service.exclude_group
+    }
 
 
 class ServiceFunc:
