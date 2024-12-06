@@ -61,7 +61,8 @@ async def friend_list(bot, ev):
 @sv.on_command('BOT列表', force_private=True)
 async def friend_list(bot, ev):
     self_ids = bot.get_self_ids()
-    await bot.send(ev, f'> 共{len(self_ids)}个bot:\n{"\n".join(self_ids)}')
+    self_ids_str_list = [str(x) for x in self_ids]
+    await bot.send(ev, f'> 共{len(self_ids)}个bot:\n{"\n".join(self_ids_str_list)}')
 
 
 # 变更授权

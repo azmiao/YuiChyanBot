@@ -1,3 +1,4 @@
+import random
 import re
 
 from nonebot import on_notice, NoticeSession, on_request, RequestSession
@@ -92,3 +93,52 @@ async def quit_group(bot, ev):
     await bot.set_group_leave(self_id=ev.self_id, group_id=int(split[0]))
     msg = f'> 已成功退出群：{str(split[0])} | 原因：{leave_reason}'
     await bot.send(ev, msg)
+
+
+# 让 YuiChyan 戳戳你
+@sv.on_match(('戳一戳我', '戳戳我'), only_to_me=True)
+async def send_point(bot, ev):
+    await bot.send(ev, f'[CQ:poke,qq={int(ev.user_id)}]')
+
+
+# YuiChyan 被戳提醒
+@on_notice('notify.poke')
+async def poke_back(session: NoticeSession):
+    # 单次戳我的冷却
+    time_limit = 10
+    # 每日戳我的总上限
+    daily_limit = 10
+    # 返回的消息列表
+    msg_list = [
+        '呜喵~',
+        '嗯哼？找优衣酱有啥事呢',
+        '优衣酱饿了，能给我买点吃的吗~',
+        '嘎哦~ 嘎哦~',
+        '每天最多戳我十次哦~',
+        '嗯...优衣酱..正在睡大觉呢',
+        '看我的必杀技————花朵射击！',
+        '喵喵喵？',
+        '优衣酱我啊，以前可是优衣酱哦',
+        '你戳的对，优衣酱我啊是由优衣酱自主研发的优衣酱',
+        '大家要早睡早起哦，指第一天早上睡，第二天早上起',
+        '俗话说的好，早期的虫儿被鸟吃',
+        '欸嘿嘿，优衣酱打牌又赢了，荣！段幺九！',
+        '优衣酱其实不是机器人，只是打字比较块而已，嗯'
+    ]
+
+    uid = session.ctx['user_id']
+    self_ids = session.bot.get_self_ids()
+    if session.ctx['target_id'] not in self_ids:
+        return
+
+    # 频次和单日次数检测
+    lmt = FreqLimiter(time_limit)
+    daily_limit = DailyNumberLimiter(daily_limit)
+    if not lmt.check(uid):
+        return
+    if not daily_limit.check(uid):
+        return
+
+    lmt.start_cd(uid)
+    daily_limit.increase(uid, 1)
+    await session.send(random.choice(msg_list))

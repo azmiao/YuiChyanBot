@@ -190,11 +190,7 @@ async def xqa(bot, ev):
     # 优先回复自己的问答
     ans = None
     # 判断是否允许设置个人问答
-    group_id = str(ev.group_id)
-    with open(group_auth_path, 'r', encoding='UTF-8') as file:
-        group_auth = dict(json.load(file))
-    auth_config = group_auth.get(group_id, {})
-    self_enable = auth_config.get('self', True)
+    self_enable = await judge_enable_self(group_id)
     if self_enable:
         # 启用我问功能才会回复个人问答
         ans = await match_ans(group_dict.get(user_id, {}), message, '')

@@ -1,7 +1,7 @@
 import asyncio
 import json
-import time
 import random
+import time
 
 import websockets
 from aiocqhttp.message import Message
@@ -55,35 +55,51 @@ async def connect_ws(ws_url, reconnect_interval, rate_limiter, headers):
         try:
             while True:
                 message_ = await asyncio.to_thread(input)
+                message_ = message_.strip()
+                if not message_:
+                    continue
                 msg_id = random.randint(10000000, 99999999)
-                is_private = message_.startswith('/')
-                message_ = message_[1:] if is_private else message_
+
                 data = {
                     'time': int(time.time()),
                     'self_id': config['bot_id'],
                     'post_type': 'message',
-                    'message_type': 'private' if is_private else 'group',
                     'sub_type': 'normal',
                     'message_id': msg_id,
-                    'user_id': config['sender_id'],
-                    'message': message_,
-                    'raw_message': message_,
-                    'font': 0,
-                    'sender': {
-                        'nickname': config['nickname'],
-                        'sex': config['sex'],
-                        'age': config['age']
-                    }
+                    'user_id': config['sender_id']
                 }
 
-                if not is_private:
-                    data['group_id'] = config['group_id']
-                    msg_from = f'群 {config["group_name"]}({config["group_id"]})'
-                else:
-                    msg_from = f'私聊 {config["nickname"]}({config["sender_id"]})'
+                # 消息类型匹配
+                msg_header = message_[:1]
+                match msg_header:
+                    case '~':
+                        # 戳一戳
+                        data['post_type'] = 'notice'
+                        data['notice_type'] = 'notify'
+                        data['sub_type'] = 'poke'
+                        data['target_id'] = config['bot_id']
+                        data['group_id'] = config['group_id']
+                        print(f'收到群 {config["group_name"]}({config["group_id"]}) 的戳一戳事件 ({msg_id})')
+                    case '/':
+                        # 私聊
+                        message_ = message_[1:]
+                        data['post_type'] = 'message'
+                        data['message_type'] = 'private'
+                        data['sub_type'] = 'normal'
+                        data['message'] = message_
+                        data['raw_message'] = message_
+                        print(f'收到私聊 {config["nickname"]}({config["sender_id"]}) 的消息: {message_} ({msg_id})')
+                    case _:
+                        data['post_type'] = 'message'
+                        data['message_type'] = 'group'
+                        data['sub_type'] = 'normal'
+                        data['message'] = message_
+                        data['raw_message'] = message_
+                        data['group_id'] = config['group_id']
+                        print(f'收到群 {config["group_name"]}({config["group_id"]}) 的消息: {message_} ({msg_id})')
 
-                print(f'收到{msg_from} 的消息: {message_} ({msg_id})')
                 await rate_limit_middleware(rate_limiter, ws.send(json.dumps(data)))
+
         except asyncio.CancelledError as error:
             print(error)
         except Exception as _:
@@ -131,7 +147,25 @@ async def connect_ws(ws_url, reconnect_interval, rate_limiter, headers):
                                 'max_member_count': 500
                             }
                         ]
+                    case 'get_group_info':
+                        data = {
+                            'group_id': config["group_id"],
+                            'group_name': config["group_name"],
+                            'member_count': 10,
+                            'max_member_count': 500
+                        }
+                    case 'send_group_msg':
+                        print(f'发送群 {config["group_name"]}({config["group_id"]}) 的消息: {msg} ({msg_id})')
+                        data = {'message_id': msg_id}
+                    case 'get_friend_list':
+                        data = [
+                            {
+                                'user_id': config["sender_id"],
+                                'nickname': config["nickname"]
+                            }
+                        ]
                     case _:
+                        print(f'> 检测到未知Action: {action}')
                         continue
                 json_data = json.dumps({'echo': echo, 'data': data, 'retcode': 0, 'status': 'ok', 'message': ''})
                 # print(f'Send msg: {json_data}')

@@ -129,6 +129,8 @@ class Service:
             @functools.wraps(func)
             @exception_handler
             async def wrapper(ctx: CQEvent):
+                if ctx.detail_type != 'group':
+                    raise nonebot.command.SwitchException(nonebot.message.Message(ctx.raw_message))
                 if self.judge_enable(int(ctx.group_id)):
                     try:
                         return await func(self.bot, ctx)
@@ -149,6 +151,8 @@ class Service:
             @functools.wraps(func)
             @exception_handler
             async def wrapper(event):
+                if event.detail_type != 'group':
+                    raise nonebot.command.SwitchException(nonebot.message.Message(event.raw_message))
                 return await func(event)
 
             service_func = ServiceFunc(self, func, only_to_me)
@@ -169,6 +173,8 @@ class Service:
             @functools.wraps(func)
             @exception_handler
             async def wrapper(bot, event: CQEvent):
+                if event.detail_type != 'group':
+                    raise nonebot.command.SwitchException(nonebot.message.Message(event.raw_message))
                 if len(event.message) != 1 or event.message[0].data.get('text'):
                     self.logger.info(f'Message {event.message_id} is ignored by fullmatch condition.')
                     raise nonebot.command.SwitchException(nonebot.message.Message(event.raw_message))
@@ -192,6 +198,8 @@ class Service:
             @functools.wraps(func)
             @exception_handler
             async def wrapper(event):
+                if event.detail_type != 'group':
+                    raise nonebot.command.SwitchException(nonebot.message.Message(event.raw_message))
                 return await func(event)
 
             service_func = ServiceFunc(self, func, only_to_me)
@@ -212,6 +220,8 @@ class Service:
             @functools.wraps(func)
             @exception_handler
             async def wrapper(event):
+                if event.detail_type != 'group':
+                    raise nonebot.command.SwitchException(nonebot.message.Message(event.raw_message))
                 return await func(event)
 
             sf = ServiceFunc(self, func, only_to_me, normalize)
