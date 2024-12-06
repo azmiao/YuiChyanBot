@@ -97,7 +97,8 @@ async def quick_check_chat(bot, ev):
 
 
 # 每天早上9点01检查授权
-@sv.scheduled_job('cron', day='1/1', hour='09', minute='01')
+@sv.scheduled_job(second='*/1')
+# @sv.scheduled_job(day='*/1', hour='09', minute='01')
 async def check_auth_schedule():
     if not ENABLE_AUTH:
         return

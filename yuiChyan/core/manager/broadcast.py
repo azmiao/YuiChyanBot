@@ -1,8 +1,6 @@
 import asyncio
 from collections import deque
 
-import nonebot
-
 from yuiChyan import get_bot, logger
 from yuiChyan.exception import *
 from .util import sv
@@ -91,7 +89,7 @@ async def broadcast(bot, ev):
             logger.debug(f'> Broadcast[{self_id}, {group_id}, {bc_msg}] has added to BroadcastQueue!')
 
 
-@nonebot.scheduler.scheduled_job('interval', seconds=2)
+@sv.scheduled_job(second='*/2')
 async def send_broadcast():
     if broadcast_queue.size() == 0:
         return

@@ -28,7 +28,7 @@ async def help_view():
 
 
 # 帮助菜单
-@sv.on_match('help', '帮助', '菜单')
+@sv.on_match(('help', '帮助', '菜单'))
 async def sv_help(bot, ev):
     address = f'{PUBLIC_PROTOCOL}://{PUBLIC_DOMAIN}' if PUBLIC_DOMAIN else f'http://{HOST}:{PORT}'
     await bot.send(ev, f'> 优衣酱帮助菜单：\n{address}/help')

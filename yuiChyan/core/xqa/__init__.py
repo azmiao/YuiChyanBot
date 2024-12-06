@@ -24,7 +24,7 @@ sv_help = '''
 ===============
 '''.strip()
 
-sv = Service('XQA')
+sv = Service('core_xqa')
 
 
 # 帮助界面

@@ -9,7 +9,7 @@ from yuiChyan.resources import auth_db_
 from yuiChyan.service import Service
 
 # BOT管理核心服务
-sv = Service('manager', visible=False, need_auth=False)
+sv = Service('core_manager', visible=False, need_auth=False)
 
 
 # 获取数据库
