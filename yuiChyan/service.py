@@ -10,10 +10,10 @@ import nonebot
 import pytz
 from aiocqhttp import MessageSegment
 from nonebot import CQHttpError
-from sqlitedict import SqliteDict
 
 import yuiChyan.config
 from yuiChyan import get_bot, YuiChyan, trigger, config, logger as bot_logger
+from yuiChyan.resources import auth_db_ as auth_db
 from yuiChyan.exception import *
 from yuiChyan.log import current_dir, new_logger
 from yuiChyan.permission import NORMAL, PRIVATE, ADMIN, OWNER, SUPERUSER
@@ -280,8 +280,6 @@ class Service:
         if isinstance(msgs, (str, MessageSegment, nonebot.message.Message)):
             msgs = (msgs,)
         groups = await self.get_enable_groups()
-        auth_db_path = os.path.join(os.path.dirname(__file__), 'core', 'manager', 'config', 'auth.sqlite')
-        auth_db = SqliteDict(auth_db_path, encode=json.dumps, decode=json.loads, autocommit=True)
         for gid, self_id_list in groups.items():
             if gid not in auth_db:
                 self.logger.info(f'群{gid} 不会投递{tag}：该群授权已过期')

@@ -1,11 +1,11 @@
 nonebot>=1.9.1
-curl_cffi>=0.7.3
+curl_cffi>=0.7.4
 aiocqhttp>=1.4.4
 zhconv>=1.4.3
 pygtrie>=2.5.0
 pytz>=2024.1
-restricted-sqlitedict>=1.0.0
 APScheduler>=3.11.0
 websockets>=14.1
 Jinja2>=3.1.4
-quart>=0.19.6
+quart>=0.19.9
+rocksdict>=0.3.24

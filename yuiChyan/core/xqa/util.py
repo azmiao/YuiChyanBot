@@ -6,36 +6,31 @@ import random
 import re
 from urllib import request
 
-from sqlitedict import SqliteDict
+from rocksdict import Rdict
 
 from yuiChyan import logger
 from yuiChyan.config.xqa_config import *
+from yuiChyan.resources import xqa_db_, xqa_img_path, base_db_path
 from yuiChyan.util import filter_message
 
-# 数据存储目录
-FILE_PATH = os.path.dirname(__file__)
 
-
-# XQA配置，启动！
-group_auth_path = os.path.join(FILE_PATH, 'group_auth.json')
-if not os.path.exists(group_auth_path):
-    with open(group_auth_path, 'w', encoding='UTF-8') as f:
-        # noinspection PyTypeChecker
-        json.dump({}, f, indent=4, ensure_ascii=False)
+# 获取数据库
+async def get_database() -> Rdict:
+    return xqa_db_
 
 
 # 判断是否启用个人问答功能
 async def judge_enable_self(group_id: str):
-    with open(group_auth_path, 'r', encoding='UTF-8') as file:
-        group_auth = dict(json.load(file))
+    xqa_db = await get_database()
+    group_auth = xqa_db.get('config', {})
     auth_config = group_auth.get(group_id, {})
     return auth_config.get('self', True)
 
 
 # 修改启用个人问答功能的状态
 async def modify_enable_self(group_id: str, enable: bool) -> str:
-    with open(group_auth_path, 'r', encoding='UTF-8') as file:
-        group_auth = dict(json.load(file))
+    xqa_db = await get_database()
+    group_auth = xqa_db.get('config', {})
     auth_config = group_auth.get(group_id, {})
     # 判断原来的状态
     self_enable = auth_config.get('self', True)
@@ -46,9 +41,7 @@ async def modify_enable_self(group_id: str, enable: bool) -> str:
     # 修改
     auth_config['self'] = enable
     group_auth[group_id] = auth_config
-    with open(group_auth_path, 'w', encoding='UTF-8') as file:
-        # noinspection PyTypeChecker
-        json.dump(group_auth, file, indent=4, ensure_ascii=False)
+    xqa_db['config'] = group_auth
     return ''
 
 
@@ -65,40 +58,27 @@ async def judge_ismember(bot, group_id: str, user_id: str) -> bool:
         return False
 
 
-# 获取数据库
-async def get_database() -> SqliteDict:
-    # 创建目录
-    img_path = os.path.join(FILE_PATH, 'img')
-    if not os.path.exists(img_path):
-        os.makedirs(img_path)
-    # 数据库
-    db_path = os.path.join(FILE_PATH, 'data.sqlite')
-    # 替换默认的pickle为json的形式读写数据库
-    db = SqliteDict(db_path, encode=json.dumps, decode=json.loads, autocommit=True)
-    return db
-
-
 # 数据库导出至JSON文件
 async def export_json():
-    db = await get_database()
-    db_json_path = os.path.join(FILE_PATH, 'db.json')
+    xqa_db = await get_database()
+    db_json_path = os.path.join(base_db_path, 'xqa_db.json')
+    data = {}
+    for key, value in xqa_db.items():
+        data[key] = value
     with open(db_json_path, 'w', encoding='UTF-8') as file:
         # noinspection PyTypeChecker
-        json.dump(dict(db), file, indent=4, ensure_ascii=False)
+        json.dump(data, file, indent=4, ensure_ascii=False)
 
 
 # JSON文件转换回数据库文件
 async def import_json():
-    db_json_path = os.path.join(FILE_PATH, 'db.json')
+    db_json_path = os.path.join(base_db_path, 'xqa_db.json')
     with open(db_json_path, 'r', encoding='UTF-8') as file:
         data = dict(json.load(file))
-    # 数据库
-    db_path = os.path.join(FILE_PATH, 'data_temp.sqlite')
-    # 替换默认的pickle为json的形式读写数据库
-    db = SqliteDict(db_path, encode=json.dumps, decode=json.loads, autocommit=True)
+    xqa_db_temp = Rdict(os.path.join(base_db_path, 'xqa_temp.db'))
     # 将数据写入数据库
     for key, value in data.items():
-        db[key] = value
+        xqa_db_temp[key] = value
 
 
 # 获取群列表
@@ -153,8 +133,7 @@ async def adjust_list(list_tmp: list, char: str) -> list:
 
 # 下载图片并转换图片路径
 async def doing_img(bot, img_name: str, img_file: str, img_url: str, save: bool) -> str:
-    img_path = os.path.join(FILE_PATH, 'img')
-    file = os.path.join(img_path, img_name)
+    file = os.path.join(xqa_img_path, img_name)
 
     # 调用协议客户端实现接口下载图片
     if save:
@@ -290,7 +269,7 @@ async def delete_img(list_raw: list):
             if 'base64' in image_file:
                 # 目前屎山架构base64不好删，不管了
                 continue
-            img_path = os.path.join(FILE_PATH, 'img', image_file)
+            img_path = os.path.join(xqa_img_path, image_file)
             try:
                 os.remove(img_path)
                 logger.info(f'XQA: 已删除图片{image_file}')

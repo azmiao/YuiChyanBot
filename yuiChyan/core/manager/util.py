@@ -1,30 +1,20 @@
-import json
-import os
 from datetime import timedelta, datetime
 
-from sqlitedict import SqliteDict
+from rocksdict import Rdict
 
 import yuiChyan
 from yuiChyan import get_bot
 from yuiChyan.config import NICKNAME, REMIND_BEFORE_EXPIRED
+from yuiChyan.resources import auth_db_
 from yuiChyan.service import Service
 
 # BOT管理核心服务
 sv = Service('manager', visible=False, need_auth=False)
-# 本地配置路径
-config_path = os.path.join(os.path.dirname(__file__), 'config')
 
 
 # 获取数据库
-async def get_database() -> SqliteDict:
-    # 创建目录
-    if not os.path.exists(config_path):
-        os.makedirs(config_path)
-    # 数据库
-    auth_db_path = os.path.join(config_path, 'auth.sqlite')
-    # 替换默认的pickle为json的形式读写数据库
-    auth_db = SqliteDict(auth_db_path, encode=json.dumps, decode=json.loads, autocommit=True)
-    return auth_db
+async def get_database() -> Rdict:
+    return auth_db_
 
 
 # 获取授权结果列表
@@ -103,7 +93,7 @@ async def check_auth():
             # 发消息提醒
             await group_notice(group_id, f'【提醒】本群授权已过期！\n如需续费请联系{NICKNAME}维护组~')
             # 清除授权
-            auth_db.pop(group_id)
+            auth_db.delete(group_id)
             sv.logger.info(f'群{group_id}的授权已过期，已清除对应授权信息')
         elif days_left < REMIND_BEFORE_EXPIRED:
             # 将要过期
