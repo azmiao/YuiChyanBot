@@ -7,18 +7,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- 基础 CSS -->
     <link href="{{ url_for('static', filename='css/bootstrap.css') }}" rel="stylesheet" type="text/css">
-    <!-- 栅格系统样式，用于支持响应式布局设计，允许你使用行和列进行布局 -->
     <link href="{{ url_for('static', filename='css/bootstrap-grid.min.css') }}" rel="stylesheet" type="text/css">
-    <!-- 重置 CSS 样式，确保不同浏览器之间的一致性 -->
     <link href="{{ url_for('static', filename='css/bootstrap-reboot.min.css') }}" rel="stylesheet" type="text/css">
-    <!-- CSS3 动画效果 -->
-    <link href="{{ url_for('static', filename='css/animate.css') }}" rel="stylesheet" type="text/css">
-    <!-- 实现动画效果 -->
-    <link href="{{ url_for('static', filename='css/owl.carousel.css') }}" rel="stylesheet" type="text/css">
-    <link href="{{ url_for('static', filename='css/owl.theme.default.css') }}" rel="stylesheet" type="text/css">
-    <!-- 响应式 jQuery 弹出框插件 -->
-    <link href="{{ url_for('static', filename='css/magnific-popup.css') }}" rel="stylesheet" type="text/css">
-    <!-- 渲染的 Markdown 样式 -->
     <link href="{{ url_for('static', filename='css/github-markdown.css') }}" rel="stylesheet" type="text/css">
     <!-- 自定义样式 -->
     <style>
@@ -44,9 +34,7 @@
             margin: 0 auto;
         }
 
-        h1,
-        h2,
-        h3 {
+        h1, h2, h3 {
             color: #333;
         }
 
@@ -57,7 +45,7 @@
         }
 
         input[type="text"] {
-            width: 80%;
+            flex: 1; /* 让输入框填满可用空间 */
             padding: 12px;
             margin: 10px 0;
             border: 2px solid #ddd;
@@ -72,7 +60,8 @@
         }
 
         button {
-            padding: 10px 20px;
+            height: 48px;
+            padding: 0 20px;
             border: none;
             border-radius: 25px;
             background: linear-gradient(to right, #87CEEB, #FF69B4);
@@ -87,6 +76,22 @@
             box-shadow: 0 2px 10px rgba(135, 206, 235, 0.5);
         }
 
+        .accordion .card-header button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 15px;
+            background: linear-gradient(to right, #87CEEB, #FF69B4);
+            color: white;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 16px;
+            transition: box-shadow 0.3s;
+        }
+
+        .accordion .card-header button:hover {
+            box-shadow: 0 2px 10px rgba(135, 206, 235, 0.5);
+        }
+
         .accordion .card-header {
             background-color: #f8f9fa;
             border: none;
@@ -96,7 +101,7 @@
         .accordion .btn-link {
             font-size: 18px;
             text-decoration: none;
-            color: #ffffff;
+            color: #000;
         }
 
         .accordion .btn-link:hover {
@@ -112,38 +117,67 @@
             margin-top: 20px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
+
+        .markdown-body {
+            font-size: 16px;
+            line-height: 1.5;
+            color: #24292e;
+            font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
+            background-color: white;
+        }
+
+        .about-content {
+            text-align: center;
+            font-size: 16px;
+            line-height: 1.6;
+            color: #24292e;
+        }
+
+        .highlight {
+            background-color: yellow;
+        }
+
+        .d-flex {
+            display: flex;
+        }
+
+        .align-items-center {
+            align-items: center;
+        }
     </style>
 </head>
 
 <body>
     <div id="content">
-        <div class="container text-center">
+        <div class="container text-center markdown-body">
             <!-- 标题 -->
-            <h1 class="no-bottom gradient-text"><strong>> {{ help_config.bot_name }} <</strong></h1>
+            <h1 class="no-bottom gradient-text"><strong>✨ {{ help_config.bot_name }} ✨</strong></h1>
             <!-- 搜索框 -->
-            <form class="row" id="form_subscribe" method="get" onsubmit="return search();">
-                <div class="col text-center">
-                    <label for="searchInput"></label>
+            <form class="row justify-content-center" id="form_subscribe" method="get" onsubmit="return search();">
+                <div class="col-auto d-flex align-items-center">
+                    <label for="searchInput" class="me-2"></label>
                     <input class="form-control" id="searchInput" placeholder="搜索功能或指令" type="text">
-                    <button type="submit" id="btn-submit"><i class="arrow_right"></i> 搜索</button>
+                    <button type="submit" id="btn-submit" class="ms-2"><i class="arrow_right"></i> 搜索</button>
                 </div>
             </form>
             <!-- 命令文档 -->
             <div class="command-box">
-                <h2>命令文档</h2>
+                <h2 class="gradient-text">命令文档</h2>
                 <div class="accordion" id="instructions">
                     {% for help_body in help_config.help_list %}
                     <div class="card">
                         <div class="card-header" id="heading-{{help_body.id}}">
                             <h5 class="mb-0">
-                                <button class="btn btn-link text-white" data-bs-toggle="collapse" data-bs-target="#collapse-{{help_body.id}}" aria-expanded="true" aria-controls="collapse-{{help_body.id}}">
+                                <button class="btn btn-link" data-bs-toggle="collapse"
+                                    data-bs-target="#collapse-{{help_body.id}}" aria-expanded="true"
+                                    aria-controls="collapse-{{help_body.id}}">
                                     {{ help_body.name }}
                                 </button>
                             </h5>
                         </div>
                         <div id="collapse-{{help_body.id}}" class="collapse" aria-labelledby="heading-{{help_body.id}}" data-bs-parent="#instructions">
                             <div class="card-body">
-                                {{ help_body.help }}
+                                {{ help_body.help | safe }}
                             </div>
                         </div>
                     </div>
@@ -152,17 +186,11 @@
             </div>
             <!-- 关于 -->
             <div class="about-box">
-                <h3>关于</h3>
-                <table class="table">
-                    <tbody>
-                        <tr>
-                            <td>Power By YuiChyanBot</td>
-                        </tr>
-                        <tr>
-                            <td>Author: Github @azmiao</td>
-                        </tr>
-                    </tbody>
-                </table>
+                <h2 class="gradient-text">关于</h2>
+                <div class="about-content">
+                    <p>Power By YuiChyanBot</p>
+                    <p>Author: Github @azmiao</p>
+                </div>
             </div>
         </div>
     </div>
@@ -170,6 +198,46 @@
     <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+
+    <script>
+        function search() {
+            const inputElement = document.getElementById('searchInput');
+            const input = inputElement.value.toLowerCase();
+            const cards = document.querySelectorAll('.accordion .card');
+
+            cards.forEach(card => {
+                const headerButton = card.querySelector('.card-header button');
+                const body = card.querySelector('.card-body');
+                const headerText = headerButton.textContent.toLowerCase();
+                const bodyText = body.textContent.toLowerCase();
+
+                card.querySelectorAll('.highlight').forEach(element => {
+                    element.classList.remove('highlight');
+                });
+
+                if (input === "") {
+                    card.style.display = '';
+                    card.querySelector('.collapse').classList.remove('show');
+                } else if (headerText.includes(input) || bodyText.includes(input)) {
+                    card.style.display = '';
+                    card.querySelector('.collapse').classList.add('show');
+                    highlightText(headerButton, input);
+                    highlightText(body, input);
+                } else {
+                    card.style.display = 'none';
+                    card.querySelector('.collapse').classList.remove('show');
+                }
+            });
+
+            return false;
+        }
+
+        function highlightText(element, text) {
+            const innerHTML = element.innerHTML;
+            const regex = new RegExp(`(${text})`, 'gi');
+            element.innerHTML = innerHTML.replace(regex, '<span class="highlight">$1</span>');
+        }
+    </script>
 </body>
 
 </html>
