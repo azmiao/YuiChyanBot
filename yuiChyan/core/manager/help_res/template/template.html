@@ -6,22 +6,19 @@
     <title>{{ help_config.bot_name }}菜单</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- 基础 CSS -->
-    <link href="{{ url_for('static', filename='css/bootstrap.css') }}" rel="stylesheet" type="text/css">
-    <link href="{{ url_for('static', filename='css/bootstrap-grid.min.css') }}" rel="stylesheet" type="text/css">
-    <link href="{{ url_for('static', filename='css/bootstrap-reboot.min.css') }}" rel="stylesheet" type="text/css">
-    <link href="{{ url_for('static', filename='css/github-markdown.css') }}" rel="stylesheet" type="text/css">
+    <link href="../static/css/bootstrap.css" rel="stylesheet" type="text/css">
+    <link href="../static/css/bootstrap-grid.min.css" rel="stylesheet" type="text/css">
+    <link href="../static/css/bootstrap-reboot.min.css" rel="stylesheet" type="text/css">
+    <link href="../static/css/github-markdown.css" rel="stylesheet" type="text/css">
     <!-- 自定义样式 -->
     <style>
         body {
             font-family: Arial, sans-serif;
             background-color: #f2f2f2;
-            height: 100vh;
             margin: 0;
             text-align: center;
             color: #333;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            display: block;
         }
 
         .container {
@@ -31,7 +28,7 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
             max-width: 800px;
             width: 100%;
-            margin: 0 auto;
+            margin: 20px auto;
         }
 
         h1, h2, h3 {
@@ -76,6 +73,14 @@
             box-shadow: 0 2px 10px rgba(135, 206, 235, 0.5);
         }
 
+        .transparent-card {
+            background-color: rgba(255, 255, 255, 0.5);
+            border: none;
+            box-shadow: none;
+            margin-bottom: 1rem;
+            border-radius: 10px;
+        }
+
         .accordion .card-header button {
             padding: 10px 20px;
             border: none;
@@ -94,8 +99,7 @@
 
         .accordion .card-header {
             background-color: #f8f9fa;
-            border: none;
-            border-bottom: 1px solid #e1e1e1;
+            border-style: none;
         }
 
         .accordion .btn-link {
@@ -148,6 +152,7 @@
 </head>
 
 <body>
+    <div class="highlight invisible-highlight"></div>
     <div id="content">
         <div class="container text-center markdown-body">
             <!-- 标题 -->
@@ -165,7 +170,7 @@
                 <h2 class="gradient-text">命令文档</h2>
                 <div class="accordion" id="instructions">
                     {% for help_body in help_config.help_list %}
-                    <div class="card">
+                    <div class="transparent-card">
                         <div class="card-header" id="heading-{{help_body.id}}">
                             <h5 class="mb-0">
                                 <button class="btn btn-link" data-bs-toggle="collapse"
@@ -188,16 +193,17 @@
             <div class="about-box">
                 <h2 class="gradient-text">关于</h2>
                 <div class="about-content">
-                    <p>Power By YuiChyanBot</p>
-                    <p>Author: Github @azmiao</p>
+                    <p>框架: <a href="https://github.com/azmiao/YuiChyanBot">YuiChyanBot</a></p>
+                    <p>作者: <a href="https://github.com/azmiao">Github @azmiao</a></p>
+                    <img src="../static/yui.jpg" alt="天使禁止迫害" style="max-width:30%; height:auto;" />
                 </div>
             </div>
         </div>
     </div>
     <!-- 本地 jQuery 和 Bootstrap JS -->
-    <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+    <script src="../static/js/jquery.min.js"></script>
+    <script src="../static/js/popper.min.js"></script>
+    <script src="../static/js/bootstrap.min.js"></script>
 
     <script>
         function search() {

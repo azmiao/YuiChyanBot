@@ -2,6 +2,7 @@ import importlib
 from typing import List, LiteralString, Dict
 
 import nonebot
+from jinja2 import FileSystemLoader
 from nonebot import NoneBot, load_plugins
 
 import yuiChyan.config
@@ -30,6 +31,8 @@ yui_bot: Optional[YuiChyan] = None
 logger = new_logger('YuiChyan', config.DEBUG)
 # 插件帮助文档列表
 help_list: List[Dict[str, LiteralString | str | bytes | int]] = []
+# Quart资源路径
+help_res_dir = os.path.abspath(os.path.join(current_dir, 'core', 'manager', 'help_res'))
 
 
 # 获取当前BOT实例
@@ -54,6 +57,11 @@ def create_instance() -> YuiChyan:
 
     # 使用基础配置启动
     yui_bot = YuiChyan(config)
+
+    # 配置 Quart App
+    yui_bot.server_app.static_folder = os.path.join(help_res_dir, 'static')
+    yui_bot.server_app.jinja_env.loader = FileSystemLoader(os.path.join(help_res_dir, 'template'))
+    # App 启动前载入计时器
     yui_bot.server_app.before_serving(_start_scheduler)
 
     # 加载插件
