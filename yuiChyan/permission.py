@@ -1,17 +1,50 @@
+from functools import total_ordering
+
 from aiocqhttp import Event as CQEvent
 
 from yuiChyan import config
 
-BLACK = -999
-NORMAL = 1
-PRIVATE = 10
-ADMIN = 21
-OWNER = 22
-SUPERUSER = 999
+
+# 权限类
+@total_ordering
+class Permission:
+    # 使用类变量存储所有权限实例
+    _permissions_by_level = {}
+
+    def __init__(self, name: str, level: int):
+        self.name = name
+        self.level = level
+        Permission._permissions_by_level[level] = self
+
+    def __lt__(self, other):
+        if not isinstance(other, Permission):
+            return NotImplemented
+        return self.level < other.level
+
+    def __eq__(self, other):
+        if not isinstance(other, Permission):
+            return NotImplemented
+        return self.level == other.level
+
+    # 使用类方法从类变量中检索权限
+    @classmethod
+    def get_permission_by_level(cls, level) -> 'Permission':
+        if level not in cls._permissions_by_level:
+            raise Exception(f'权限级别 {level} 不存在，请检查')
+        return cls._permissions_by_level.get(level)
+
+
+# 权限级别
+BLACK: Permission = Permission('黑名单', -999 )
+NORMAL: Permission = Permission('群员', 1)
+PRIVATE: Permission = Permission('私聊', 10)
+ADMIN: Permission = Permission('群管理', 20)
+OWNER: Permission = Permission('群主', 21)
+SUPERUSER: Permission = Permission('维护组', 999)
 
 
 # 根据事件获取用户权限
-def get_user_permission(ev: CQEvent):
+def get_user_permission(ev: CQEvent) -> Permission:
     uid = ev.user_id
     # 维护组
     if uid in config.SUPERUSERS:
@@ -36,7 +69,7 @@ def get_user_permission(ev: CQEvent):
 
 
 # 确认权限
-def check_permission(ev: CQEvent, require: int) -> bool:
+def check_permission(ev: CQEvent, require: Permission) -> bool:
     # 只对群聊做判断
     if ev['message_type'] == 'group':
         return get_user_permission(ev) >= require

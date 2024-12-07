@@ -12,7 +12,7 @@ import yuiChyan.config
 from yuiChyan import get_bot, YuiChyan, trigger, config, logger as bot_logger
 from yuiChyan.exception import *
 from yuiChyan.log import new_logger
-from yuiChyan.permission import NORMAL, PRIVATE, ADMIN, OWNER, SUPERUSER, check_permission
+from yuiChyan.permission import ADMIN, check_permission, Permission
 from yuiChyan.resources import auth_db_ as auth_db, service_db_ as service_db
 
 # 全局服务配置缓存
@@ -27,9 +27,9 @@ def exception_handler(func) -> Callable:
         try:
             return await func(*args, **kwargs)
         except BotException as e:
-            if e.ev:
-                # 将异常消息通过BOT发送
-                await get_bot().send(e.ev, e.message)
+            if e.ev and e.message:
+                # 如果有事件和消息 | 将异常消息通过BOT发送
+                await get_bot().send(e.ev, e.message, at_sender=True)
             else:
                 # 优先使用 service_instance.logger 进行日志记录
                 if service_instance and service_instance.logger:
@@ -46,16 +46,14 @@ class Service:
 
     def __init__(
             self,
-            name: str,  # service name
-            permission: NORMAL | PRIVATE | ADMIN | OWNER | SUPERUSER = NORMAL,  # use permission
-            manage: NORMAL | PRIVATE | ADMIN | OWNER | SUPERUSER = ADMIN,  # manage permission
-            use_exclude: bool = True,  # use exclude group: similar with blacklist, otherwise use whitelist
-            visible: bool = True,  # visible or not
-            need_auth: bool = True  # need bot auth
+            name: str,  # 服务名称
+            manage: Permission = ADMIN,  # 管理启用和禁用的权限
+            use_exclude: bool = True,  # 是否使用排除列表，即黑名单模式，否则使用白名单模式
+            visible: bool = True,  # 是否可见
+            need_auth: bool = True  # 是否需要群授权
     ):
         service_config = _read_service_config(name)
         self.name = name
-        self.permission = service_config.get('permission') if service_config.get('permission') else permission
         self.manage = service_config.get('manage') if service_config.get('manage') else manage
         self.use_exclude = service_config.get('use_exclude') or use_exclude
         self.visible = service_config.get('visible') or visible
@@ -302,8 +300,9 @@ class Service:
                 if force_private and event.detail_type != 'private':
                     raise FunctionException(event, '> 该命令只支持私聊')
                 # 校验权限
-                if not check_permission(event, cmd_permission):
-                    raise LakePermissionException(event, '权限不足')
+                permission = Permission.get_permission_by_level(cmd_permission)
+                if not check_permission(event, permission):
+                    raise LakePermissionException(event, f'您的权限不足，需要权限 [{permission.name}]')
                 return await func(bot, event)
 
             service_func = ServiceFunc(self, wrapper, only_to_me)
@@ -390,7 +389,6 @@ def _read_service_config(service_name: str):
 def _save_service_config(service: Service):
     service_db[service.name] = {
         'name': service.name,
-        'permission': service.permission,
         'manage': service.manage,
         'use_exclude': service.use_exclude,
         'visible': service.visible,
