@@ -6,9 +6,7 @@
     <title>{{ help_config.bot_name }}菜单</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- 基础 CSS -->
-    <link href="../static/css/bootstrap.css" rel="stylesheet" type="text/css">
-    <link href="../static/css/bootstrap-grid.min.css" rel="stylesheet" type="text/css">
-    <link href="../static/css/bootstrap-reboot.min.css" rel="stylesheet" type="text/css">
+    <link href="../static/css/bootstrap.min.css" rel="stylesheet">
     <link href="../static/css/github-markdown.css" rel="stylesheet" type="text/css">
     <!-- 自定义样式 -->
     <style>
@@ -33,6 +31,8 @@
 
         h1, h2, h3 {
             color: #333;
+            animation: colorChange 3s infinite alternate;
+            background-size: 200% 200%;
         }
 
         .gradient-text {
@@ -66,11 +66,12 @@
             cursor: pointer;
             text-decoration: none;
             font-size: 16px;
-            transition: box-shadow 0.3s;
+            transition: background 0.5s, box-shadow 0.3s;
         }
 
         button:hover {
-            box-shadow: 0 2px 10px rgba(135, 206, 235, 0.5);
+            background: linear-gradient(to right, #FF69B4, #87CEEB);
+            box-shadow: 0 2px 10px rgba(255, 105, 180, 0.5);
         }
 
         .transparent-card {
@@ -90,10 +91,11 @@
             cursor: pointer;
             text-decoration: none;
             font-size: 16px;
-            transition: box-shadow 0.3s;
+            transition: background 0.5s, box-shadow 0.3s;
         }
 
         .accordion .card-header button:hover {
+            background: linear-gradient(to right, #FF69B4, #87CEEB);
             box-shadow: 0 2px 10px rgba(135, 206, 235, 0.5);
         }
 
@@ -148,6 +150,24 @@
         .align-items-center {
             align-items: center;
         }
+
+        #searchInput::placeholder {
+            color: #999;
+            opacity: 1;
+        }
+
+        @keyframes colorChange {
+            0% {
+                background: linear-gradient(to right, #87CEEB, #FF69B4);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
+            100% {
+                background: linear-gradient(to right, #FF69B4, #87CEEB);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
+        }
     </style>
 </head>
 
@@ -180,7 +200,7 @@
                                 </button>
                             </h5>
                         </div>
-                        <div id="collapse-{{help_body.id}}" class="collapse" aria-labelledby="heading-{{help_body.id}}" data-bs-parent="#instructions">
+                        <div id="collapse-{{help_body.id}}" class="collapse" aria-labelledby="heading-{{help_body.id}}">
                             <div class="card-body">
                                 {{ help_body.help | safe }}
                             </div>
@@ -193,8 +213,8 @@
             <div class="about-box">
                 <h2 class="gradient-text">关于</h2>
                 <div class="about-content">
-                    <p>框架: <a href="https://github.com/azmiao/YuiChyanBot">YuiChyanBot</a></p>
-                    <p>作者: <a href="https://github.com/azmiao">Github @azmiao</a></p>
+                    <p>闭源框架: YuiChyanBot</p>
+                    <p>开发作者: <a href="https://github.com/azmiao">Github @azmiao</a></p>
                     <img src="../static/yui.jpg" alt="天使禁止迫害" style="max-width:30%; height:auto;" />
                 </div>
             </div>
@@ -202,14 +222,13 @@
     </div>
     <!-- 本地 jQuery 和 Bootstrap JS -->
     <script src="../static/js/jquery.min.js"></script>
-    <script src="../static/js/popper.min.js"></script>
-    <script src="../static/js/bootstrap.min.js"></script>
+    <script src="../static/js/bootstrap.bundle.min.js"></script>
 
     <script>
         function search() {
             const inputElement = document.getElementById('searchInput');
             const input = inputElement.value.toLowerCase();
-            const cards = document.querySelectorAll('.accordion .card');
+            const cards = document.querySelectorAll('.accordion .transparent-card');
 
             cards.forEach(card => {
                 const headerButton = card.querySelector('.card-header button');
