@@ -13,7 +13,7 @@ async_session_map: Dict[str, AsyncSession] = {}
 # 获取缓存的session
 def get_session(name: str) -> Session | AsyncSession:
     if name not in session_map and name not in async_session_map:
-        raise SessionNotFoundException(f'session [{name}] not found!')
+        raise SessionNotFoundException(f'找不到 Session [{name}]')
     elif name in session_map:
         return session_map.get(name)
     else:
@@ -27,13 +27,13 @@ def set_session(name: str, session: Session | AsyncSession):
     elif isinstance(session, AsyncSession):
         async_session_map[name] = session
     else:
-        raise SessionNotFoundException('Unsupported type!')
+        raise SessionNotFoundException('不支持的 Session 类型，只支持 [Session] 和 [AsyncSession]')
 
 
 # 创建同步session
 def create_session(name: str, is_save: bool = False) -> Session:
     if name in session_map or name in async_session_map:
-        raise SessionExistException(f'session [{name}] is already exist!')
+        raise SessionExistException(f'Session [{name}] 已经存在')
     session = requests.Session()
     if is_save:
         set_session(name, session)
@@ -43,7 +43,7 @@ def create_session(name: str, is_save: bool = False) -> Session:
 # 创建异步session
 def create_async_session(name: str, is_save: bool = False) -> AsyncSession:
     if name in session_map or name in async_session_map:
-        raise SessionExistException(f'async_session [{name}] is already exist!')
+        raise SessionExistException(f'AsyncSession [{name}] 已经存在')
     async_session = requests.AsyncSession()
     if is_save:
         set_session(name, async_session)

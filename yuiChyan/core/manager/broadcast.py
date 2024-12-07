@@ -51,7 +51,7 @@ def parse_command(command_raw: str):
     bc_sv_name = args[0]
     bc_msg = args[1]
     if bc_sv_name != 'all' and not bc_sv_name.startswith('g-') and not bc_sv_name.startswith('exg-'):
-        raise CommandErrorException('> broadcast command error!')
+        raise CommandErrorException('> 广播命令错误!')
     return bc_sv_name, bc_msg
 
 
@@ -86,10 +86,10 @@ async def broadcast(bot, ev):
         for group_id in group_id_list:
             bc_entity = Broadcast(self_id, group_id, bc_msg)
             broadcast_queue.enqueue(bc_entity)
-            logger.debug(f'> Broadcast[{self_id}, {group_id}, {bc_msg}] has added to BroadcastQueue!')
+            logger.debug(f'> 广播 [{self_id}, {group_id}, {bc_msg}] 已被添加至广播队列!')
 
 
-@sv.scheduled_job(second='*/2')
+@sv.scheduled_job(silence=True, second='*/2')
 async def send_broadcast():
     if broadcast_queue.size() == 0:
         return
@@ -99,7 +99,7 @@ async def send_broadcast():
     msg = bc_entity.msg
     yui_bot = get_bot()
     try:
-        msg_obj = await yui_bot.send_group_msg(self_id=self_id, group_id=group_id, message=msg)
-        logger.info(f'> Broadcast[{self_id}, {group_id}, {msg}] send success, message id is [{msg_obj["message_id"]}].')
+        await yui_bot.send_group_msg(self_id=self_id, group_id=group_id, message=msg)
+        logger.info(f'> 广播 [{self_id}, {group_id}, {msg}] 发送成功')
     except Exception as e:
-        logger.error(f'> Broadcast[{self_id}, {group_id}, {msg}] send failed：{str(e)}')
+        logger.error(f'> 广播 [{self_id}, {group_id}, {msg}] 发送失败：{str(e)}')

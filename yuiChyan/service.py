@@ -9,7 +9,7 @@ from apscheduler.triggers.cron import CronTrigger
 from nonebot import CQHttpError
 
 import yuiChyan.config
-from yuiChyan import get_bot, YuiChyan, trigger, config, logger as bot_logger, scheduler
+from yuiChyan import get_bot, YuiChyan, trigger, config, logger as bot_logger
 from yuiChyan.exception import *
 from yuiChyan.log import new_logger
 from yuiChyan.permission import NORMAL, PRIVATE, ADMIN, OWNER, SUPERUSER, check_permission
@@ -225,8 +225,8 @@ class Service:
             suffixes = (suffixes,)
 
         def deco(func) -> Callable:
-            @functools.wraps(func)
             @exception_handler
+            @functools.wraps(func)
             async def wrapper(event):
                 # 校验是否是群消息
                 if event.detail_type != 'group':
@@ -316,7 +316,7 @@ class Service:
 
         return deco
 
-    def scheduled_job(self, **kwargs) -> Callable:
+    def scheduled_job(self, silence: bool = False, **kwargs) -> Callable:
         """
         > 服务触发 - 定时任务
 
@@ -326,18 +326,17 @@ class Service:
         """
         def deco(func: Callable[[], Any]) -> Callable:
             @functools.wraps(func)
+            @exception_handler
             async def wrapper():
-                try:
+                if not silence:
                     self.logger.info(f'> 定时任务 {func.__name__} 开始运行...')
-                    ret = await func()
+                ret = await func()
+                if not silence:
                     self.logger.info(f'> 定时任务 {func.__name__} 执行完成！')
-                    return ret
-                except Exception as e:
-                    self.logger.error(f'定时任务 {func.__name__} 执行出错：f{str(e)}')
-                    self.logger.exception(e)
+                return ret
 
             # 使用 YuiChyanBot 生成的全局唯一计时器添加任务
-            scheduler.add_job(
+            nonebot.scheduler.add_job(
                 wrapper,
                 CronTrigger(**kwargs),
                 id=f'{self.name}_{func.__name__}_job',

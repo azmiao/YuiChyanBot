@@ -46,7 +46,7 @@ class PrefixTrigger(BaseTrigger):
 
     def add(self, prefix_str: str, sf: 'ServiceFunc'):
         super()._add(self.trie, prefix_str, sf)
-        yuiChyan.logger.debug(f'Succeed to add prefix trigger [{prefix_str}]')
+        yuiChyan.logger.debug(f'成功添加 [前缀匹配] 条件 [{prefix_str}]')
 
     def find_handler(self, ev: CQEvent) -> Iterable['ServiceFunc']:
         prefix_raw = ev.message[0]
@@ -83,7 +83,7 @@ class SuffixTrigger(BaseTrigger):
     def add(self, suffix_str: str, sf: 'ServiceFunc'):
         suffix_r = suffix_str[::-1]
         super()._add(self.trie, suffix_r, sf)
-        yuiChyan.logger.debug(f'Succeed to add suffix trigger [{suffix_str}]')
+        yuiChyan.logger.debug(f'成功添加 [后缀匹配] 条件 [{suffix_str}]')
 
     def find_handler(self, event: CQEvent) -> Iterable['ServiceFunc']:
         suffix_raw = event.message[-1]
@@ -119,7 +119,7 @@ class RegularTrigger(BaseTrigger):
         trie_list = self.regular_dict.get(x, [])
         trie_list.append(sf)
         self.regular_dict[x] = trie_list
-        yuiChyan.logger.debug(f'Succeed to add rex trigger [{x.pattern}]')
+        yuiChyan.logger.debug(f'成功添加 [正则匹配] 条件 [{x.pattern}]')
 
     def find_handler(self, event: CQEvent) -> Iterable['ServiceFunc']:
         for rex, sfs in self.regular_dict.items():
@@ -131,6 +131,7 @@ class RegularTrigger(BaseTrigger):
                     yield service_func
 
 
+# 普通消息匹配
 class NormalTrigger(BaseTrigger):
 
     def __init__(self):
@@ -142,11 +143,13 @@ class NormalTrigger(BaseTrigger):
         return []
 
 
+# 四种基本匹配触发器
 prefix = PrefixTrigger()
 suffix = SuffixTrigger()
 normal = NormalTrigger()
 regular = RegularTrigger()
 
+# 匹配触发链 | 优先级：前缀 > 后缀 > 普通 > 正则
 trigger_chain: List[BaseTrigger] = [
     prefix,
     suffix,

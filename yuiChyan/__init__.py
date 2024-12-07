@@ -2,7 +2,6 @@ import importlib
 from typing import List
 
 import nonebot
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from nonebot import NoneBot, load_plugins
 
 import yuiChyan.config
@@ -19,13 +18,14 @@ class YuiChyan(NoneBot):
     # 获取所有的bot的QQ
     def get_self_ids(self) -> List[int]:
         keys_as_int = map(int, self._wsr_api_clients.keys())
-        return list(keys_as_int)
+        self_ids = list(keys_as_int)
+        if not self_ids:
+            raise BotException(None, '> 获取YuiChyan自身QQ号列表失败，可能是协议实现客户端未启动')
+        return self_ids
 
 
 # 全局唯一的BOT实例
 yui_bot: Optional[YuiChyan] = None
-# 全局唯一的计时器
-scheduler: Optional[AsyncIOScheduler] = None
 # 全局默认的logger实例
 logger = new_logger('YuiChyan', config.DEBUG)
 
@@ -34,18 +34,16 @@ logger = new_logger('YuiChyan', config.DEBUG)
 def get_bot() -> YuiChyan:
     global yui_bot
     if yui_bot is None:
-        raise YuiNotFoundException('YuiChyan bot has not been created yet!')
+        raise YuiNotFoundException('YuiChyanBot实例还未启动!')
     return yui_bot
 
 
 # 启动 YuiChyanBot 计时器
-async def start_scheduler():
-    global scheduler
-    scheduler = AsyncIOScheduler()
-    if not scheduler.running:
-        scheduler.configure(config.APSCHEDULER_CONFIG)
-        scheduler.start()
-        logger.info('> YuiChyanBot 计时器启动成功！')
+async def _start_scheduler():
+    if nonebot.scheduler and not nonebot.scheduler.running:
+        nonebot.scheduler.configure(config.APSCHEDULER_CONFIG)
+        nonebot.scheduler.start()
+        logger.info('> YuiChyanBot 核心计时器启动成功！')
 
 
 # 设置一些Nonebot的基础参数
@@ -61,6 +59,7 @@ def create_instance() -> YuiChyan:
     # 使用基础配置启动
     _set_default_config()
     yui_bot = YuiChyan(config)
+    yui_bot.server_app.before_serving(_start_scheduler)
 
     # 加载插件
     config_logger = new_logger('config', config.DEBUG)
@@ -117,15 +116,18 @@ def _message_preprocessor(func):
 async def _process_message(bot: YuiChyan, event: CQEvent):
     for _trigger in trigger_chain:
         for service_func in _trigger.find_handler(event):
+
+            # 校验是否需要@触发
             if service_func.only_to_me and not event['to_me']:
                 continue
 
+            # 如果有群ID | 群消息判断是否启用服务
             if event.group_id:
                 group_id = int(event.group_id)
                 if not service_func.sv.judge_enable(group_id):
                     continue
 
-            service_func.sv.logger.info(f'Message {event.message_id} triggered {service_func.__name__}.')
+            service_func.sv.logger.info(f'消息ID [{event.message_id}] 触发服务 [{service_func.__name__}]')
             try:
                 await service_func.func(bot, event)
             except nonebot.command.SwitchException:
@@ -133,6 +135,5 @@ async def _process_message(bot: YuiChyan, event: CQEvent):
             except nonebot.message.CanceledException:
                 raise
             except Exception as e:
-                service_func.sv.logger.error(f'{type(e)} occurred when {service_func.__name__} '
-                                             f'handling message {event.message_id}.')
+                service_func.sv.logger.error(f'消息ID [{event.message_id}] 触发服务 [{service_func.__name__}] 出错！')
                 service_func.sv.logger.exception(e)
