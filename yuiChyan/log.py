@@ -16,7 +16,7 @@ error_handler.setLevel(logging.ERROR)
 error_handler.setFormatter(formatter)
 
 
-def new_logger(name, debug=True):
+def new_logger(name: str, debug: bool = True) -> logging.Logger:
     _logger = logging.getLogger(name)
     _logger.addHandler(default_handler)
     _logger.addHandler(error_handler)

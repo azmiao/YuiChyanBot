@@ -2,6 +2,7 @@ import asyncio
 import functools
 import random
 import re
+from logging import Logger
 from typing import Dict, Callable, List, Union, Any, Tuple, Iterable
 
 import nonebot
@@ -16,7 +17,7 @@ from yuiChyan.permission import ADMIN, check_permission, Permission
 from yuiChyan.resources import auth_db_ as auth_db, service_db_ as service_db
 
 # 全局服务配置缓存
-loaded_services: Dict[str, 'Service'] = {}
+_loaded_services: Dict[str, 'Service'] = {}
 
 
 # 自定义异常拦截处理器
@@ -58,53 +59,56 @@ class Service:
         self.use_exclude = service_config.get('use_exclude') or use_exclude
         self.visible = service_config.get('visible') or visible
         self.need_auth = service_config.get('need_auth') or need_auth
-        self.include_group = service_config.get('include_group', [])
-        self.exclude_group = service_config.get('exclude_group', [])
-        self.logger = new_logger(name, yuiChyan.config.DEBUG)
+        self.include_group: List[int] = service_config.get('include_group', [])
+        self.exclude_group: List[int] = service_config.get('exclude_group', [])
+        self.logger: Logger = new_logger(name, yuiChyan.config.DEBUG)
 
         # 载入缓存
-        assert self.name not in loaded_services, f'服务 [{self.name}] 已存在！'
-        loaded_services[self.name] = self
+        assert self.name not in _loaded_services, f'服务 [{self.name}] 已存在！'
+        _loaded_services[self.name] = self
 
     # 获取bot
     @property
     def bot(self) -> YuiChyan:
         return get_bot()
 
+    # 获取载入的所有服务缓存
     @staticmethod
     def get_loaded_services() -> Dict[str, 'Service']:
-        return loaded_services
+        return _loaded_services
 
+    # 将自身服务保存至缓存
+    def save_loaded_services(self):
+        _loaded_services[self.name] = self
+
+    # 对某个群开启服务
     def enable_service(self, group_id: int):
         if self.use_exclude:
-            if group_id not in self.exclude_group:
-                raise ServiceEnabledException(f'服务 [{self.name}] 已经在群 [{group_id}] 中启用过了!')
-            self.exclude_group.pop(group_id)
+            self.exclude_group.remove(group_id)
         else:
-            if group_id in self.include_group:
-                raise ServiceEnabledException(f'服务 [{self.name}] 已经在群 [{group_id}] 中启用过了!')
             self.include_group.append(group_id)
+        self.save_loaded_services()
         _save_service_config(self)
-        self.logger.info(f'服务 [{self.name}] 在群 [{group_id}] 开启成功！')
+        self.logger.info(f'服务 [{self.name}] 在群 [{group_id}] 启用成功！')
 
+    # 对某个群禁用服务
     def disable_service(self, group_id: int):
         if self.use_exclude:
-            if group_id in self.exclude_group:
-                raise ServiceDisabledException(f'服务 [{self.name}] 已经在群 [{group_id}] 中禁用过了!')
             self.exclude_group.append(group_id)
         else:
-            if group_id not in self.include_group:
-                raise ServiceDisabledException(f'服务 [{self.name}] 已经在群 [{group_id}] 中禁用过了!')
-            self.include_group.pop(group_id)
+            self.include_group.remove(group_id)
+        self.save_loaded_services()
         _save_service_config(self)
         self.logger.info(f'服务 [{self.name}] 在群 [{group_id}] 禁用成功！')
 
+    # 判断某个群是否启用本服务
     def judge_enable(self, group_id: int) -> bool:
         if self.use_exclude:
             return group_id not in self.exclude_group
         else:
             return group_id in self.include_group
 
+    # 获取所有启用本服务的群 | key: 群号 | value: BOT列表
     async def get_enable_groups(self) -> Dict[int, List[int]]:
         group_self_dict = {}
         for self_id in self.bot.get_self_ids():
@@ -274,7 +278,7 @@ class Service:
     def on_command(self, commands: Union[str, Tuple[str, ...], Iterable[str]],
                    only_to_me: bool = False,
                    force_private: bool = False,
-                   cmd_permission: int = ADMIN) -> Callable:
+                   cmd_permission: Permission = ADMIN) -> Callable:
         """
         > 服务触发 - 命令匹配
 
@@ -300,9 +304,8 @@ class Service:
                 if force_private and event.detail_type != 'private':
                     raise FunctionException(event, '> 该命令只支持私聊')
                 # 校验权限
-                permission = Permission.get_permission_by_level(cmd_permission)
-                if not check_permission(event, permission):
-                    raise LakePermissionException(event, f'您的权限不足，需要权限 [{permission.name}]')
+                if not check_permission(event, cmd_permission):
+                    raise LakePermissionException(event, f'您的权限不足，需要权限 [{cmd_permission.name}]')
                 return await func(bot, event)
 
             service_func = ServiceFunc(self, wrapper, only_to_me)

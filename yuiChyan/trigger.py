@@ -44,8 +44,8 @@ class PrefixTrigger(BaseTrigger):
         super().__init__()
         self.trie = pygtrie.CharTrie()
 
-    def add(self, prefix_str: str, sf: 'ServiceFunc'):
-        super()._add(self.trie, prefix_str, sf)
+    def add(self, prefix_str: str, service_func: 'ServiceFunc'):
+        super()._add(self.trie, prefix_str, service_func)
         yuiChyan.logger.debug(f'成功添加 [前缀匹配] 条件 [{prefix_str}]')
 
     def find_handler(self, ev: CQEvent) -> Iterable['ServiceFunc']:
@@ -80,9 +80,9 @@ class SuffixTrigger(BaseTrigger):
         super().__init__()
         self.trie = pygtrie.CharTrie()
 
-    def add(self, suffix_str: str, sf: 'ServiceFunc'):
+    def add(self, suffix_str: str, service_func: 'ServiceFunc'):
         suffix_r = suffix_str[::-1]
-        super()._add(self.trie, suffix_r, sf)
+        super()._add(self.trie, suffix_r, service_func)
         yuiChyan.logger.debug(f'成功添加 [后缀匹配] 条件 [{suffix_str}]')
 
     def find_handler(self, event: CQEvent) -> Iterable['ServiceFunc']:
@@ -124,7 +124,7 @@ class RegularTrigger(BaseTrigger):
     def find_handler(self, event: CQEvent) -> Iterable['ServiceFunc']:
         for rex, sfs in self.regular_dict.items():
             for service_func in sfs:
-                text = event.normal_text if service_func.normalize_text else event.plain_text
+                text = event.normal_text
                 match = rex.search(text)
                 if match:
                     event['match'] = match
@@ -138,8 +138,8 @@ class NormalTrigger(BaseTrigger):
         super().__init__()
 
     def find_handler(self, event: CQEvent):
-        event.plain_text = event.message.extract_plain_text().strip()
-        event.normal_text = normalize_str(event.plain_text)
+        plain_text = event.message.extract_plain_text().strip()
+        event.normal_text = normalize_str(plain_text)
         return []
 
 

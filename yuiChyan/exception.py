@@ -47,18 +47,6 @@ class SessionExistException(BotException):
         super().__init__(None, message)
 
 
-# 服务已被开启
-class ServiceEnabledException(BotException):
-    def __init__(self, message: Optional[str] = None):
-        super().__init__(None, message)
-
-
-# 服务已被关闭
-class ServiceDisabledException(BotException):
-    def __init__(self, message: Optional[str] = None):
-        super().__init__(None, message)
-
-
 # 命令格式错误
 class CommandErrorException(BotException):
     def __init__(self, message: Optional[str] = None):

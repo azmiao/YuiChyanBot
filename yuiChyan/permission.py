@@ -28,7 +28,7 @@ class Permission:
 
     # 使用类方法从类变量中检索权限
     @classmethod
-    def get_permission_by_level(cls, level) -> 'Permission':
+    def get_permission_by_level(cls, level: int) -> 'Permission':
         if level not in cls._permissions_by_level:
             raise Exception(f'权限级别 {level} 不存在，请检查')
         return cls._permissions_by_level.get(level)
@@ -54,7 +54,7 @@ def get_user_permission(ev: CQEvent) -> Permission:
     if msg_type == 'group':
         if ev.anonymous:
             return BLACK
-        role = ev.sender.get('role')
+        role = ev.get('sender', {}).get('role', '')
         match role:
             case 'owner':
                 return OWNER

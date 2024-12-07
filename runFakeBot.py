@@ -1,6 +1,7 @@
 import asyncio
 import json
 import random
+import re
 import time
 
 import websockets
@@ -10,7 +11,7 @@ from aiocqhttp.message import Message
 config = {
     'bot_id': 3100271297,
     'sender_id': 2362020227,
-    'name': 'message.group.admin',
+    'role': 'normal',
     'group_name': '测试群',
     'group_id': 66666666,
     'ws_url': 'ws://127.0.0.1:2333/ws/',
@@ -56,8 +57,6 @@ async def connect_ws(ws_url, reconnect_interval, rate_limiter, headers):
             while True:
                 message_ = await asyncio.to_thread(input)
                 message_ = message_.strip()
-                if not message_:
-                    continue
                 msg_id = random.randint(10000000, 99999999)
 
                 data = {
@@ -90,10 +89,13 @@ async def connect_ws(ws_url, reconnect_interval, rate_limiter, headers):
                         data['raw_message'] = message_
                         print(f'收到私聊 {config["nickname"]}({config["sender_id"]}) 的消息: {message_} ({msg_id})')
                     case _:
+                        # 群聊
+                        _match = re.match(r'^(\[CQ:at,qq=[0-9]+])? ?([\S\s]*)$', message_)
+                        data['to_me'] = True if _match.group(1) else False
                         data['post_type'] = 'message'
                         data['message_type'] = 'group'
                         data['sub_type'] = 'normal'
-                        data['message'] = message_
+                        data['message'] = _match.group(2)
                         data['raw_message'] = message_
                         data['group_id'] = config['group_id']
                         print(f'收到群 {config["group_name"]}({config["group_id"]}) 的消息: {message_} ({msg_id})')
@@ -102,7 +104,8 @@ async def connect_ws(ws_url, reconnect_interval, rate_limiter, headers):
 
         except asyncio.CancelledError as error:
             print(error)
-        except Exception as _:
+        except Exception as error:
+            print(error)
             raise websockets.ConnectionClosed
 
     async def receive_messages(ws):
@@ -116,7 +119,7 @@ async def connect_ws(ws_url, reconnect_interval, rate_limiter, headers):
                 msg_list = message_.get('params', {}).get('message', [])
                 message_type = message_.get('params', {}).get('message_type', '')
                 echo = message_.get("echo", {})
-                msg = Message(msg_list).extract_plain_text()
+                msg = Message(msg_list).extract_plain_text().strip()
 
                 # 准备返回API
                 msg_id = random.randint(10000000, 99999999)
@@ -125,9 +128,9 @@ async def connect_ws(ws_url, reconnect_interval, rate_limiter, headers):
                 match action:
                     case 'send_msg':
                         if message_type == 'group':
-                            print(f'发送群 {config["group_name"]}({config["group_id"]}) 的消息: {msg} ({msg_id})')
+                            print(f'发送群 {config["group_name"]}({config["group_id"]}) 的消息 ({msg_id}) :\n{msg}')
                         else:
-                            print(f'发送私聊 {config["nickname"]}({config["sender_id"]}) 的消息: {msg} ({msg_id})')
+                            print(f'发送私聊 {config["nickname"]}({config["sender_id"]}) 的消息 ({msg_id}) :\n{msg}')
                         data = {'message_id': msg_id}
                     case 'get_group_member_info':
                         data = {
@@ -173,7 +176,8 @@ async def connect_ws(ws_url, reconnect_interval, rate_limiter, headers):
 
         except asyncio.CancelledError as error:
             print(error)
-        except Exception as _:
+        except Exception as error:
+            print(error)
             raise websockets.ConnectionClosed
 
     while True:
