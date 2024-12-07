@@ -210,7 +210,7 @@ async def copy_question(bot, ev):
         return
 
     if not check_permission(ev, SUPERUSER):
-        raise LakePermissionException(ev, f'该功能限维护组')
+        raise LakePermissionException(ev, permission=SUPERUSER)
 
     group_1, group_2, copy_type = match.group(1), match.group(2), match.group(3)
     group_list = await get_g_list(bot)
@@ -224,7 +224,7 @@ async def copy_question(bot, ev):
 @sv.on_match('XQA禁用我问')
 async def xqa_disable_self(bot, ev):
     if not check_permission(ev, SUPERUSER):
-        raise LakePermissionException(ev, f'该功能限维护组')
+        raise LakePermissionException(ev, permission=SUPERUSER)
 
     msg = await modify_enable_self(str(ev.group_id), False)
     if msg:
@@ -237,7 +237,7 @@ async def xqa_disable_self(bot, ev):
 @sv.on_match('XQA启用我问')
 async def xqa_enable_self(bot, ev):
     if not check_permission(ev, SUPERUSER):
-        raise LakePermissionException(ev, f'该功能限维护组')
+        raise LakePermissionException(ev, permission=SUPERUSER)
 
     msg = await modify_enable_self(str(ev.group_id), True)
     if msg:
@@ -250,7 +250,7 @@ async def xqa_enable_self(bot, ev):
 @sv.on_match('XQA清空本群所有我问')
 async def xqa_delete_self(bot, ev):
     if not check_permission(ev, SUPERUSER):
-        raise LakePermissionException(ev, f'该功能限维护组')
+        raise LakePermissionException(ev, permission=SUPERUSER)
 
     group_id = str(ev.group_id)
     try:
@@ -265,7 +265,7 @@ async def xqa_delete_self(bot, ev):
 @sv.on_match('XQA清空本群所有有人问')
 async def xqa_delete_all(bot, ev):
     if not check_permission(ev, SUPERUSER):
-        raise LakePermissionException(ev, f'该功能限维护组')
+        raise LakePermissionException(ev, permission=SUPERUSER)
 
     group_id = str(ev.group_id)
     try:
@@ -280,7 +280,7 @@ async def xqa_delete_all(bot, ev):
 @sv.on_match('XQA提取数据')
 async def xqa_export_data(bot, ev):
     if not check_permission(ev, SUPERUSER):
-        raise LakePermissionException(ev, f'该功能限维护组')
+        raise LakePermissionException(ev, permission=SUPERUSER)
 
     await export_json()
     await bot.send(ev, 'XQA提取完成，请检查日志')
@@ -290,7 +290,7 @@ async def xqa_export_data(bot, ev):
 @sv.on_match('XQA重建数据')
 async def xqa_import_data(bot, ev):
     if not check_permission(ev, SUPERUSER):
-        raise LakePermissionException(ev, f'该功能限维护组')
+        raise LakePermissionException(ev, permission=SUPERUSER)
 
     await import_json()
-    await bot.send(ev, 'XQA重建完成，新数据将存在"data_temp.sqlite"中，请自行备份替换')
+    await bot.send(ev, 'XQA重建完成，新数据将存在"xqa_temp.db"中，请自行备份替换')

@@ -293,7 +293,7 @@ class Service:
             @functools.wraps(func)
             @exception_handler
             async def wrapper(bot, event: CQEvent):
-                # 私聊只支持超管
+                # 私聊只支持超管 | 其他人的消息直接忽略
                 if force_private and event.user_id not in config.SUPERUSERS:
                     raise nonebot.command.SwitchException(nonebot.message.Message(event.raw_message))
                 # 校验是否是私聊
