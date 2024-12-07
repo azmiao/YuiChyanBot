@@ -1,5 +1,5 @@
 import importlib
-from typing import List
+from typing import List, LiteralString, Dict
 
 import nonebot
 from nonebot import NoneBot, load_plugins
@@ -28,6 +28,8 @@ class YuiChyan(NoneBot):
 yui_bot: Optional[YuiChyan] = None
 # 全局默认的logger实例
 logger = new_logger('YuiChyan', config.DEBUG)
+# 插件帮助文档列表
+help_list: List[Dict[str, LiteralString | str | bytes | int]] = []
 
 
 # 获取当前BOT实例
@@ -46,18 +48,11 @@ async def _start_scheduler():
         logger.info('> YuiChyanBot 核心计时器启动成功！')
 
 
-# 设置一些Nonebot的基础参数
-def _set_default_config():
-    config.COMMAND_START = {''}
-    config.COMMAND_SEP = set()
-
-
 # 创建 YuiChyanBot 实例
 def create_instance() -> YuiChyan:
     global yui_bot
 
     # 使用基础配置启动
-    _set_default_config()
     yui_bot = YuiChyan(config)
     yui_bot.server_app.before_serving(_start_scheduler)
 
@@ -78,9 +73,7 @@ def create_instance() -> YuiChyan:
 # 加载核心插件
 def _load_core_plugins(config_logger):
     config_logger.info("=== 开始加载核心插件 ===")
-    core_dir = os.path.join(current_dir, 'core')
-    listdir = os.listdir(core_dir)
-    for core_plugin in listdir:
+    for core_plugin in config.CORE_MODULE:
         try:
             importlib.import_module('yuiChyan.config.' + core_plugin + '_config')
             config_logger.info(f'> 核心配置 [{core_plugin}_config] 加载成功')
@@ -88,6 +81,13 @@ def _load_core_plugins(config_logger):
             pass
         load_plugins(str(os.path.join(os.path.dirname(__file__), 'core', core_plugin)),
                      f'yuiChyan.core.{core_plugin}')
+        help_path = os.path.join(os.path.dirname(__file__), 'core', core_plugin, 'HELP.md')
+        if os.path.exists(help_path):
+            help_ = {
+                'name': config.CORE_PLUGINS[core_plugin],
+                'path': help_path,
+            }
+            help_list.append(help_)
         config_logger.info(f'> 核心插件 [{core_plugin}] 加载成功')
 
 
@@ -102,6 +102,13 @@ def _load_external_plugins(config_logger):
             pass
         load_plugins(str(os.path.join(os.path.dirname(__file__), 'plugins', plugin_name)),
                      f'yuiChyan.plugins.{plugin_name}')
+        help_path = os.path.join(os.path.dirname(__file__), 'plugins', plugin_name, 'HELP.md')
+        if os.path.exists(help_path):
+            help_ = {
+                'name': config.EXTRA_PLUGINS[plugin_name],
+                'path': help_path,
+            }
+            help_list.append(help_)
         config_logger.info(f'> 拓展插件 [{plugin_name}] 加载成功')
 
 

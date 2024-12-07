@@ -2,6 +2,6 @@
 from .util import sv
 
 
-@sv.on_command('服务列表', force_private=True)
+@sv.on_match('服务列表')
 async def list_group_list(bot, ev):
     return
