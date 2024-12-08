@@ -11,6 +11,19 @@
     <link href="../static/css/github-markdown.css" rel="stylesheet" type="text/css">
     <!-- 自定义样式 -->
     <style>
+        {# 背景图样式 #}
+        .background-image {
+            background-image: url('../static/background_compressed.jpg');
+            background-size: cover;
+            filter: blur(30px);
+            opacity: 0.2;
+            height: 100vh;
+            width: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
         {# 鸿蒙字体 #}
         @font-face {
             font-family: 'HarmonyFont';
@@ -72,19 +85,18 @@
             animation: colorFlow 5s linear infinite;
         }
         {# 搜索框样式 #}
-        input[type="text"] {
+        .input-with-reset {
+            position: relative;
+        }
+        {# 搜索框样式 #}
+        #searchInput {
             flex: 1;
-            padding: 12px;
+            padding: 12px 40px 12px 12px;
             margin: 10px 0;
             border: 2px solid #ddd;
             border-radius: 50px;
             transition: border-color 0.3s, box-shadow 0.3s;
-        }
-        {# 搜索框聚焦样式 #}
-        input[type="text"]:focus {
-            border-color: #007BFF;
-            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
-            outline: none;
+            width: 100%;
         }
         {# 搜索框内的提示字体样式 #}
         #searchInput::placeholder {
@@ -94,6 +106,42 @@
         {# 搜索结果的高亮展示 #}
         .highlight {
             background-color: yellow;
+        }
+        {# 搜索框内的重置按钮样式 #}
+        .reset-button {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 16px;
+            color: #999;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            width: 30px;
+            line-height: 1;
+        }
+        {# 竖线分隔符样式 #}
+        .input-with-reset::after {
+            content: '';
+            position: absolute;
+            right: 45px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 1px;
+            height: 35%;
+            background-color: #ddd;
+        }
+        {# 搜索框聚焦样式 #}
+        input[type="text"]:focus {
+            border-color: #007BFF;
+            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
+            outline: none;
         }
         {# 将搜索框和搜索按钮设置为一个 Flex 容器 #}
         .d-flex {
@@ -113,7 +161,7 @@
             }
         }
         {# 按钮常规样式 #}
-        button {
+        button:not(.reset-button) {
             height: 48px;
             padding: 0 20px;
             border: none;
@@ -129,7 +177,7 @@
             animation: buttonColorFlow 10s linear infinite;
         }
         {# 按钮悬停样式 #}
-        button:hover {
+        button:hover:not(.reset-button) {
             box-shadow: 0 6px 15px rgba(255, 105, 180, 0.5);
             transform: scale(1.05);
         }
@@ -165,6 +213,7 @@
 </head>
 
 <body>
+    <div class="background-image"></div>
     <div id="content">
         <div class="container text-center markdown-body">
             <!-- 标题 -->
@@ -173,7 +222,10 @@
             <form class="row justify-content-center" id="form_subscribe" method="get" onsubmit="return search();">
                 <div class="col-auto d-flex align-items-center">
                     <label for="searchInput" class="me-2"></label>
-                    <input class="form-control" id="searchInput" placeholder="搜索功能或指令" type="text">
+                    <div class="input-with-reset">
+                        <input class="form-control" id="searchInput" placeholder="搜索功能或指令" type="text">
+                        <button type="button" class="reset-button" onclick="resetAndSearch();">✕</button>
+                    </div>
                     <button type="submit" id="btn-submit" class="ms-2">搜索</button>
                 </div>
             </form>
@@ -213,50 +265,12 @@
             </div>
         </div>
     </div>
-    <!-- 本地 jQuery 和 Bootstrap JS -->
+    <!-- 页面所需的JS -->
     <script src="../static/js/jquery.min.js"></script>
     <script src="../static/js/bootstrap.bundle.min.js"></script>
-
-    <!-- 页面搜索脚本 -->
-    <script>
-        function search() {
-            const inputElement = document.getElementById('searchInput');
-            const input = inputElement.value.toLowerCase();
-            const cards = document.querySelectorAll('.accordion .transparent-card');
-
-            cards.forEach(card => {
-                const headerButton = card.querySelector('.card-header button');
-                const body = card.querySelector('.card-body');
-                const headerText = headerButton.textContent.toLowerCase();
-                const bodyText = body.textContent.toLowerCase();
-
-                card.querySelectorAll('.highlight').forEach(element => {
-                    element.classList.remove('highlight');
-                });
-
-                if (input === "") {
-                    card.style.display = '';
-                    card.querySelector('.collapse').classList.remove('show');
-                } else if (headerText.includes(input) || bodyText.includes(input)) {
-                    card.style.display = '';
-                    card.querySelector('.collapse').classList.add('show');
-                    highlightText(headerButton, input);
-                    highlightText(body, input);
-                } else {
-                    card.style.display = 'none';
-                    card.querySelector('.collapse').classList.remove('show');
-                }
-            });
-
-            return false;
-        }
-        {# 高亮显示文本 #}
-        function highlightText(element, text) {
-            const innerHTML = element.innerHTML;
-            const regex = new RegExp(`(${text})`, 'gi');
-            element.innerHTML = innerHTML.replace(regex, '<span class="highlight">$1</span>');
-        }
-    </script>
+    <!-- 自定义的JS -->
+    <script src="../static/js/emoji.js"></script>
+    <script src="../static/js/search.js"></script>
 </body>
 
 </html>
