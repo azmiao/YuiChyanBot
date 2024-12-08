@@ -54,23 +54,22 @@
             color: #24292e;
         }
         {# 字体颜色变化 #}
-        @keyframes colorChange {
+        @keyframes colorFlow {
             0% {
-                background: linear-gradient(to right, #87CEEB, #FF69B4);
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
+                background-position: 0 50%;
             }
             100% {
-                background: linear-gradient(to right, #FF69B4, #87CEEB);
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
+                background-position: 100% 50%;
             }
         }
         {# H1/H2/H3标签的字体样式 #}
         h1, h2, h3 {
             color: #333;
-            animation: colorChange 5s ease-in-out infinite alternate;
+            background: linear-gradient(to right, #87CEEB, #FF69B4, #A1D1F5, #FF82A5, #87CEEB);
             background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: colorFlow 5s linear infinite;
         }
         {# 搜索框样式 #}
         input[type="text"] {
@@ -105,18 +104,12 @@
             align-items: center;
         }
         {# 按钮颜色变化 #}
-        @keyframes buttonColorChange {
+        @keyframes buttonColorFlow {
             0% {
-                background: linear-gradient(to right, #87CEEB, #FF69B4);
-            }
-            33% {
-                background: linear-gradient(to right, #A1D1F5, #FF82A5);
-            }
-            66% {
-                background: linear-gradient(to right, #FF82A5, #A1D1F5);
+                background-position: 0 50%;
             }
             100% {
-                background: linear-gradient(to right, #87CEEB, #FF69B4);
+                background-position: 200% 50%;
             }
         }
         {# 按钮常规样式 #}
@@ -125,19 +118,20 @@
             padding: 0 20px;
             border: none;
             border-radius: 25px;
-            background: linear-gradient(to right, #87CEEB, #FF69B4);
+            background: linear-gradient(to right, #87CEEB, #FF69B4, #A1D1F5, #FF82A5, #87CEEB);
+            background-size: 200% 200%;
             color: white;
             cursor: pointer;
             text-decoration: none;
             font-size: 16px;
             transition: background 0.5s, box-shadow 0.3s;
             box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
-            animation: buttonColorChange 10s ease-in-out infinite;
+            animation: buttonColorFlow 10s linear infinite;
         }
         {# 按钮悬停样式 #}
         button:hover {
-            background: linear-gradient(to right, #FF69B4, #87CEEB);
             box-shadow: 0 6px 15px rgba(255, 105, 180, 0.5);
+            transform: scale(1.05);
         }
         {# 每个子文档的卡片样式 #}
         .transparent-card {
@@ -148,20 +142,24 @@
         }
         {# 每个子文档的折叠按钮样式 #}
         .accordion .card-header button {
-            padding: 10px 20px;
+            height: 48px;
+            padding: 0 20px;
             border: none;
             border-radius: 15px;
-            background: linear-gradient(to right, #87CEEB, #FF69B4);
+            background: linear-gradient(to right, #87CEEB, #FF69B4, #A1D1F5, #FF82A5, #87CEEB);
+            background-size: 200% 200%;
             color: white;
             cursor: pointer;
             text-decoration: none;
             font-size: 16px;
             transition: background 0.5s, box-shadow 0.3s;
+            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+            animation: buttonColorFlow 10s linear infinite;
         }
         {# 每个子文档的折叠按钮悬停样式 #}
         .accordion .card-header button:hover {
-            background: linear-gradient(to right, #FF69B4, #87CEEB);
-            box-shadow: 0 2px 10px rgba(135, 206, 235, 0.5);
+            box-shadow: 0 6px 15px rgba(255, 105, 180, 0.5);
+            transform: scale(1.05);
         }
     </style>
 </head>
