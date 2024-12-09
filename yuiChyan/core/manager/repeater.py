@@ -30,7 +30,8 @@ async def random_repeater(bot, ev: CQEvent):
                 # 概率测试通过，复读并设flag
                 try:
                     group_stat[group_id] = (msg, True, 0)
-                    await bot.send(ev, filter_message(ev.message))
+                    msg = await filter_message(ev.message)
+                    await bot.send(ev, msg)
                 except CQHttpError as e:
                     yuiChyan.logger.error(f'复读失败: {type(e)}')
             else:

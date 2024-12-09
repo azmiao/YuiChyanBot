@@ -23,6 +23,12 @@ class YuiNotFoundException(BotException):
         super().__init__(None, message)
 
 
+# 向上级抛出的可拦截异常
+class ThrowException(BotException):
+    def __init__(self, message: Optional[str] = None):
+        super().__init__(None, message)
+
+
 # 手动抛出的业务异常 | 让BOT发送出去
 class FunctionException(BotException):
     def __init__(self, ev: Optional[CQEvent], message: Optional[str] = None):

@@ -10,30 +10,61 @@ from aiocqhttp import Event as CQEvent, Message, Union
 from aiocqhttp.exceptions import ActionFailed
 
 import yuiChyan
+from yuiChyan.exception import ThrowException
 from .textfilter import *
+from .translator_lite.apis import youdao_api
+
+# 默认支持的语言
+trans_dict = {
+    'en': '英语',
+    'zh': '中文',
+    'ar': '阿拉伯语',
+    'ru': '俄语',
+    'fr': '法语',
+    'de': '德语',
+    'es': '西班牙语',
+    'pt': '葡萄牙语',
+    'it': '意大利语',
+    'ja': '日语',
+    'ko': '韩语',
+    'nl': '荷兰语',
+    'vi': '越南语',
+    'id': '印尼语'
+}
+
 
 # 初始化敏感词
-search = StringSearch()
-sen_word_file = os.path.join(os.path.dirname(__file__), 'textfilter', 'sensitive_words.txt')
-with open(sen_word_file, 'r', encoding='utf-8') as f:
-    sen_word = f.read()
-search.SetKeywords(sen_word.split('\n'))
+_search = StringSearch()
+_sen_word_file = os.path.join(os.path.dirname(__file__), 'textfilter', 'sensitive_words.txt')
+with open(_sen_word_file, 'r', encoding='utf-8') as f:
+    _sen_word = f.read()
+_search.SetKeywords(_sen_word.split('\n'))
 
 
+# 撤回消息
 async def delete_msg(ev: CQEvent):
     try:
-        await yuiChyan.get_bot().delete_msg(self_id=ev.self_id, message_id=ev.message_id)
+        await yuiChyan.get_bot().delete_msg(
+            self_id=ev.self_id,
+            message_id=ev.message_id
+        )
     except ActionFailed as e:
         yuiChyan.logger.error(f'撤回失败: {e}')
     except Exception as e:
         yuiChyan.logger.exception(e)
 
 
+# 禁言
 async def silence(ev: CQEvent, ban_time, skip_su=True):
     try:
         if skip_su and ev.user_id in yuiChyan.config.SUPERUSERS:
             return
-        await yuiChyan.get_bot().set_group_ban(self_id=ev.self_id, group_id=ev.group_id, user_id=ev.user_id, duration=ban_time)
+        await yuiChyan.get_bot().set_group_ban(
+            self_id=ev.self_id,
+            group_id=ev.group_id,
+            user_id=ev.user_id,
+            duration=ban_time
+        )
     except ActionFailed as e:
         if 'NOT_MANAGEABLE' in str(e):
             return
@@ -43,16 +74,15 @@ async def silence(ev: CQEvent, ban_time, skip_su=True):
         yuiChyan.logger.exception(e)
 
 
+# 规范化unicode字符串 并 转为小写 并 转为简体
 def normalize_str(string) -> str:
-    """
-    规范化unicode字符串 并 转为小写 并 转为简体
-    """
     string = unicodedata.normalize('NFKC', string)
     string = string.lower()
     string = zhconv.convert(string, 'zh-hans')
     return string
 
 
+# 频次限制器
 class FreqLimiter:
     def __init__(self, default_cd_seconds):
         self.next_time = defaultdict(float)
@@ -68,6 +98,7 @@ class FreqLimiter:
         return self.next_time[key] - time.time()
 
 
+# 每日限制器
 class DailyNumberLimiter:
     tz = pytz.timezone('Asia/Shanghai')
 
@@ -95,14 +126,23 @@ class DailyNumberLimiter:
 
 
 # 敏感词替换
-def filter_message(message: Union[Message, str]):
-    
+async def filter_message(message: Union[Message, str]):
     if isinstance(message, str):
-        return search.Replace(message)
+        return _search.Replace(message)
     elif isinstance(message, Message):
         for seg in message:
             if seg.type == 'text':
-                seg.data['text'] = search.Replace(seg.data.get('text', ''))
+                seg.data['text'] = _search.Replace(seg.data.get('text', ''))
         return message
     else:
         raise TypeError
+
+
+# 翻译 | 目前只有有道引擎
+async def translate(text: str, from_: str = 'auto', to_: str = 'zh') -> str:
+    error_msg = ' - 目前支持的语言有：\n' + '\n'.join([f'{key}: {value}' for key, value in trans_dict.items()])
+    if from_ not in trans_dict:
+        raise ThrowException(f'> 源语言 [{from_}] 不存在\n{error_msg}')
+    if to_ not in trans_dict:
+        raise ThrowException(f'> 目标语言 [{to_}] 不存在\n{error_msg}')
+    return await youdao_api(text, from_, to_)

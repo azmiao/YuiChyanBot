@@ -210,11 +210,11 @@ async def adjust_img(bot, str_raw: str, is_ans: bool, save: bool) -> str:
     # 找出其中所有的CQ码
     cq_list = re.findall(r'(\[CQ:(\S+?),(\S+?)])', str_raw)
     # 整个消息过滤敏感词，问题：无需过滤
-    flit_msg = beautiful(str_raw) if is_ans else str_raw
+    flit_msg = await filter_message(str_raw) if is_ans else str_raw
     # 对每个CQ码元组进行操作
     for cq_code in cq_list:
         # 对当前的完整的CQ码过滤敏感词，问题：无需过滤
-        flit_cq = beautiful(cq_code[0]) if is_ans else cq_code[0]
+        flit_cq = await filter_message(cq_code[0]) if is_ans else cq_code[0]
         # 判断是否是图片
         if cq_code[1] == 'image':
             # 解析file和file_name
@@ -275,24 +275,6 @@ async def delete_img(list_raw: list):
                 logger.info(f'XQA: 已删除图片{image_file}')
             except Exception as e:
                 logger.info(f'XQA: 图片{image_file}删除失败：' + str(e))
-
-
-# 和谐模块
-def beautifulworld(msg: str) -> str:
-    w = ''
-    infolist = msg.split('[')
-    for i in infolist:
-        if i:
-            try:
-                w = w + '[' + i.split(']')[0] + ']' + beautiful(i.split(']')[1])
-            except:
-                w = w + beautiful(i)
-    return w
-
-
-# 美化中国话！
-def beautiful(msg: str) -> str:
-    return filter_message(msg)
 
 
 # 消息分段 | 输入：问题列表 和 初始的前缀消息内容 | 返回：需要发送的完整消息列表（不分段列表里就一个）

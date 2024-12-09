@@ -31,7 +31,7 @@ async def leave_notice(session: NoticeSession):
     try:
         info = await session.bot.get_stranger_info(self_id=ev.self_id, user_id=ev.user_id)
         name = info['nickname'] or name
-        name = filter_message(str(name))
+        name = await filter_message(str(name))
     except Exception as e:
         yuiChyan.logger.exception(e)
     await session.send(f"{name}({ev.user_id})偷偷地退群了")
