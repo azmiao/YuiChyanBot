@@ -10,6 +10,11 @@ window.addEventListener('load', () => {
         span.style.top = `${y}px`;
         span.style.left = `${x}px`;
         span.style.opacity = '1';
+
+        // 添加点击穿透和防止选择属性
+        span.style.pointerEvents = 'none';
+        span.style.userSelect = 'none';
+
         document.body.appendChild(span);
 
         let i = 0;
