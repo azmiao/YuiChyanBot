@@ -4,7 +4,7 @@ window.addEventListener('load', () => {
         const y = e.pageY;
         const span = document.createElement('span');
 
-        span.innerHTML = "✨";
+        span.innerHTML = "⭐";
         span.className = 'text';
         span.style.position = 'absolute';
         span.style.top = `${y}px`;

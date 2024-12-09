@@ -167,14 +167,14 @@
             border: none;
             border-radius: 25px;
             background: linear-gradient(to right, #87CEEB, #FF69B4, #A1D1F5, #FF82A5, #87CEEB);
-            background-size: 500% 500%;
+            background-size: 400% 400%;
             color: white;
             cursor: pointer;
             text-decoration: none;
             font-size: 16px;
             transition: background 0.5s, box-shadow 0.3s;
             box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
-            animation: buttonColorFlow 20s linear infinite;
+            animation: buttonColorFlow 12s linear infinite;
         }
         {# 按钮悬停样式 #}
         button:hover:not(.reset-button) {
@@ -195,14 +195,14 @@
             border: none;
             border-radius: 15px;
             background: linear-gradient(to right, #87CEEB, #FF69B4, #A1D1F5, #FF82A5, #87CEEB);
-            background-size: 500% 500%;
+            background-size: 400% 400%;
             color: white;
             cursor: pointer;
             text-decoration: none;
             font-size: 16px;
             transition: background 0.5s, box-shadow 0.3s;
             box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
-            animation: buttonColorFlow 20s linear infinite;
+            animation: buttonColorFlow 12s linear infinite;
         }
         {# 每个子文档的折叠按钮悬停样式 #}
         .accordion .card-header button:hover {
@@ -217,7 +217,7 @@
     <div id="content">
         <div class="container text-center markdown-body">
             <!-- 标题 -->
-            <h1><strong>✨ {{ help_config.bot_name }} ✨</strong></h1>
+            <h1><strong>✦ {{ help_config.bot_name }} ✦</strong></h1>
             <!-- 搜索框 -->
             <form class="row justify-content-center" id="form_subscribe" method="get" onsubmit="return search();">
                 <div class="col-auto d-flex align-items-center">
