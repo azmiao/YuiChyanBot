@@ -52,6 +52,7 @@
         }
         {# 命令文档 和 关于 页面的样式#}
         .command-box, .about-box {
+            font-family: 'HarmonyFont', Arial, sans-serif;
             border: 1px solid #ddd;
             border-radius: 12px;
             padding: 20px;
@@ -61,6 +62,7 @@
         }
         {# 关于  页面内容的样式 #}
         .about-content {
+            font-family: 'HarmonyFont', Arial, sans-serif;
             text-align: center;
             font-size: 18px;
             line-height: 1.6;
@@ -77,6 +79,7 @@
         }
         {# H1/H2/H3标签的字体样式 #}
         h1, h2, h3 {
+            font-family: 'HarmonyFont', Arial, sans-serif;
             color: #333;
             background: linear-gradient(to right, #87CEEB, #FF69B4, #A1D1F5, #FF82A5, #87CEEB);
             background-size: 200% 200%;
@@ -90,6 +93,7 @@
         }
         {# 搜索框样式 #}
         #searchInput {
+            font-family: 'HarmonyFont', Arial, sans-serif;
             flex: 1;
             padding: 12px 40px 12px 12px;
             margin: 10px 0;
@@ -100,12 +104,22 @@
         }
         {# 搜索框内的提示字体样式 #}
         #searchInput::placeholder {
+            font-family: 'HarmonyFont', Arial, sans-serif;
             color: #999;
             opacity: 1;
         }
         {# 搜索结果的高亮展示 #}
         .highlight {
-            background-color: yellow;
+            background-color: rgba(255, 192, 203, 0.8);
+            border-radius: 5px;
+            padding: 2px;
+        }
+        {# 不可见高亮条 #}
+        .highlight.invisible-highlight {
+            background-color: transparent;
+            border-radius: 0;
+            padding: 0;
+            color: inherit;
         }
         {# 搜索框内的重置按钮样式 #}
         .reset-button {
@@ -162,6 +176,7 @@
         }
         {# 按钮常规样式 #}
         button:not(.reset-button) {
+            font-family: 'HarmonyFont', Arial, sans-serif;
             height: 48px;
             padding: 0 20px;
             border: none;
@@ -190,6 +205,7 @@
         }
         {# 每个子文档的折叠按钮样式 #}
         .accordion .card-header button {
+            font-family: 'HarmonyFont', Arial, sans-serif;
             height: 48px;
             padding: 0 20px;
             border: none;
