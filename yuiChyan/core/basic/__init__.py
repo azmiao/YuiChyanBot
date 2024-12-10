@@ -1,6 +1,10 @@
-from yuiChyan import FunctionException
+from yuiChyan import FunctionException, LakePermissionException, CommandErrorException
+from yuiChyan.config import NICKNAME
+from yuiChyan.permission import check_permission, ADMIN
 from yuiChyan.service import Service
 from yuiChyan.util import translate
+from .create_info import *
+from .group_gacha import *
 
 sv = Service('base_func')
 
@@ -13,10 +17,123 @@ async def translate_text(bot, ev):
     try:
         _, _, _ = text_list[0], text_list[1], text_list[2]
     except:
-        raise FunctionException(ev, '> 翻译指令错误! \n示例：翻译 en zh 文本')
+        raise CommandErrorException(ev, '> 翻译指令错误! \n示例：翻译 en zh 文本')
 
     try:
         msg = await translate(text_list[2], text_list[0], text_list[1])
     except Exception as e:
         raise FunctionException(ev, f'> 翻译出现错误：{str(e)}')
+    await bot.send(ev, msg)
+
+
+# ocr
+@sv.on_prefix('ocr')
+async def get_ocr(bot, ev):
+    img_text = str(ev.message)
+    if not img_text.startswith('[CQ:image,file='):
+        raise CommandErrorException(ev, '> OCR指令错误! \n示例：ocr{图片}，注意{图片}换成自己实际需要的图片')
+    user_id = ev.user_id
+    img_id_tmp = re.findall(r'CQ:image,file=.+?\.image', img_text)
+    img_id = img_id_tmp[0].replace('CQ:image,file=', '')
+    data = await bot.ocr_image(image=img_id)
+    text_list = list(data['texts'])
+    msg = f'[CQ:at,qq={user_id}]\n'
+    for text_info in text_list:
+        msg = msg + ' | ' + text_info['text']
+    await bot.send(ev, msg)
+
+
+# 生成消息
+@sv.on_prefix('生成消息')
+async def create_msg(bot, ev):
+    group_id = ev.group_id
+    all_text = str(ev.message)
+    try:
+        forward_msg_list = await get_create_msg(bot, all_text, group_id, False)
+    except:
+        raise CommandErrorException(ev, '> 生成消息命令错误，实例：\n生成消息 qq号:内容1|qq号:内容2\n注意：冒号使用英文冒号')
+    if not forward_msg_list:
+        raise CommandErrorException(ev, '> 生成消息命令错误，实例：\n生成消息 qq号:内容1|qq号:内容2\n注意：冒号使用英文冒号')
+    elif forward_msg_list == ['QQ号错误!本群里没有这个人哦']:
+        raise FunctionException(ev, f'> {forward_msg_list[0]}')
+    elif forward_msg_list == ['QQ号错误!被@的人不在本群里']:
+        raise FunctionException(ev, f'> {forward_msg_list[0]}')
+    else:
+        await bot.send_group_forward_msg(group_id=group_id, messages=forward_msg_list)
+
+
+# 生成陌生消息
+@sv.on_prefix('生成陌生消息')
+async def create_msg(bot, ev):
+    group_id = ev.group_id
+    all_text = str(ev.message)
+    try:
+        forward_msg_list = await get_create_msg(bot, all_text, group_id, True)
+    except:
+        raise CommandErrorException(ev, '> 生成陌生消息命令错误，实例：\n生成陌生消息 qq号:内容1|qq号:内容2\n注意：冒号使用英文冒号')
+    if not forward_msg_list:
+        raise CommandErrorException(ev, '> 生成陌生消息命令错误，实例：\n生成陌生消息 qq号:内容1|qq号:内容2\n注意：冒号使用英文冒号')
+    elif forward_msg_list == ['QQ号错误!被@的人不在本群里']:
+        raise FunctionException(ev, f'> {forward_msg_list[0]}')
+    else:
+        await bot.send_group_forward_msg(group_id=group_id, messages=forward_msg_list)
+
+
+# 帮助选择器
+@sv.on_prefix('选择', only_to_me=True)
+async def make_choice(bot, ev):
+    all_text = str(ev.message).strip()
+    if '还是' not in all_text:
+        return
+    split = all_text.split('还是')
+    msg_list = []
+    for choice in split:
+        index = split.index(choice) + 1
+        msg_list.append(f'{index}. {choice}')
+    split.append('全都要')
+    await bot.send(ev, '> 您的选项:\n' + '\n'.join(msg_list) + f'\n{NICKNAME}建议你选择: {random.choice(split)} 哦~')
+
+
+# 创建抽奖
+@sv.on_prefix('创建抽奖', only_to_me=False)
+async def create_gacha(bot, ev):
+    if not check_permission(ev, ADMIN):
+        raise LakePermissionException(ev, '创建抽奖仅限群管理员哦~')
+    all_text = str(ev.message).strip()
+    if not all_text:
+        raise CommandErrorException(ev, '创建抽奖命令错误，样例：创建抽奖 抽奖名字 1')
+    if ' ' not in all_text:
+        raise CommandErrorException(ev, '创建抽奖命令错误，样例：创建抽奖 抽奖名字 1')
+    split = all_text.split(' ')
+    try:
+        number = int(split[1])
+    except Exception:
+        raise CommandErrorException(ev, '创建抽奖命令错误，样例：创建抽奖 抽奖名字 1')
+    msg = await create_group_gacha(str(ev.group_id), str(split[0]), number)
+    await bot.send(ev, msg)
+
+
+# 结束抽奖
+@sv.on_prefix('结束抽奖', only_to_me=False)
+async def finish_gacha(bot, ev):
+    if not check_permission(ev, ADMIN):
+        raise LakePermissionException(ev, '结束抽奖仅限群管理员哦~')
+    all_text = str(ev.message).strip()
+    if not all_text:
+        raise CommandErrorException(ev, '结束抽奖命令错误，样例：结束抽奖 抽奖名字')
+    msg = await finish_group_gacha(str(ev.group_id), all_text)
+    await bot.send(ev, msg)
+
+
+# 参与抽奖
+@sv.on_match(('参与抽奖', '参加抽奖'), only_to_me=False)
+async def join_gacha(bot, ev):
+    msg = await join_group_gacha(str(ev.group_id), int(ev.user_id))
+    await bot.send(ev, msg)
+
+
+# 查询抽奖
+@sv.on_match('查询抽奖', only_to_me=False)
+async def query_gacha(bot, ev):
+    msg = await query_group_gacha(str(ev.group_id))
     await bot.send(ev, msg)

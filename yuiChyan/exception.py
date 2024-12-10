@@ -49,8 +49,8 @@ class SessionExistException(BotException):
 
 # 命令格式错误
 class CommandErrorException(BotException):
-    def __init__(self, message: Optional[str] = None):
-        super().__init__(None, message)
+    def __init__(self, ev: Optional[CQEvent], message: Optional[str] = None):
+        super().__init__(ev, message)
 
 
 # 权限不足

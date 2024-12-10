@@ -14,14 +14,14 @@ bc_example = f'''
 '''.strip()
 
 
-def parse_command(command_raw: str):
+def parse_command(ev, command_raw: str):
     if ' ' not in command_raw:
         return 'all', command_raw
     args = command_raw.split(' ', 1)
     bc_sv_name = args[0]
     bc_msg = args[1]
     if bc_sv_name != 'all' and not bc_sv_name.startswith('g-') and not bc_sv_name.startswith('exg-'):
-        raise CommandErrorException('> 广播命令错误!')
+        raise CommandErrorException(ev, f'> 广播命令错误，{bc_example}')
     return bc_sv_name, bc_msg
 
 
@@ -29,11 +29,7 @@ def parse_command(command_raw: str):
 @sv.on_command('广播', force_private=True)
 async def broadcast(bot, ev):
     command_raw = str(ev.message).strip()
-    try:
-        bc_sv_name, bc_msg = parse_command(command_raw)
-    except CommandErrorException:
-        await bot.send(ev, '命令格式错误，请参考' + bc_example)
-        return
+    bc_sv_name, bc_msg = parse_command(ev, command_raw)
     yui_bot = get_bot()
     self_id_list = yui_bot.get_self_ids()
     for self_id in self_id_list:
