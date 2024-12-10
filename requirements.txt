@@ -1,5 +1,6 @@
 nonebot>=1.9.1
 curl_cffi>=0.7.4
+requests>=2.32.3
 aiocqhttp>=1.4.4
 zhconv>=1.4.3
 pygtrie>=2.5.0
@@ -10,3 +11,4 @@ Jinja2>=3.1.4
 quart>=0.19.9
 rocksdict>=0.3.24
 markdown>=3.7
+pillow>=11.0.0
