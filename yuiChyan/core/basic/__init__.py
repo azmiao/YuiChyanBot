@@ -80,7 +80,7 @@ async def create_msg(bot, ev):
 
 
 # 帮助选择器
-@sv.on_prefix('选择', only_to_me=True)
+@sv.on_prefix('选择', only_to_me=False)
 async def make_choice(bot, ev):
     all_text = str(ev.message).strip()
     if '还是' not in all_text:

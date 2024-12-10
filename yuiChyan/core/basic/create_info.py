@@ -6,8 +6,8 @@ async def get_create_msg(bot, all_text, group_id, is_stranger):
     at_text_list = re.findall(r'\[CQ:at,qq=.+?] ', all_text)
     for each_at in at_text_list:
         each_at_tmp = str(each_at)
-        each_at_tmp = re.sub('] ', '', each_at_tmp)
-        each_at_tmp = re.sub('\[CQ:at,qq=', '', each_at_tmp)
+        each_at_tmp = re.sub(r'] ', '', each_at_tmp)
+        each_at_tmp = re.sub(r'\[CQ:at,qq=', '', each_at_tmp)
         if not is_stranger:
             try:
                 at = await bot.get_group_member_info(group_id=group_id, user_id=int(each_at_tmp))
@@ -17,7 +17,7 @@ async def get_create_msg(bot, all_text, group_id, is_stranger):
         else:
             at = await bot.get_stranger_info(user_id=int(each_at_tmp))
         at_nickname = '@' + at['nickname']
-        replace_text = f'\{each_at}'
+        replace_text = fr'\{each_at}'
         all_text = re.sub(replace_text, at_nickname, str(all_text))
     text_list = all_text.split('|')
     forward_msg_list = []
