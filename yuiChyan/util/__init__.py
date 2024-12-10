@@ -10,9 +10,8 @@ from aiocqhttp import Event as CQEvent, Message, Union
 from aiocqhttp.exceptions import ActionFailed
 
 import yuiChyan
-from yuiChyan.exception import ThrowException
 from .textfilter import *
-from .translator_lite.apis import youdao_api
+from .translator_lite.apis import Youdao
 
 # 默认支持的语言
 trans_dict = {
@@ -31,7 +30,8 @@ trans_dict = {
     'vi': '越南语',
     'id': '印尼语'
 }
-
+# 翻译器
+_youdao = Youdao()
 
 # 初始化敏感词
 _search = StringSearch()
@@ -141,8 +141,6 @@ async def filter_message(message: Union[Message, str]):
 # 翻译 | 目前只有有道引擎
 async def translate(text: str, from_: str = 'auto', to_: str = 'zh') -> str:
     error_msg = ' - 目前支持的语言有：\n' + '\n'.join([f'{key}: {value}' for key, value in trans_dict.items()])
-    if from_ not in trans_dict:
-        raise ThrowException(f'> 源语言 [{from_}] 不存在\n{error_msg}')
-    if to_ not in trans_dict:
-        raise ThrowException(f'> 目标语言 [{to_}] 不存在\n{error_msg}')
-    return await youdao_api(text, from_, to_)
+    assert from_ in trans_dict, f'源语言 [{from_}] 不存在\n{error_msg}'
+    assert to_ in trans_dict, f'目标语言 [{to_}] 不存在\n{error_msg}'
+    return _youdao.youdao_api(text, from_, to_)

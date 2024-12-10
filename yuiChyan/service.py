@@ -136,11 +136,11 @@ class Service:
         def deco(func) -> Callable:
             @functools.wraps(func)
             @exception_handler
-            async def wrapper(ctx: CQEvent):
+            async def wrapper(event: CQEvent):
                 # 因为不走触发器，所以这里需要手动判断服务是否启用
-                if self.judge_enable(int(ctx.group_id)):
+                if self.judge_enable(int(event.group_id)):
                     try:
-                        return await func(self.bot, ctx)
+                        return await func(self.bot, event)
                     except Exception as e:
                         self.logger.exception(e)
                     return
@@ -164,19 +164,19 @@ class Service:
         def deco(func) -> Callable:
             @functools.wraps(func)
             @exception_handler
-            async def wrapper(event):
+            async def wrapper(bot, event: CQEvent):
                 # 校验是否是群消息
                 if event.detail_type != 'group':
                     raise nonebot.command.SwitchException(nonebot.message.Message(event.raw_message))
-                return await func(event)
+                return await func(bot, event)
 
-            service_func = ServiceFunc(self, func, only_to_me)
+            service_func = ServiceFunc(self, wrapper, only_to_me)
             for prefix in prefixes:
                 if isinstance(prefix, str):
                     trigger.prefix.add(prefix, service_func)
                 else:
                     self.logger.error(f'前缀触发器 [{str(prefix)}] 添加失败，类型必须是 [str] 而不是 [{type(prefix)}]')
-            return func
+            return wrapper
 
         return deco
 
@@ -210,7 +210,7 @@ class Service:
                     trigger.prefix.add(match, service_func)
                 else:
                     self.logger.error(f'匹配触发器 [{str(match)}] 添加失败，类型必须是 [str] 而不是 [{type(match)}]')
-            return func
+            return wrapper
 
         return deco
 
@@ -229,19 +229,19 @@ class Service:
         def deco(func) -> Callable:
             @exception_handler
             @functools.wraps(func)
-            async def wrapper(event):
+            async def wrapper(bot, event: CQEvent):
                 # 校验是否是群消息
                 if event.detail_type != 'group':
                     raise nonebot.command.SwitchException(nonebot.message.Message(event.raw_message))
-                return await func(event)
+                return await func(bot, event)
 
-            service_func = ServiceFunc(self, func, only_to_me)
+            service_func = ServiceFunc(self, wrapper, only_to_me)
             for suffix in suffixes:
                 if isinstance(suffix, str):
                     trigger.suffix.add(suffix, service_func)
                 else:
                     self.logger.error(f'后缀触发器 [{str(suffix)}] 添加失败，类型必须是 [str] 而不是 [{type(suffix)}]')
-            return func
+            return wrapper
 
         return deco
 
@@ -260,18 +260,18 @@ class Service:
         def deco(func) -> Callable:
             @functools.wraps(func)
             @exception_handler
-            async def wrapper(event):
+            async def wrapper(bot, event: CQEvent):
                 # 校验是否是群消息
                 if event.detail_type != 'group':
                     raise nonebot.command.SwitchException(nonebot.message.Message(event.raw_message))
-                return await func(event)
+                return await func(bot, event)
 
-            service_func = ServiceFunc(self, func, only_to_me)
+            service_func = ServiceFunc(self, wrapper, only_to_me)
             if isinstance(rex, re.Pattern):
                 trigger.regular.add(rex, service_func)
             else:
                 self.logger.error(f'正则触发器 [{str(rex)}] 添加失败，类型必须是 [str, re.Pattern] 而不是 [{type(rex)}]')
-            return func
+            return wrapper
 
         return deco
 
@@ -314,7 +314,7 @@ class Service:
                     trigger.prefix.add(command, service_func)
                 else:
                     self.logger.error(f'命令触发器 [{str(command)}] 添加失败，类型必须是 [str] 而不是 [{type(command)}]')
-            return func
+            return wrapper
 
         return deco
 

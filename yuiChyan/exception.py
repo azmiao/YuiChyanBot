@@ -13,18 +13,12 @@ class BotException(Exception):
         self.message = message
         self.permission = permission
         # 没有消息内容，但有权限需求 | 说明是权限不足
-        if permission and not message:
-            self.message = f'您的权限不足，需要权限 [{permission.name}]'
+        if self.permission and not self.message:
+            self.message = f'您的权限不足，需要权限 [{self.permission.name}]'
 
 
 # YuiBot未创建实例
 class YuiNotFoundException(BotException):
-    def __init__(self, message: Optional[str] = None):
-        super().__init__(None, message)
-
-
-# 向上级抛出的可拦截异常
-class ThrowException(BotException):
     def __init__(self, message: Optional[str] = None):
         super().__init__(None, message)
 

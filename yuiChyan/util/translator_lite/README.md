@@ -1,3 +1,4 @@
-## translator_lite
 
-修改自 [translators](https://github.com/UlionTse/translators)
+# 本翻译功能源自：
+
+[translators](https://github.com/UlionTse/translators)

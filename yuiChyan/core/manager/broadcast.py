@@ -1,40 +1,10 @@
 import asyncio
-from collections import deque
 
 from yuiChyan import get_bot, logger
 from yuiChyan.exception import *
 from .util import sv
 
-
-class Broadcast:
-
-    def __init__(self, self_id, group_id, msg):
-        self.self_id = self_id
-        self.group_id = group_id
-        self.msg = msg
-
-
-class BroadcastQueue:
-
-    def __init__(self):
-        self.queue = deque()
-
-    def is_empty(self):
-        return len(self.queue) == 0
-
-    def enqueue(self, item: Broadcast):
-        self.queue.append(item)
-
-    def dequeue(self) -> Broadcast:
-        if not self.is_empty():
-            return self.queue.popleft()
-
-    def size(self):
-        return len(self.queue)
-
-
 lock = asyncio.Lock()
-broadcast_queue = BroadcastQueue()
 broadcast_record = []
 bc_example = f'''
 广播命令样例：
@@ -55,7 +25,7 @@ def parse_command(command_raw: str):
     return bc_sv_name, bc_msg
 
 
-# 广播消息 | 仅添加队列
+# 广播消息
 @sv.on_command('广播', force_private=True)
 async def broadcast(bot, ev):
     command_raw = str(ev.message).strip()
@@ -84,22 +54,9 @@ async def broadcast(bot, ev):
             case _:
                 group_id_list = []
         for group_id in group_id_list:
-            bc_entity = Broadcast(self_id, group_id, bc_msg)
-            broadcast_queue.enqueue(bc_entity)
-            logger.debug(f'> 广播 [{self_id}, {group_id}, {bc_msg}] 已被添加至广播队列!')
-
-
-@sv.scheduled_job(silence=True, second='*/2')
-async def send_broadcast():
-    if broadcast_queue.size() == 0:
-        return
-    bc_entity = broadcast_queue.dequeue()
-    self_id = bc_entity.self_id
-    group_id = bc_entity.group_id
-    msg = bc_entity.msg
-    yui_bot = get_bot()
-    try:
-        await yui_bot.send_group_msg(self_id=self_id, group_id=group_id, message=msg)
-        logger.info(f'> 广播 [{self_id}, {group_id}, {msg}] 发送成功')
-    except Exception as e:
-        logger.error(f'> 广播 [{self_id}, {group_id}, {msg}] 发送失败：{str(e)}')
+            try:
+                await yui_bot.send_group_msg(self_id=self_id, group_id=group_id, message=bc_msg)
+                logger.info(f'> 广播 [{self_id}, {group_id}, {bc_msg}] 发送成功')
+                await asyncio.sleep(1)
+            except Exception as e:
+                logger.error(f'> 广播 [{self_id}, {group_id}, {bc_msg}] 发送失败：{str(e)}')

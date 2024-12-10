@@ -14,8 +14,8 @@ PUBLIC_PROTOCOL = 'http'
 PUBLIC_DOMAIN = ''
 # 核心插件文件夹和对应的名称 | key是plugins下的文件夹名，value是想给它取的名称，都必填
 CORE_PLUGINS = {
-    'base_func': '基础功能',
-    'manager': '核心管理功能',
+    'basic': '基础功能',
+    'manager': '核心管理',
     'xqa': 'XQA你问我答'
 }
 # 第三方插件文件夹和对应的名称 | key是plugins下的文件夹名，value是想给它取的名称，都必填
