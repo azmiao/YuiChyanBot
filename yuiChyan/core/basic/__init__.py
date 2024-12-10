@@ -5,6 +5,7 @@ from yuiChyan.service import Service
 from yuiChyan.util import translate
 from .create_info import *
 from .group_gacha import *
+from .manga_trans import *
 
 sv = Service('base_func')
 
@@ -26,12 +27,12 @@ async def translate_text(bot, ev):
     await bot.send(ev, msg)
 
 
-# ocr
-@sv.on_prefix('ocr')
+# 文字识别
+@sv.on_prefix(('文字识别', 'ocr'), only_to_me=True)
 async def get_ocr(bot, ev):
     img_text = str(ev.message)
     if not img_text.startswith('[CQ:image,file='):
-        raise CommandErrorException(ev, '> OCR指令错误! \n示例：ocr{图片}，注意{图片}换成自己实际需要的图片')
+        raise CommandErrorException(ev, '> 文字识别指令错误! \n示例：文字识别 {图片}，注意{图片}换成自己实际需要的图片')
     user_id = ev.user_id
     img_id_tmp = re.findall(r'CQ:image,file=.+?\.image', img_text)
     img_id = img_id_tmp[0].replace('CQ:image,file=', '')
@@ -43,8 +44,17 @@ async def get_ocr(bot, ev):
     await bot.send(ev, msg)
 
 
+# 漫画翻译
+@sv.on_prefix('漫画翻译', only_to_me=True)
+async def manga_translate(bot, ev):
+    img_text = str(ev.message)
+    if not img_text.startswith('[CQ:image,file='):
+        raise CommandErrorException(ev, '> 文字识别指令错误! \n示例：漫画翻译 {图片}，注意{图片}换成自己实际需要的图片')
+    await bot.send(ev, '> 意收到翻译非常慢，请耐心等待')
+
+
 # 生成消息
-@sv.on_prefix('生成消息')
+@sv.on_prefix('生成消息', only_to_me=True)
 async def create_msg(bot, ev):
     group_id = ev.group_id
     all_text = str(ev.message)
@@ -63,7 +73,7 @@ async def create_msg(bot, ev):
 
 
 # 生成陌生消息
-@sv.on_prefix('生成陌生消息')
+@sv.on_prefix('生成陌生消息', only_to_me=True)
 async def create_msg(bot, ev):
     group_id = ev.group_id
     all_text = str(ev.message)
@@ -80,7 +90,7 @@ async def create_msg(bot, ev):
 
 
 # 帮助选择器
-@sv.on_prefix('选择', only_to_me=False)
+@sv.on_prefix('选择', only_to_me=True)
 async def make_choice(bot, ev):
     all_text = str(ev.message).strip()
     if '还是' not in all_text:
@@ -95,7 +105,7 @@ async def make_choice(bot, ev):
 
 
 # 创建抽奖
-@sv.on_prefix('创建抽奖', only_to_me=False)
+@sv.on_prefix('创建抽奖')
 async def create_gacha(bot, ev):
     if not check_permission(ev, ADMIN):
         raise LakePermissionException(ev, '创建抽奖仅限群管理员哦~')
@@ -114,7 +124,7 @@ async def create_gacha(bot, ev):
 
 
 # 结束抽奖
-@sv.on_prefix('结束抽奖', only_to_me=False)
+@sv.on_prefix('结束抽奖')
 async def finish_gacha(bot, ev):
     if not check_permission(ev, ADMIN):
         raise LakePermissionException(ev, '结束抽奖仅限群管理员哦~')
@@ -126,14 +136,14 @@ async def finish_gacha(bot, ev):
 
 
 # 参与抽奖
-@sv.on_match(('参与抽奖', '参加抽奖'), only_to_me=False)
+@sv.on_match(('参与抽奖', '参加抽奖'))
 async def join_gacha(bot, ev):
     msg = await join_group_gacha(str(ev.group_id), int(ev.user_id))
     await bot.send(ev, msg)
 
 
 # 查询抽奖
-@sv.on_match('查询抽奖', only_to_me=False)
+@sv.on_match('查询抽奖')
 async def query_gacha(bot, ev):
     msg = await query_group_gacha(str(ev.group_id))
     await bot.send(ev, msg)
