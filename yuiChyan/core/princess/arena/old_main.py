@@ -15,7 +15,7 @@ from hoshino.util import FreqLimiter, concat_pic, pic2b64
 
 from .record import update_dic, update_record
 from .. import chara
-from .. import _pcr_data
+from .. import chara_class
 from . import sv
 from . import arena
 

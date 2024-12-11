@@ -2,74 +2,67 @@ import asyncio
 import importlib
 from io import BytesIO
 
-import hoshino
 import pygtrie
 import requests
 from PIL import Image
 from fuzzywuzzy import process
 
-
-from . import _pcr_data
-
-logger = log.new_logger('chara', hoshino.config.DEBUG)
-UNKNOWN = 1000
-
-try:
-    gadget_equip = R.img('priconne/gadget/equip.png').open()
-    gadget_star = R.img('priconne/gadget/star.png').open()
-    gadget_star_dis = R.img('priconne/gadget/star_disabled.png').open()
-    gadget_star_pink = R.img('priconne/gadget/star_pink.png').open()
-    unknown_chara_icon = R.img(f'priconne/unit/icon_unit_{UNKNOWN}31.png').open()
-except Exception as e:
-    logger.exception(e)
+from yuiChyan.util import normalize_str
+from . import chara_class
+from .chara_class import UNKNOWN, CHARA_NAME
+from .util import sv
 
 
+# 花名册
 class Roster:
 
     def __init__(self):
         self._roster = pygtrie.CharTrie()
         self.update()
 
+    # 重载花名册
     def update(self):
-        importlib.reload(_pcr_data)
+        importlib.reload(chara_class)
         self._roster.clear()
         result = {'success': 0, 'duplicate': 0}
-        for idx, names in _pcr_data.CHARA_NAME.items():
+        for idx, names in CHARA_NAME.items():
             for n in names:
-                n = util.normalize_str(n)
+                n = normalize_str(n)
                 if n not in self._roster:
                     self._roster[n] = idx
                     result['success'] += 1
                 else:
                     result['duplicate'] += 1
-                    logger.warning(f'priconne.chara.Roster: 出现重名{n}于id{idx}与id{self._roster[n]}')
+                    sv.logger.warning(f'PCR角色: 出现重名{n}于id{idx}与id{self._roster[n]}')
         return result
 
+    # 根据名字获取ID
     def get_id(self, name):
-        name = util.normalize_str(name)
+        name = normalize_str(name)
         return self._roster[name] if name in self._roster else UNKNOWN
 
+    # 根据名字猜测 | 返回ID,名字。分数
     def guess_id(self, name):
-        """@return: id, name, score"""
-        name, score = process.extractOne(name, self._roster.keys(), processor=util.normalize_str)
+        name, score = process.extractOne(name, self._roster.keys(), processor=normalize_str)
         return self._roster[name], name, score
 
-    def parse_team(self, namestr):
-        """@return: List[ids], unknown_namestr"""
-        namestr = util.normalize_str(namestr.strip())
+    # 根据名字获取ID列表
+    def parse_team(self, name_str):
+        name_str = normalize_str(name_str.strip())
         team = []
         unknown = []
-        while namestr:
-            item = self._roster.longest_prefix(namestr)
+        while name_str:
+            item = self._roster.longest_prefix(name_str)
             if not item:
-                unknown.append(namestr[0])
-                namestr = namestr[1:].lstrip()
+                unknown.append(name_str[0])
+                name_str = name_str[1:].lstrip()
             else:
                 team.append(item.value)
-                namestr = namestr[len(item.key):].lstrip()
+                name_str = name_str[len(item.key):].lstrip()
         return team, ''.join(unknown)
 
 
+# 启动花名册
 roster = Roster()
 
 
