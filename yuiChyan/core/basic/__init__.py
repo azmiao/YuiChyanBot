@@ -53,8 +53,11 @@ async def manga_translate(bot, ev):
     # 保存图片
     img_name = await parse_and_save_image(bot, ev, img_text)
     await bot.send(ev, '> 已收到翻译非常慢，请耐心等待')
-    msg = await manga_tran(img_name)
-    await bot.send(ev, msg)
+    try:
+        msg = await manga_tran(img_name)
+        await bot.send(ev, msg)
+    except Exception as e:
+        raise FunctionException(ev, f'漫画 [{img_name}] 翻译出错，请联系维护组：{str(e)}')
 
 
 # 生成消息

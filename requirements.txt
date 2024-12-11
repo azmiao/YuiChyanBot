@@ -12,3 +12,5 @@ quart>=0.19.9
 rocksdict>=0.3.24
 markdown>=3.7
 pillow>=11.0.0
+fuzzywuzzy>=1.18.0
+beautifulsoup4>=4.12.3
