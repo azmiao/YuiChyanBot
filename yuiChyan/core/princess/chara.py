@@ -4,12 +4,15 @@ from io import BytesIO
 
 from PIL import Image
 from PIL.Image import Resampling
+from aiocqhttp import MessageSegment
 from curl_cffi.requests import AsyncSession
 
 from yuiChyan.exception import FunctionException
 from yuiChyan.http_request import get_session_or_create, close_session
 from .chara_manager import chara_manager, gadget_star, gadget_star_dis, gadget_star_pink, gadget_equip, is_npc
 from .util import unit_path, sv
+from ... import CommandErrorException
+from ...permission import SUPERUSER
 
 
 class Chara:
@@ -21,7 +24,12 @@ class Chara:
         self.second_equip: int = second_equip  # 专武2
         self.name: str = chara_manager.CHARA_NAME.get(self.id, chara_manager.UNKNOWN_NAME)[0]  # 角色名
 
-    # 获取图片路径
+    # 获取原始头像的图片消息
+    async def get_icon_image(self) -> MessageSegment:
+        icon_path = await self.get_icon_path()
+        return MessageSegment.image(f'file:///{os.path.abspath(icon_path)}')
+
+    # 获取头像路径
     async def get_icon_path(self, star: int = 0) -> str:
         star = star or self.star
         # 选择一个星级区段
@@ -54,7 +62,7 @@ class Chara:
         # 若下载后依然不存在，则返回未知角色图标
         return os.path.join(unit_path, f'icon_unit_{chara_manager.UNKNOWN_ID}31.png')
 
-    # 生成图标
+    # 生成带图标的头像Image
     async def render_icon(self, size: int, star_slot_verbose: bool = True) -> Image:
         icon_path = await self.get_icon_path()
         pic = Image.open(icon_path).convert('RGBA').resize((size, size), Resampling.LANCZOS)
@@ -114,7 +122,7 @@ async def download_chara_icon(session: AsyncSession, id_: int, star: int) -> int
 
 
 # 手动更新所有头像 | 只下载不存在的
-@sv.on_command('更新所有PCR头像')
+@sv.on_command('PCR更新所有头像', cmd_permission=SUPERUSER)
 async def download_all_chara_icon(bot, ev):
     try:
         tasks = []
@@ -140,3 +148,25 @@ async def download_all_chara_icon(bot, ev):
         await bot.send(ev, f'> PCR头像更新完成! \n下载成功 {success}/{len(ret)} 个头像')
     except Exception as e:
         raise FunctionException(ev, f'> PCR头像更新出错: {type(e)}，{str(e)}')
+
+
+# PCR添加角色名称
+@sv.on_command('PCR添加角色名称', cmd_permission=SUPERUSER)
+async def update_chara(bot, ev):
+    message = str(ev.message).strip()
+    if (not message) or (' ' not in message):
+        raise CommandErrorException(ev, '> 添加角色命令错误\n示例：PCR添加角色名称 {id} {名称}')
+
+    args = message.split(' ', 1)
+    id_str = args[0]
+    try:
+        _ = int(id_str)
+    except:
+        raise CommandErrorException(ev, '> 添加角色命令错误\n示例：PCR添加角色名称 {id} {名称}')
+
+    # 添加别称
+    try:
+        chara_manager.add_chara_name(int(id_str), args[1])
+        await bot.send(ev, f'已成功为PCR角色ID [{id_str}] 添加名称 [{args[1]}]')
+    except Exception as e:
+        raise FunctionException(ev, f'> PCR添加角色名称出错: {type(e)}，{str(e)}')

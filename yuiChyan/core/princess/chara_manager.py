@@ -19,17 +19,21 @@ class CharaManager:
         self.CHARA_NAME: Dict[int, List[str]] = {}
         # 不可用角色缓存
         self.UNAVAILABLE_CHARA: Dict[int, List[str]] = {}
-        # 加载角色
-        self._load_pcr_data()
-        # 未知角色名称
-        self.UNKNOWN_NAME: List[str] = self.CHARA_NAME.get(self.UNKNOWN_ID)
         # 花名册
         self.roster: pygtrie.CharTrie = pygtrie.CharTrie()
-        # 重载花名册
-        self.reload_roster()
+        # 重载缓存
+        self.reload_cache()
+        # 未知角色名称
+        self.UNKNOWN_NAME: List[str] = self.CHARA_NAME.get(self.UNKNOWN_ID)
 
-    # 加载数据
-    def _load_pcr_data(self):
+    # 保存数据
+    def _save_pcr_data(self):
+        with open(chara_name_path, 'w+', encoding='utf-8') as f:
+            # noinspection PyTypeChecker
+            json.dump(self.CHARA_NAME, f, indent=4, ensure_ascii=False)
+
+    # 重装缓存
+    def reload_cache(self):
         # 加载角色
         with open(chara_name_path, 'r', encoding='utf-8') as f:
             chara_name_str = json.load(f)
@@ -42,14 +46,7 @@ class CharaManager:
         for _id in unavailable_chara_str:
             self.UNAVAILABLE_CHARA[int(_id)] = unavailable_chara_str[_id]
 
-    # 保存数据
-    def _save_pcr_data(self):
-        with open(chara_name_path, 'w+', encoding='utf-8') as f:
-            # noinspection PyTypeChecker
-            json.dump(self.CHARA_NAME, f, indent=4, ensure_ascii=False)
-
-    # 重装花名册
-    def reload_roster(self):
+        # 重装花名册
         self.roster.clear()
         for _id, names in self.CHARA_NAME.items():
             for n in names:
@@ -70,6 +67,7 @@ class CharaManager:
             pass
         self.CHARA_NAME[_id] = name_get
         self._save_pcr_data()
+        self.reload_cache()
 
     # 根据名字获取ID
     def get_id(self, name: str) -> int:
