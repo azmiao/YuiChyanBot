@@ -1,8 +1,8 @@
 
 from yuiChyan.util import FreqLimiter
-from .chara import get_chara_by_id
-from .chara_manager import chara_manager
-from .util import *
+from ..chara import get_chara_by_id
+from ..chara_manager import chara_manager
+from ..util import *
 
 lmt = FreqLimiter(5)
 

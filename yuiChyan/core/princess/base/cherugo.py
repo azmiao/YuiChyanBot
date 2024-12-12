@@ -15,7 +15,7 @@ from aiocqhttp import Event as CQEvent
 from aiocqhttp.message import escape
 
 from yuiChyan.util import filter_message
-from .util import *
+from ..util import *
 
 # 基础参数
 CHERU_SET = '切卟叮咧哔唎啪啰啵嘭噜噼巴拉蹦铃'

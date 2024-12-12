@@ -8,7 +8,7 @@ from curl_cffi.requests import AsyncSession
 
 from yuiChyan.config import PROXY
 from yuiChyan.http_request import get_session_or_create, close_session
-from .util import *
+from ..util import *
 
 
 # 图片名称

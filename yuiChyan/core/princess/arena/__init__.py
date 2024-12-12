@@ -28,7 +28,7 @@ async def QueryAllInterface(bot, ev: CQEvent):
 async def QueryBilibiliInterface(bot, ev: CQEvent):
     if IsEmptyMessage(ev.message):
         await bot.send(ev, f'已收到查作业（B服）请求，请在 {gs_seconds_to_wait} 秒内发送防守队伍截图')
-        gs_qqid2request[ev.user_id] = QueryRequestContext(RegionEnum.Bilibili)
+        gs_qq_id2request[ev.user_id] = QueryRequestContext(RegionEnum.Bilibili)
     else:
         await QueryArenaInterface(bot, ev, ev.message, RegionEnum.Bilibili)
 
@@ -37,7 +37,7 @@ async def QueryBilibiliInterface(bot, ev: CQEvent):
 async def QueryTaiwanInterface(bot, ev: CQEvent):
     if IsEmptyMessage(ev.message):
         await bot.send(ev, f'已收到查作业（台服）请求，请在 {gs_seconds_to_wait} 秒内发送防守队伍截图')
-        gs_qqid2request[ev.user_id] = QueryRequestContext(RegionEnum.Taiwan)
+        gs_qq_id2request[ev.user_id] = QueryRequestContext(RegionEnum.Taiwan)
     else:
         await QueryArenaInterface(bot, ev, ev.message, RegionEnum.Taiwan)
 
@@ -46,7 +46,7 @@ async def QueryTaiwanInterface(bot, ev: CQEvent):
 async def QueryJapanInterface(bot, ev: CQEvent):
     if IsEmptyMessage(ev.message):
         await bot.send(ev, f'已收到查作业（日服）请求，请在 {gs_seconds_to_wait} 秒内发送防守队伍截图')
-        gs_qqid2request[ev.user_id] = QueryRequestContext(RegionEnum.Japan)
+        gs_qq_id2request[ev.user_id] = QueryRequestContext(RegionEnum.Japan)
     else:
         await QueryArenaInterface(bot, ev, ev.message, RegionEnum.Japan)
 
