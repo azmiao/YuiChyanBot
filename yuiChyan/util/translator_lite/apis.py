@@ -4,7 +4,7 @@ import re
 import time
 import urllib.parse
 
-from yuiChyan.http_request import get_session_or_create
+from yuiChyan.http_request import get_session_or_create, close_session
 
 
 class Tse:
@@ -100,6 +100,8 @@ class Youdao(Tse):
 
         not_update_cond_time = 1 if time.time() - self.begin_time < update_session_after_seconds else 0
         if not (self.session and not_update_cond_time and self.language_map and self.sign_key):
+            # 超时了就先关闭
+            close_session('Youdao', self.session)
             self.session = get_session_or_create('Youdao')
             host_html = self.session.get(self.host_url, headers=self.host_headers, timeout=timeout,
                                          proxies=proxies).text

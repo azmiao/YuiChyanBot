@@ -1,312 +1,142 @@
 import asyncio
-import importlib
+import os
 from io import BytesIO
 
-import pygtrie
-import requests
 from PIL import Image
-from fuzzywuzzy import process
+from PIL.Image import Resampling
+from curl_cffi.requests import AsyncSession
 
-from yuiChyan.util import normalize_str
-from . import chara_class
-from .chara_class import UNKNOWN, CHARA_NAME
-from .util import sv
-
-
-# 花名册
-class Roster:
-
-    def __init__(self):
-        self._roster = pygtrie.CharTrie()
-        self.update()
-
-    # 重载花名册
-    def update(self):
-        importlib.reload(chara_class)
-        self._roster.clear()
-        result = {'success': 0, 'duplicate': 0}
-        for idx, names in CHARA_NAME.items():
-            for n in names:
-                n = normalize_str(n)
-                if n not in self._roster:
-                    self._roster[n] = idx
-                    result['success'] += 1
-                else:
-                    result['duplicate'] += 1
-                    sv.logger.warning(f'PCR角色: 出现重名{n}于id{idx}与id{self._roster[n]}')
-        return result
-
-    # 根据名字获取ID
-    def get_id(self, name):
-        name = normalize_str(name)
-        return self._roster[name] if name in self._roster else UNKNOWN
-
-    # 根据名字猜测 | 返回ID,名字。分数
-    def guess_id(self, name):
-        name, score = process.extractOne(name, self._roster.keys(), processor=normalize_str)
-        return self._roster[name], name, score
-
-    # 根据名字获取ID列表
-    def parse_team(self, name_str):
-        name_str = normalize_str(name_str.strip())
-        team = []
-        unknown = []
-        while name_str:
-            item = self._roster.longest_prefix(name_str)
-            if not item:
-                unknown.append(name_str[0])
-                name_str = name_str[1:].lstrip()
-            else:
-                team.append(item.value)
-                name_str = name_str[len(item.key):].lstrip()
-        return team, ''.join(unknown)
-
-
-# 启动花名册
-roster = Roster()
-
-
-def name2id(name):
-    return roster.get_id(name)
-
-
-def fromid(id_, star=0, equip=0):
-    return Chara(id_, star, equip)
-
-
-def fromname(name, star=0, equip=0):
-    id_ = name2id(name)
-    return Chara(id_, star, equip)
-
-
-def guess_id(name):
-    """@return: id, name, score"""
-    return roster.guess_id(name)
-
-
-def is_npc(id_):
-    if id_ in _pcr_data.UnavailableChara:
-        return True
-    else:
-        return not (1000 < id_ < 1900)
-
-
-async def gen_team_pic(team, size=64, star_slot_verbose=True):
-    num = len(team)
-    des = Image.new('RGBA', (num*size, size), (255, 255, 255, 255))
-    for i, chara in enumerate(team):
-        src = await chara.render_icon(size, star_slot_verbose)
-        des.paste(src, (i * size, 0), src)
-    return des
-
-
-async def download_chara_icon(id_, star):
-    url = f'https://redive.estertion.win/icon/unit/{id_}{star}1.webp'
-    save_path = R.img(f'priconne/unit/icon_unit_{id_}{star}1.png').path
-    logger.info(f'Downloading chara icon from {url}')
-    try:
-        rsp = await aiorequests.get(url, stream=True, timeout=5)
-        if 200 == rsp.status_code:
-            img = Image.open(BytesIO(await rsp.content))
-            img.save(save_path)
-            logger.info(f'Saved to {save_path}')
-            return 0    # ok
-        elif 404 == rsp.status_code:
-            logger.info(f'image_id [{id_}{star}1] is not exist')
-            return 1
-        else:
-            logger.error(f'Failed to download {url}. HTTP {rsp.status_code}')
-            return 1        # error
-    except Exception as e:
-        logger.error(f'Failed to download {url}. {type(e)}')
-        # logger.exception(e)
-        return 1        # error
-
-
-def sync_download_chara_icon(id_, star):
-    url = f'https://redive.estertion.win/icon/unit/{id_}{star}1.webp'
-    save_path = R.img(f'priconne/unit/icon_unit_{id_}{star}1.png').path
-    logger.info(f'Downloading chara icon from {url}')
-    try:
-        rsp = requests.get(url, stream=True, timeout=5)
-        if 200 == rsp.status_code:
-            img = Image.open(BytesIO(rsp.content))
-            img.save(save_path)
-            logger.info(f'Saved to {save_path}')
-            return 0    # ok
-        elif 404 == rsp.status_code:
-            logger.info(f'image_id [{id_}{star}1] is not exist')
-            return 1
-        else:
-            logger.error(f'Failed to download {url}. HTTP {rsp.status_code}')
-            return 1        # error
-    except Exception as e:
-        logger.error(f'Failed to download {url}. {type(e)}')
-        # logger.exception(e)
-        return 1        # error
+from yuiChyan.exception import FunctionException
+from yuiChyan.http_request import get_session_or_create, close_session
+from .chara_manager import chara_manager, gadget_star, gadget_star_dis, gadget_star_pink, gadget_equip, is_npc
+from .util import unit_path, sv
 
 
 class Chara:
 
-    def __init__(self, id_, star=0, equip=0):
-        self.id = id_
-        self.star = star
-        self.equip = equip
+    def __init__(self, id_: int, star: int = 0, equip: int = 0, second_equip: int = 0):
+        self.id: int = id_  # 角色ID
+        self.star: int = star  # 星级
+        self.equip: int = equip  # 专武1
+        self.second_equip: int = second_equip  # 专武2
+        self.name: str = chara_manager.CHARA_NAME.get(self.id, chara_manager.UNKNOWN_NAME)[0]  # 角色名
 
-    @property
-    def name(self):
-        return _pcr_data.CHARA_NAME[self.id][0] if self.id in _pcr_data.CHARA_NAME else _pcr_data.CHARA_NAME[UNKNOWN][0]
-
-    @property
-    def is_npc(self) -> bool:
-        return is_npc(self.id)
-
-    @property
-    def icon(self):
-        import warnings
-        warnings.warn(
-            "`Chara.icon` is deprecated and will be removed in the next version. Use async method `Chara.get_icon()` instead.",
-            DeprecationWarning
-        )
-        star = '3' if 1 <= self.star <= 5 else '6'
-        res = R.img(f'priconne/unit/icon_unit_{self.id}{star}1.png')
-        if not res.exist:
-            res = R.img(f'priconne/unit/icon_unit_{self.id}31.png')
-        if not res.exist:
-            res = R.img(f'priconne/unit/icon_unit_{self.id}11.png')
-        if not res.exist:
-            sync_download_chara_icon(self.id, 6)
-            sync_download_chara_icon(self.id, 3)
-            sync_download_chara_icon(self.id, 1)
-            res = R.img(f'priconne/unit/icon_unit_{self.id}{star}1.png')
-        if not res.exist:
-            res = R.img(f'priconne/unit/icon_unit_{self.id}31.png')
-        if not res.exist:
-            res = R.img(f'priconne/unit/icon_unit_{self.id}11.png')
-        if not res.exist:
-            res = R.img(f'priconne/unit/icon_unit_{UNKNOWN}31.png')
-        return res
-
-    async def get_icon(self, star=0) -> R.ResImg:
+    # 获取图片路径
+    async def get_icon_path(self, star: int = 0) -> str:
         star = star or self.star
+        # 选择一个星级区段
         star = 1 if 1 <= star < 3 else 3 if 3 <= star < 6 else 6
-        res = R.img(f'priconne/unit/icon_unit_{self.id}{star}1.png')
-        if not res.exist:
-            res = R.img(f'priconne/unit/icon_unit_{self.id}31.png')
-        if not res.exist:
-            res = R.img(f'priconne/unit/icon_unit_{self.id}11.png')
-        if not res.exist:
-            await asyncio.gather(
-                download_chara_icon(self.id, 6),
-                download_chara_icon(self.id, 3),
-                download_chara_icon(self.id, 1),
-            )
-            res = R.img(f'priconne/unit/icon_unit_{self.id}{star}1.png')
-        if not res.exist:
-            res = R.img(f'priconne/unit/icon_unit_{self.id}31.png')
-        if not res.exist:
-            res = R.img(f'priconne/unit/icon_unit_{self.id}11.png')
-        if not res.exist:
-            res = R.img(f'priconne/unit/icon_unit_{UNKNOWN}31.png')
-        return res
+        # 构建检查顺序的文件路径
+        res_paths = [
+            os.path.join(unit_path, f'icon_unit_{self.id}{star}1.png'),
+            os.path.join(unit_path, f'icon_unit_{self.id}31.png'),
+            os.path.join(unit_path, f'icon_unit_{self.id}11.png')
+        ]
+        # 依次检查文件是否存在，若存在则返回路径
+        for path in res_paths:
+            if os.path.exists(path):
+                return path
 
-    async def get_icon_cqcode(self, star=0):
-        return (await self.get_icon(star)).cqcode
+        session: AsyncSession = get_session_or_create('PcrUnit', True)
+        # 文件均不存在，则下载资源
+        await asyncio.gather(
+            download_chara_icon(session, self.id, 6),
+            download_chara_icon(session, self.id, 3),
+            download_chara_icon(session, self.id, 1),
+        )
+        # 关闭会话
+        close_session('PcrUnit', session)
 
-    async def render_icon(self, size, star_slot_verbose=True) -> Image:
-        icon = await self.get_icon()
-        pic = icon.open().convert('RGBA').resize((size, size), Image.LANCZOS)
+        # 在下载之后，依次重新检查文件是否存在
+        for path in res_paths:
+            if os.path.exists(path):
+                return path
+        # 若下载后依然不存在，则返回未知角色图标
+        return os.path.join(unit_path, f'icon_unit_{chara_manager.UNKNOWN_ID}31.png')
 
-        l = size // 6
-        star_lap = round(l * 0.15)
-        margin_x = (size - 6*l) // 2
-        margin_y = round(size * 0.05)
+    # 生成图标
+    async def render_icon(self, size: int, star_slot_verbose: bool = True) -> Image:
+        icon_path = await self.get_icon_path()
+        pic = Image.open(icon_path).convert('RGBA').resize((size, size), Resampling.LANCZOS)
+
+        l: int = size // 6
+        star_lap: int = round(l * 0.15)
+        margin_x: int = (size - 6 * l) // 2
+        margin_y: int = round(size * 0.05)
         if self.star:
             for i in range(5 if star_slot_verbose else min(self.star, 5)):
-                a = i*(l-star_lap) + margin_x
+                a = i * (l - star_lap) + margin_x
                 b = size - l - margin_y
                 s = gadget_star if self.star > i else gadget_star_dis
-                s = s.resize((l, l), Image.LANCZOS)
-                pic.paste(s, (a, b, a+l, b+l), s)
+                s = s.resize((l, l), Resampling.LANCZOS)
+                pic.paste(s, (a, b, a + l, b + l), s)
             if 6 == self.star:
-                a = 5*(l-star_lap) + margin_x
+                a = 5 * (l - star_lap) + margin_x
                 b = size - l - margin_y
                 s = gadget_star_pink
-                s = s.resize((l, l), Image.LANCZOS)
-                pic.paste(s, (a, b, a+l, b+l), s)
+                s = s.resize((l, l), Resampling.LANCZOS)
+                pic.paste(s, (a, b, a + l, b + l), s)
         if self.equip:
-            l = round(l * 1.5)
+            l: int = round(l * 1.5)
             a = margin_x
             b = margin_x
-            s = gadget_equip.resize((l, l), Image.LANCZOS)
-            pic.paste(s, (a, b, a+l, b+l), s)
+            s = gadget_equip.resize((l, l), Resampling.LANCZOS)
+            pic.paste(s, (a, b, a + l, b + l), s)
         return pic
 
 
-@sucmd('download-pcr-chara-icon', force_private=False, aliases=('下载角色头像'))
-async def download_pcr_chara_icon(sess: CommandSession):
-    '''
-    覆盖更新1、3、6星头像
-    '''
+# 根据ID查询角色
+def get_chara_by_id(id_: int, star: int = 0, equip: int = 0, second_equip: int = 0) -> Chara:
+    return Chara(id_, star, equip, second_equip)
+
+
+# 下载头像 | 返回值：0正常，1不存在，2失败，3出错
+async def download_chara_icon(session: AsyncSession, id_: int, star: int) -> int:
+    url = f'https://redive.estertion.win/icon/unit/{id_}{star}1.webp'
+    save_path = os.path.join(unit_path, f'icon_unit_{id_}{star}1.png')
+    sv.logger.info(f'> 开始下载PCR角色 [{id_}] URL={url}')
     try:
-        ch = fromname(sess.current_arg_text.strip())
-        assert ch.id != UNKNOWN, '未知角色名'
-        await asyncio.gather(
-            download_chara_icon(ch.id, 6),
-            download_chara_icon(ch.id, 3),
-            download_chara_icon(ch.id, 1),
-        )
-        msg = await ch.get_icon_cqcode(6) + \
-            await ch.get_icon_cqcode(3) + \
-            await ch.get_icon_cqcode(1)
-        await sess.send(msg)
+        rsp = await session.get(url, stream=True, timeout=5)
+        if 200 == rsp.status_code:
+            img = Image.open(BytesIO(await rsp.content))
+            img.save(save_path)
+            sv.logger.info(f'- 已保存至 [{save_path}]')
+            return 0
+        elif 404 == rsp.status_code:
+            sv.logger.info(f'- 角色头像 [{id_}{star}1] 不存在，将跳过')
+            return 1
+        else:
+            sv.logger.info(f'- 角色头像 [{id_}{star}1] 下载失败：CODE={rsp.status_code}')
+            return 2
     except Exception as e:
-        logger.exception(e)
-        await sess.send(f'Error: {type(e)}')
+        sv.logger.error(f'- 角色头像 [{id_}{star}1] 下载出错：{str(e)}')
+        return 3
 
 
-@sucmd('download-star6-chara-icon', force_private=False, aliases=('下载六星头像', '更新六星头像'))
-async def download_star6_chara_icon(sess: CommandSession):
-    '''
-    尝试下载缺失的六星头像，已有头像不会被覆盖
-    '''
-    try:
-        tasks = []
-        for id_ in _pcr_data.CHARA_NAME:
-            if is_npc(id_):
-                continue
-            res = R.img(f'priconne/unit/icon_unit_{id_}61.png')
-            if not res.exist:
-                tasks.append(download_chara_icon(id_, 6))
-        ret = await asyncio.gather(*tasks)
-        succ = sum(r == 0 for r in ret)
-        await sess.send(f'ok! downloaded {succ}/{len(ret)} icons.')
-    except Exception as e:
-        logger.exception(e)
-        await sess.send(f'Error: {type(e)}')
-
-@sucmd('download-all-chara-icon', force_private=False, aliases=('下载所有头像', '更新所有头像'))
-async def download_all_chara_icon(sess: CommandSession):
-    '''
-    尝试下载缺失的所有头像，已有头像不会被覆盖
-    '''
+# 手动更新所有头像 | 只下载不存在的
+@sv.on_command('更新所有PCR头像')
+async def download_all_chara_icon(bot, ev):
     try:
         tasks = []
-        for id_ in _pcr_data.CHARA_NAME:
+        session: AsyncSession = get_session_or_create('PcrUnitUpdate', True)
+        for id_ in chara_manager.CHARA_NAME:
             if is_npc(id_):
                 continue
-            res = R.img(f'priconne/unit/icon_unit_{id_}11.png')
-            if not res.exist:
-                tasks.append(download_chara_icon(id_, 1))
-            res = R.img(f'priconne/unit/icon_unit_{id_}31.png')
-            if not res.exist:
-                tasks.append(download_chara_icon(id_, 3))
-            res = R.img(f'priconne/unit/icon_unit_{id_}61.png')
-            if not res.exist:
-                tasks.append(download_chara_icon(id_, 6))
+
+            if not os.path.exists(os.path.join(unit_path, f'icon_unit_{id_}11.png')):
+                tasks.append(download_chara_icon(session, id_, 1))
+
+            if not os.path.exists(os.path.join(unit_path, f'icon_unit_{id_}31.png')):
+                tasks.append(download_chara_icon(session, id_, 3))
+
+            if not os.path.exists(os.path.join(unit_path, f'icon_unit_{id_}61.png')):
+                tasks.append(download_chara_icon(session, id_, 6))
+
         ret = await asyncio.gather(*tasks)
-        succ = sum(r == 0 for r in ret)
-        await sess.send(f'ok! downloaded {succ}/{len(ret)} icons.')
+        # 关闭会话
+        close_session('PcrUnitUpdate', session)
+
+        success = sum(r == 0 for r in ret)
+        await bot.send(ev, f'> PCR头像更新完成! \n下载成功 {success}/{len(ret)} 个头像')
     except Exception as e:
-        logger.exception(e)
-        await sess.send(f'Error: {type(e)}')
+        raise FunctionException(ev, f'> PCR头像更新出错: {type(e)}，{str(e)}')

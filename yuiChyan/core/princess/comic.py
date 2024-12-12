@@ -7,7 +7,7 @@ from aiocqhttp import MessageSegment
 from curl_cffi.requests import AsyncSession
 
 from yuiChyan.config import PROXY
-from yuiChyan.http_request import get_session_or_create
+from yuiChyan.http_request import get_session_or_create, close_session
 from .util import *
 
 
@@ -90,6 +90,9 @@ async def update_manga():
     # 确定已有更新，下载图片
     sv.logger.info(f'PCR官方漫画: 发现更新 [{id_}]')
     await download_comic(session, id_)
+
+    # 关闭会话
+    close_session('PcrComic', session)
 
     # 推送至各个订阅群
     pic_name = get_pic_name(episode)

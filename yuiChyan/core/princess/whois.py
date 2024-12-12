@@ -1,21 +1,24 @@
-from .util import *
+
 from yuiChyan.util import FreqLimiter
+from .chara import roster, get_chara_by_id
+from .chara_manager import UNKNOWN
+from .util import *
 
 lmt = FreqLimiter(5)
 
 
 @sv.on_prefix('PCR谁是')
 async def whois(bot, ev):
-    name = escape(ev.message.extract_plain_text().strip())
+    name = str(ev.message).strip()
     if not name:
         return
-    id_ = chara.name2id(name)
+    id_ = roster.get_id(name)
     confi = 100
     guess = False
-    if id_ == chara.UNKNOWN:
-        id_, guess_name, confi = chara.guess_id(name)
+    if id_ == UNKNOWN:
+        id_, guess_name, confi = roster.guess_id(name)
         guess = True
-    c = chara.fromid(id_)
+    c = get_chara_by_id(id_)
     
     if confi < 60:
         msg = f'兰德索尔似乎没有和"{name}"名字相近的人欸'

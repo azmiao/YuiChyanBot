@@ -104,7 +104,7 @@ def result2render(result, team_type="normal", id_list=[]):
                 pass
 
         render.append({
-            "atk": [chara.fromid(c["id"] // 100, c["star"], c["equip"]) for c in entry["atk"]],
+            "atk": [chara.get_chara_by_id(c["id"] // 100, c["star"], c["equip"]) for c in entry["atk"]],
             "up": entry["up"],
             "down": entry["down"],
             "val": caculateVal(entry),

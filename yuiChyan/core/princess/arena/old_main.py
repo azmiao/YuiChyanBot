@@ -15,9 +15,10 @@ from hoshino.util import FreqLimiter, concat_pic, pic2b64
 
 from .record import update_dic, update_record
 from .. import chara
-from .. import chara_class
+from .. import chara_manager
 from . import sv
 from . import arena
+from ..chara import roster
 
 try:
     thumb_up_a = R.img('priconne/gadget/thumb-up-a.png').open().resize((16, 16), Image.LANCZOS)
@@ -43,7 +44,7 @@ async def render_atk_def_teams(entries, border_pix=5):
         y2 = y1 + icon_size
 
         if e == "placeholder":  # 输出五个佑树
-            e = {'atk': [chara.fromid(9000) for _ in range(5)], "team_type": "youshu"}
+            e = {'atk': [chara.get_chara_by_id(9000) for _ in range(5)], "team_type": "youshu"}
 
         # e此时只能是dict了
         for j, c in enumerate(e['atk']):
@@ -75,13 +76,13 @@ async def render_atk_def_teams(entries, border_pix=5):
             _, uid_4_1_str, uid_4_2_str = e["team_type"].split(' ')
             draw.text((x1, y1 - 3), f"近似解", (0, 0, 0, 255), font)
 
-            chara_1 = chara.fromid(int(uid_4_1_str))
+            chara_1 = chara.get_chara_by_id(int(uid_4_1_str))
             icon_1 = await chara_1.render_icon(small_icon_size)
             im.paste(icon_1, (x1, y1 + 26), icon_1)
 
             draw.text((x1 + 33, y1 + 32), f"→", (0, 0, 0, 255), font)
 
-            chara_2 = chara.fromid(int(uid_4_2_str))
+            chara_2 = chara.get_chara_by_id(int(uid_4_2_str))
             icon_2 = await chara_2.render_icon(small_icon_size)
             im.paste(icon_2, (x1 + 50, y1 + 26), icon_2)
         elif e["team_type"] == "frequency":
@@ -352,7 +353,7 @@ async def getPos(img: Image):
                         x, y, w, h = arr[row_index][4 - col_index]
                         cropped = img.crop([x + 2, y + 2, x + w - 2, y + h - 2]).resize((64, 64), Image.ANTIALIAS)
                         compare_img.paste(cropped, (pos_x, pos_y), cropped)  # 要不要加cropped
-                        c = chara.fromid(arr_id_6[row_index][4 - col_index] // 100, arr_id_6[row_index][4 - col_index] % 100 // 10)
+                        c = chara.get_chara_by_id(arr_id_6[row_index][4 - col_index] // 100, arr_id_6[row_index][4 - col_index] % 100 // 10)
                         icon = await c.render_icon(icon_size)
                         compare_img.paste(icon, (pos_x, pos_y + 64), icon)
 
@@ -409,7 +410,7 @@ async def getUnit(img2):
     uid_6 = int(lis[0][0])
     uid = uid_6 // 100
     try:
-        return uid_6, uid, chara.fromid(uid).name, 100 - similarity
+        return uid_6, uid, chara.get_chara_by_id(uid).name, 100 - similarity
     except:
         return uid_6, uid, "Unknown", 100 - similarity
 
@@ -493,7 +494,7 @@ def recommend1Team(already_used_units: List[int]):
         record_4 = [x // 100 for x in record_6]  # [1114,1012,1103,1034,1032]
         team_mix = already_used_units + record_4
         if len(team_mix) == len(set(team_mix)):  # 推荐配队成功
-            return {"atk": [chara.fromid(uid_6 // 100, uid_6 % 100 // 10) for uid_6 in record_6], "team_type": "frequency"}
+            return {"atk": [chara.get_chara_by_id(uid_6 // 100, uid_6 % 100 // 10) for uid_6 in record_6], "team_type": "frequency"}
     return "placeholder"
 
 
@@ -520,7 +521,7 @@ def recommend2Teams(already_used_units: List[int]):
         team_mix = already_used_units + record_4_1 + record_4_2
         if len(team_mix) == len(set(team_mix)):  # 推荐配队成功
             # print(f'\n\n成功配队{already_used_units}\n{record_4_1}\n{record_4_2}')  # test
-            return {"atk": [chara.fromid(uid_6 // 100, uid_6 % 100 // 10) for uid_6 in record_6_2], "team_type": "frequency"}, {"atk": [chara.fromid(uid_6 // 100, uid_6 % 100 // 10) for uid_6 in record_6_1], "team_type": "frequency"}
+            return {"atk": [chara.get_chara_by_id(uid_6 // 100, uid_6 % 100 // 10) for uid_6 in record_6_2], "team_type": "frequency"}, {"atk": [chara.get_chara_by_id(uid_6 // 100, uid_6 % 100 // 10) for uid_6 in record_6_1], "team_type": "frequency"}
 
     return "placeholder", "placeholder"
 
@@ -707,7 +708,7 @@ async def _QueryArenaTextAsync(text: str, region: int, bot: HoshinoBot, ev: CQEv
     defen = re.sub(r'[?？，,_]', '', text)
     defen, unknown = chara.roster.parse_team(defen)
     if unknown:
-        _, name, score = chara.guess_id(unknown)
+        _, name, score = roster.guess_id(unknown)
         if score < 50 and not defen:
             return  # 忽略无关对话
         msg = f'无法识别"{unknown}"' if score < 50 else f'无法识别"{unknown}" 您说的有{score}%可能是{name}'
@@ -727,7 +728,7 @@ async def __arena_query(bot, ev: CQEvent, region: int, defen, raw=0, only_use_ca
     key = ''.join([str(x) for x in sorted(defen)]) + str(region)
     res = await arena.do_query(defen, region, -1 if only_use_cache else 1)
 
-    defen = [chara.fromid(x).name for x in defen]
+    defen = [chara.get_chara_by_id(x).name for x in defen]
     defen = f"防守方【{' '.join(defen)}】"
 
     # 处理查询结果

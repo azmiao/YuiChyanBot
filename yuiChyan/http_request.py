@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Union
 
 from curl_cffi import requests
 from curl_cffi.requests import AsyncSession, Session
@@ -23,6 +23,22 @@ def get_session_or_create(name: str, if_async: bool = False, create_if_none: boo
         return create_session_func(name, True)
 
     raise SessionNotFoundException(f'找不到 {session_type} [{name}]')
+
+
+# 一个调度器函数，决定使用哪个关闭函数
+def close_session(name: str, session: Union[Session, AsyncSession, None]):
+    # 为空就直接跳过
+    if not session:
+        return
+
+    if isinstance(session, Session):
+        _close_sync_session(name, session)
+    elif isinstance(session, AsyncSession):
+        # 使用事件循环运行异步关闭
+        import asyncio
+        asyncio.run(_close_async_session(name, session))
+    else:
+        pass
 
 
 # 保存session至缓存
@@ -53,3 +69,21 @@ def create_async_session(name: str, is_save: bool = False) -> AsyncSession:
     if is_save:
         save_session(name, async_session)
     return async_session
+
+
+# 手动关闭同步会话 | 一般建议走 close_session 入口
+def _close_sync_session(name: str, session: Session):
+    if isinstance(session, Session):
+        session.close()
+        session_map.pop(name)
+    else:
+        pass
+
+
+# 手动关闭异步会话 | 一般建议走 close_session 入口
+async def _close_async_session(name: str, session: AsyncSession):
+    if isinstance(session, AsyncSession):
+        await session.close()
+        async_session_map.pop(name)
+    else:
+        pass
