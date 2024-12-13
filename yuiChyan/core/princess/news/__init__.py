@@ -1,4 +1,4 @@
-from curl_cffi.requests.exceptions import ChunkedEncodingError
+
 
 from yuiChyan.service import Service
 from .spider import *
@@ -26,32 +26,26 @@ async def send_jp_news(bot, ev):
     await bot.send(ev, msg, at_sender=True)
 
 
-@sv_tw.scheduled_job(minute='*/5')
+# @sv_tw.scheduled_job(minute='*/5')
 async def sonet_news_poller():
     try:
         await news_poller(SonetSpider, sv_tw, '台服官网')
-    except ChunkedEncodingError:
-        sv_tw.logger.error(f'新闻解析失败')
     except Exception:
         sv_tw.logger.info(f'PCR台服官网连接失败')
 
 
-@sv_bl.scheduled_job(minute='*/5')
+# @sv_bl.scheduled_job(minute='*/5')
 async def bili_news_poller():
     try:
         await news_poller(BiliSpider, sv_bl, '国服官网')
-    except ChunkedEncodingError:
-        sv_tw.logger.error(f'新闻解析失败')
     except Exception:
         sv_bl.logger.info(f'PCR国服官网连接失败')
 
 
-@sv_jp.scheduled_job(minute='*/5')
+# @sv_jp.scheduled_job(minute='*/5')
 async def jp_news_poller():
     try:
         await news_poller(JpSpider, sv_jp, '日服官网')
-    except ChunkedEncodingError:
-        sv_tw.logger.error(f'新闻解析失败')
     except Exception:
         sv_bl.logger.info(f'PCR日服官网连接失败')
 
@@ -63,10 +57,8 @@ async def create_news(_spider, max_num=5):
         news = _spider.item_cache
         news = news[:min(max_num, len(news))]
         msg = _spider.format_items(news)
-    except requests.exceptions.ConnectionError:
+    except Exception:
         msg = f'官网连接失败'
-    except ChunkedEncodingError:
-        msg = f'新闻解析失败'
     return msg
 
 

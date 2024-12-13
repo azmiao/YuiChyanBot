@@ -1,5 +1,5 @@
 nonebot>=1.9.1
-curl_cffi>=0.7.4
+aiohttp>=3.11.10
 requests>=2.32.3
 aiocqhttp>=1.4.4
 zhconv>=1.4.3
@@ -13,6 +13,7 @@ rocksdict>=0.3.24
 markdown>=3.7
 pillow>=11.0.0
 fuzzywuzzy>=1.18.0
+python-Levenshtein>=0.26.1
 beautifulsoup4>=4.12.3
 numpy>=2.2.0
 opencv-python>=4.10.0.84

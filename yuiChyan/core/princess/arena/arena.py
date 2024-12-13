@@ -7,11 +7,13 @@ from math import log
 from random import random
 from typing import List
 
-from curl_cffi.requests import AsyncSession
+import aiohttp
 
 from yuiChyan.config.princess_config import AUTH_KEY
-from . import sv
+from yuiChyan.service import Service
 from .. import chara
+
+sv = Service('pcr-arena')
 
 # 查询锁
 query_lock = Lock()
@@ -193,7 +195,7 @@ async def do_query(id_list, region=1, try_cnt=1):
                 if should_sleep:
                     await asyncio.sleep(1)
                 try:
-                    async with AsyncSession() as session:
+                    async with aiohttp.ClientSession() as session:
                         resp = await session.post(
                             "https://api.pcrdfans.com/x/v1/search",
                             headers=header,

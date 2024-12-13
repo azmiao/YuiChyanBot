@@ -12,7 +12,7 @@ async def whois(bot, ev):
     name = str(ev.message).strip()
     if not name:
         return
-    id_ = chara_manager.roster.get_id(name)
+    id_ = chara_manager.get_id(name)
 
     # 如果找到了就直接返回
     if id_ != chara_manager.UNKNOWN_ID:

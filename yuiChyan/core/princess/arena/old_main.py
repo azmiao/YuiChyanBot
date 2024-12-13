@@ -7,17 +7,16 @@ from os import remove
 from os.path import join, exists
 from typing import List, Optional
 
+import aiohttp
 import cv2
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageColor
 from PIL.Image import Resampling
 from aiocqhttp import MessageSegment
-from curl_cffi import requests
 
 from yuiChyan.util import pic2b64
 from . import arena
-from . import sv
-from .arena import buffer_json_path, cur_path
+from .arena import buffer_json_path, cur_path, sv
 from .record import update_dic, update_record
 from .. import chara
 from ..chara_manager import chara_manager
@@ -431,7 +430,9 @@ async def getUnit(img2):
 
 
 async def get_pic(address: str):
-    return requests.get(address, timeout=6).content
+    async with aiohttp.ClientSession() as session:
+        resp = await session.get(address, timeout=6)
+    return await resp.read()
 
 
 async def _QueryArenaImageAsync(image_url: str, region: int, bot, ev):

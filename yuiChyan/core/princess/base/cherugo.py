@@ -28,7 +28,7 @@ rex_cheru_word: re.Pattern = re.compile(rf'切[{CHERU_SET}]+', re.U)
 
 @sv.on_prefix('切噜一下')
 async def cheru(bot, ev: CQEvent):
-    s = ev.message.extract_plain_text()
+    s = str(ev.message).strip()
     if len(s) > 500:
         await bot.send(ev, '切、切噜太长切不动勒切噜噜...', at_sender=True)
         return
@@ -37,7 +37,7 @@ async def cheru(bot, ev: CQEvent):
 
 @sv.on_prefix('切噜～♪')
 async def de_cheru(bot, ev: CQEvent):
-    s = ev.message.extract_plain_text()
+    s = str(ev.message).strip()
     if len(s) > 1501:
         await bot.send(ev, '切、切噜太长切不动勒切噜噜...', at_sender=True)
         return

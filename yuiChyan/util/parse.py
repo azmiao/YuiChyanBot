@@ -1,6 +1,6 @@
 import os
 import re
-from typing import List, Optional
+from typing import List, Optional, Tuple
 from urllib import request
 
 from aiocqhttp import Event as CQEvent
@@ -18,7 +18,7 @@ async def parse_single_image(ev: CQEvent, str_raw: str) -> (str, str, str):
 
 
 # 解析所有图片数据
-async def parse_all_image(ev: CQEvent, str_raw: str) -> List[(str, str, str)]:
+async def parse_all_image(ev: CQEvent, str_raw: str) -> List[Tuple[str, str, str]]:
     cq_list = re.findall(r'(\[CQ:image,(\S+?)])', str_raw)
     if not cq_list:
         raise FunctionException(ev, f'无法从消息中获取图片，请检查')

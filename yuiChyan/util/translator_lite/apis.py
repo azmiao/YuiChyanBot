@@ -3,6 +3,9 @@ import random
 import re
 import time
 import urllib.parse
+from typing import Optional
+
+from requests import Session
 
 from yuiChyan.http_request import get_session_or_create, close_session
 
@@ -48,7 +51,7 @@ class Youdao(Tse):
         self.host_headers = self.get_headers(self.host_url, if_api=False)
         self.api_headers = self.get_headers(self.host_url, if_api=True)
         self.language_map = None
-        self.session = None
+        self.session: Optional[Session] = None
         self.sign_key = None
         self.query_count = 0
         self.output_zh = 'zh-CHS'
@@ -102,7 +105,7 @@ class Youdao(Tse):
         if not (self.session and not_update_cond_time and self.language_map and self.sign_key):
             # 超时了就先关闭
             close_session('Youdao', self.session)
-            self.session = get_session_or_create('Youdao')
+            self.session: Session = get_session_or_create('Youdao')
             host_html = self.session.get(self.host_url, headers=self.host_headers, timeout=timeout,
                                          proxies=proxies).text
             self.sign_key = self.get_sign_key(host_html, self.session, timeout, proxies)

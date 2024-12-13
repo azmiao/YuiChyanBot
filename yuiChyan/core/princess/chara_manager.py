@@ -6,8 +6,8 @@ import pygtrie
 from PIL import Image
 from fuzzywuzzy import process
 
-from .util import sv, gadget_path, unit_path, chara_name_path, unavailable_chara_path
 from yuiChyan.util import normalize_str
+from .util import sv, gadget_path, chara_name_path, unavailable_chara_path
 
 
 # 角色管理类
@@ -102,7 +102,7 @@ gadget_equip = Image.open(os.path.join(gadget_path, 'equip.png'))
 gadget_star = Image.open(os.path.join(gadget_path, 'star.png'))
 gadget_star_dis = Image.open(os.path.join(gadget_path, 'star_disabled.png'))
 gadget_star_pink = Image.open(os.path.join(gadget_path, 'star_pink.png'))
-unknown_chara_icon = Image.open(os.path.join(unit_path, f'icon_unit_{chara_manager.UNKNOWN_ID}31.png.png'))
+unknown_chara_icon = Image.open(os.path.join(gadget_path, f'icon_unit_{chara_manager.UNKNOWN_ID}31.png'))
 
 
 # 是否是NPC

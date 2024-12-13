@@ -21,7 +21,8 @@ PROXY = {
 CORE_PLUGINS = {
     'basic': '基础功能',
     'manager': '核心管理',
-    'xqa': 'XQA你问我答'
+    'xqa': 'XQA你问我答',
+    'princess': 'PCR插件'
 }
 # 第三方插件文件夹和对应的名称 | key是plugins下的文件夹名，value是想给它取的名称，都必填
 EXTRA_PLUGINS = {

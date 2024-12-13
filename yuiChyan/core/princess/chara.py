@@ -5,10 +5,10 @@ from io import BytesIO
 from PIL import Image
 from PIL.Image import Resampling
 from aiocqhttp import MessageSegment
-from curl_cffi.requests import AsyncSession
+from aiohttp import ClientSession
 
 from yuiChyan.exception import FunctionException
-from yuiChyan.http_request import get_session_or_create, close_session
+from yuiChyan.http_request import get_session_or_create, close_async_session
 from .chara_manager import chara_manager, gadget_star, gadget_star_dis, gadget_star_pink, gadget_equip, is_npc
 from .util import unit_path, sv
 from ... import CommandErrorException
@@ -45,7 +45,7 @@ class Chara:
             if os.path.exists(path):
                 return path
 
-        session: AsyncSession = get_session_or_create('PcrUnit', True)
+        session: ClientSession = get_session_or_create('PcrUnit', True)
         # 文件均不存在，则下载资源
         await asyncio.gather(
             download_chara_icon(session, self.id, 6),
@@ -53,7 +53,7 @@ class Chara:
             download_chara_icon(session, self.id, 1),
         )
         # 关闭会话
-        close_session('PcrUnit', session)
+        await close_async_session('PcrUnit', session)
 
         # 在下载之后，依次重新检查文件是否存在
         for path in res_paths:
@@ -99,22 +99,22 @@ def get_chara_by_id(id_: int, star: int = 0, equip: int = 0, second_equip: int =
 
 
 # 下载头像 | 返回值：0正常，1不存在，2失败，3出错
-async def download_chara_icon(session: AsyncSession, id_: int, star: int) -> int:
+async def download_chara_icon(session: ClientSession, id_: int, star: int) -> int:
     url = f'https://redive.estertion.win/icon/unit/{id_}{star}1.webp'
     save_path = os.path.join(unit_path, f'icon_unit_{id_}{star}1.png')
     sv.logger.info(f'> 开始下载PCR角色 [{id_}] URL={url}')
     try:
-        rsp = await session.get(url, stream=True, timeout=5)
-        if 200 == rsp.status_code:
-            img = Image.open(BytesIO(await rsp.content))
+        rsp = await session.get(url, timeout=5)
+        if 200 == rsp.status:
+            img = Image.open(BytesIO(await rsp.read()))
             img.save(save_path)
             sv.logger.info(f'- 已保存至 [{save_path}]')
             return 0
-        elif 404 == rsp.status_code:
+        elif 404 == rsp.status:
             sv.logger.info(f'- 角色头像 [{id_}{star}1] 不存在，将跳过')
             return 1
         else:
-            sv.logger.info(f'- 角色头像 [{id_}{star}1] 下载失败：CODE={rsp.status_code}')
+            sv.logger.info(f'- 角色头像 [{id_}{star}1] 下载失败：CODE={rsp.status}')
             return 2
     except Exception as e:
         sv.logger.error(f'- 角色头像 [{id_}{star}1] 下载出错：{str(e)}')
@@ -126,7 +126,7 @@ async def download_chara_icon(session: AsyncSession, id_: int, star: int) -> int
 async def download_all_chara_icon(bot, ev):
     try:
         tasks = []
-        session: AsyncSession = get_session_or_create('PcrUnitUpdate', True)
+        session: ClientSession = get_session_or_create('PcrUnitUpdate', True)
         for id_ in chara_manager.CHARA_NAME:
             if is_npc(id_):
                 continue
@@ -142,7 +142,7 @@ async def download_all_chara_icon(bot, ev):
 
         ret = await asyncio.gather(*tasks)
         # 关闭会话
-        close_session('PcrUnitUpdate', session)
+        await close_async_session('PcrUnitUpdate', session)
 
         success = sum(r == 0 for r in ret)
         await bot.send(ev, f'> PCR头像更新完成! \n下载成功 {success}/{len(ret)} 个头像')

@@ -3,8 +3,8 @@ import re
 from dataclasses import dataclass
 from typing import List, Union
 
+import aiohttp
 from bs4 import BeautifulSoup
-from curl_cffi import requests
 
 from yuiChyan.config import PROXY
 
@@ -28,7 +28,8 @@ class BaseSpider(abc.ABC):
     @classmethod
     async def get_response(cls):
         proxy = {} if cls.src_name == "国服官网" else PROXY
-        resp = await requests.get(cls.url, headers=cls.header, proxies=proxy, timeout=15)
+        async with aiohttp.ClientSession() as session:
+            resp = await session.get(cls.url, headers=cls.header, proxies=proxy, timeout=15)
         resp.raise_for_status()
         return resp
 

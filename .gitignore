@@ -9,6 +9,8 @@ __pycache__/
 
 *.log
 
+*.npy
+
 yuiChyan/res/
 
 yuiChyan/config/plugins/

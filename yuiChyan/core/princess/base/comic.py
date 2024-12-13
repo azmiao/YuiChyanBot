@@ -4,10 +4,10 @@ import re
 from urllib.parse import urlparse, parse_qs
 
 from aiocqhttp import MessageSegment
-from curl_cffi.requests import AsyncSession
+from aiohttp import ClientSession
 
 from yuiChyan.config import PROXY
-from yuiChyan.http_request import get_session_or_create, close_session
+from yuiChyan.http_request import get_session_or_create, close_async_session
 from ..util import *
 
 
@@ -19,14 +19,14 @@ def get_pic_name(id_):
 
 
 # 下载
-async def download_comic(session: AsyncSession, id_: str):
+async def download_comic(session: ClientSession, id_: str):
     base = 'https://comic.priconne-redive.jp/api/detail/'
     with open(os.path.join(comic_path, 'index.json'), encoding='utf8') as f:
         index = json.load(f)
 
     url = base + id_
     resp = await session.get(url, proxies=PROXY)
-    if 200 != resp.status_code:
+    if 200 != resp.status:
         sv.logger.error(f'PCR官方漫画: 详细信息获取失败，URL={url}')
         return
     data = await resp.json()
@@ -39,14 +39,14 @@ async def download_comic(session: AsyncSession, id_: str):
 
     sv.logger.info(f'PCR官方漫画: 图片URL={link}')
     resp = await session.get(link, stream=True, proxies=PROXY)
-    if 200 != resp.status_code:
+    if 200 != resp.status:
         sv.logger.error(f'PCR官方漫画: 图片下载失败，{resp.text}')
         return
     if re.search(r'image', resp.headers['content-type'], re.I):
         pic_name = get_pic_name(episode)
         save_path = os.path.join(comic_path, pic_name)
         with open(save_path, 'wb') as f:
-            f.write(await resp.content)
+            f.write(await resp.read())
         sv.logger.info(f'PCR官方漫画: 图片 [{pic_name}] 已保存')
 
     # 保存官漫目录信息
@@ -58,7 +58,7 @@ async def download_comic(session: AsyncSession, id_: str):
 # 定时任务
 @sv.scheduled_job(minute='*/30', second='15')
 async def update_manga():
-    session: AsyncSession = get_session_or_create('PcrComic', True)
+    session: ClientSession = get_session_or_create('PcrComic', True)
     # 获取最新漫画信息
     try:
         resp = await session.get(
@@ -92,7 +92,7 @@ async def update_manga():
     await download_comic(session, id_)
 
     # 关闭会话
-    close_session('PcrComic', session)
+    await close_async_session('PcrComic', session)
 
     # 推送至各个订阅群
     pic_name = get_pic_name(episode)

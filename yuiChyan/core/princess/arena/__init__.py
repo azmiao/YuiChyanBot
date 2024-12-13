@@ -3,11 +3,9 @@ from enum import IntEnum, unique
 
 from aiocqhttp import Event as CQEvent
 
-from yuiChyan.service import Service
+from .arena import sv
 from yuiChyan.util.parse import parse_single_image, get_real_url
 from .old_main import _QueryArenaImageAsync, _QueryArenaTextAsync, _update_dic_cron
-
-sv = Service('pcr-arena')
 
 
 @unique
