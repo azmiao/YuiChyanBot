@@ -9,7 +9,7 @@ sv_jp = Service('pcr-news-jp')
 
 
 @sv_tw.on_match('PCR台服新闻')
-async def send_sonet_news(bot, ev):
+async def send_tw_news(bot, ev):
     msg = await create_news(SonetSpider)
     await bot.send(ev, msg, at_sender=True)
 
@@ -26,15 +26,15 @@ async def send_jp_news(bot, ev):
     await bot.send(ev, msg, at_sender=True)
 
 
-# @sv_tw.scheduled_job(minute='*/5')
-async def sonet_news_poller():
+@sv_tw.scheduled_job(minute='*/5')
+async def tw_news_poller():
     try:
         await news_poller(SonetSpider, sv_tw, '台服官网')
     except Exception:
         sv_tw.logger.info(f'PCR台服官网连接失败')
 
 
-# @sv_bl.scheduled_job(minute='*/5')
+@sv_bl.scheduled_job(minute='*/5')
 async def bili_news_poller():
     try:
         await news_poller(BiliSpider, sv_bl, '国服官网')
@@ -42,7 +42,7 @@ async def bili_news_poller():
         sv_bl.logger.info(f'PCR国服官网连接失败')
 
 
-# @sv_jp.scheduled_job(minute='*/5')
+@sv_jp.scheduled_job(minute='*/5')
 async def jp_news_poller():
     try:
         await news_poller(JpSpider, sv_jp, '日服官网')

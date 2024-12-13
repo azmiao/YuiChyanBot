@@ -23,7 +23,7 @@ async def whois(bot, ev):
         return
 
     # 找不到就猜测
-    id_, guess_name, confi = chara_manager.roster.guess_id(name)
+    id_, guess_name, confi = chara_manager.guess_id(name)
     chara = get_chara_by_id(id_)
     image = await chara.get_icon_image()
     

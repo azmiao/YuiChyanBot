@@ -116,11 +116,11 @@ class Service:
                 self_group_list = await self.bot.get_group_list(self_id=self_id)
             except CQHttpError:
                 self_group_list = []
-            self_group_list = set(int(x['group_id']) for x in self_group_list)
+            self_group_list = list(int(x['group_id']) for x in self_group_list)
             if self.use_exclude:
-                self_group_list -= self.exclude_group
+                self_group_list = [item for item in self_group_list if item not in self.exclude_group]
             else:
-                self_group_list &= self.include_group
+                self_group_list = list(set(self_group_list) & set(self.include_group))
             for group in self_group_list:
                 self_id_list = group_self_dict.get(group, [])
                 self_id_list.append(self_id)
@@ -322,6 +322,8 @@ class Service:
         """
         > 服务触发 - 定时任务
 
+        silence: 是否沉默执行，不打印日志
+
         注意：参数只能是CronTrigger的参数
 
         定时任务的参数配置。
@@ -330,6 +332,11 @@ class Service:
             @functools.wraps(func)
             @exception_handler
             async def wrapper():
+                # 如果压根没有群启用了就直接跳过
+                group_self_dict = await self.get_enable_groups()
+                if not group_self_dict:
+                    self.logger.info(f'> 定时任务 {func.__name__} 已在所有群禁用，将跳过执行')
+                    return
                 if not silence:
                     self.logger.info(f'> 定时任务 {func.__name__} 开始运行...')
                 ret = await func()

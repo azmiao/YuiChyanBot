@@ -90,7 +90,7 @@ async def connect_ws(ws_url, reconnect_interval, rate_limiter, headers):
                         print(f'收到私聊 {config["nickname"]}({config["sender_id"]}) 的消息: {message_} ({msg_id})')
                     case _:
                         # 群聊
-                        _match = re.match(r'^(\[CQ:at,qq=[0-9]+])? ?([\S\s]*)$', message_)
+                        _match = re.match(r'^(@BOT)? ?([\S\s]*)$', message_)
                         data['to_me'] = True if _match.group(1) else False
                         data['post_type'] = 'message'
                         data['message_type'] = 'group'
