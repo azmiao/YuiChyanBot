@@ -5,7 +5,7 @@ from aiocqhttp import Event as CQEvent
 
 from yuiChyan.service import Service
 from yuiChyan.util.parse import parse_single_image, get_real_url
-from .old_main import _QueryArenaImageAsync, _QueryArenaTextAsync
+from .old_main import _QueryArenaImageAsync, _QueryArenaTextAsync, _update_dic_cron
 
 sv = Service('pcr-arena')
 
@@ -39,11 +39,17 @@ async def parse_and_query(bot, ev: CQEvent, region: RegionEnum, str_raw: str):
     cq_code = re.match(r'(\[CQ:image,(\S+?)])', str_raw)
     if not cq_code:
         # 不是图片 | 解析阵容
-        await _QueryArenaTextAsync(str_raw, region, bot, ev)
+        await _QueryArenaTextAsync(str_raw, int(region), bot, ev)
     else:
         # 是图片 | 解析图片
         image_file, _, image_url = await parse_single_image(ev, str_raw)
         # 如果没有image_url，说明是GO-CQ的客户端，重新取一下图片URL
         image_url = image_url if image_url else await get_real_url(ev, image_file)
         # 查询
-        await _QueryArenaImageAsync(image_url, region, bot, ev)
+        await _QueryArenaImageAsync(image_url, int(region), bot, ev)
+
+
+# 更新字典图标缓存
+@sv.scheduled_job(hour='3', minute='21')
+async def update_dic_cron():
+    await _update_dic_cron()

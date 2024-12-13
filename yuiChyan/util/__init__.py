@@ -1,11 +1,14 @@
+import base64
 import os
 import time
 from collections import defaultdict
 from datetime import datetime, timedelta
+from io import BytesIO
 
 import pytz
 import unicodedata
 import zhconv
+from PIL import Image
 from aiocqhttp import Event as CQEvent, Message, Union
 from aiocqhttp.exceptions import ActionFailed
 
@@ -144,3 +147,11 @@ async def translate(text: str, from_: str = 'auto', to_: str = 'zh') -> str:
     assert from_ in trans_dict, f'源语言 [{from_}] 不存在\n{error_msg}'
     assert to_ in trans_dict, f'目标语言 [{to_}] 不存在\n{error_msg}'
     return _youdao.youdao_api(text, from_, to_)
+
+
+# 图片转base64
+def pic2b64(pic: Image) -> str:
+    buf = BytesIO()
+    pic.save(buf, format='PNG')
+    base64_str = base64.b64encode(buf.getvalue()).decode()
+    return 'base64://' + base64_str

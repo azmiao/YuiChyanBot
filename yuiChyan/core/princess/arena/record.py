@@ -1,19 +1,18 @@
 import json
 import os
 import re
-from os.path import dirname, join
 
 import numpy as np
 from PIL import Image
 
-from hoshino import R
+from .arena import buffer_path
+from ..util import unit_path
 
 
 def update_dic():
-    nowpath = os.path.abspath(R.get('img/priconne/unit/').path)
     dic = {}
     icon_list = []
-    for file in os.listdir(nowpath):
+    for file in os.listdir(unit_path):
         try:
             ret = re.match(r"^icon_unit_(\d{6}).png$", file)
             icon_id = int(ret.group(1))
@@ -25,7 +24,7 @@ def update_dic():
     cnt_success = 0
     for file, icon_id in icon_list:
         try:
-            img = Image.open(os.path.join(nowpath, file))
+            img = Image.open(os.path.join(unit_path, file))
             img = img.convert("RGB")
             img = img.resize((128, 128))
             dic[icon_id] = np.array(img)
@@ -39,12 +38,10 @@ def update_dic():
 
 
 def update_record():
-    curpath = dirname(__file__)
-    bufferpath = join(curpath, 'buffer/')
 
     buffer_region_cnt = [None, {}, {}, {}, {}]  # 全服=1 b服=2 台服=3 日服=4
-    tot_file_cnt = len(os.listdir(bufferpath))
-    for index, filename in enumerate(os.listdir(bufferpath)):  # 我为什么不用buffer.json 我是猪鼻
+    tot_file_cnt = len(os.listdir(buffer_path))
+    for index, filename in enumerate(os.listdir(buffer_path)):  # 我为什么不用buffer.json 我是猪鼻
         # if index % 100 == 0:
         #     print(f'{index:5d}/{tot_file_cnt}')  # test
 
@@ -61,20 +58,21 @@ def update_record():
             continue
 
         try:
-            filepath = join(bufferpath, filename)
+            filepath = os.path.join(buffer_path, filename)
             with open(filepath, "r", encoding="utf-8") as fp:
                 records = json.load(fp)
 
             for record in records:
                 if "atk" in record:
-                    unit_id_list = tuple([(unit.get("id", 100001) + unit.get("star", 3) * 10) for unit in record["atk"]])
+                    unit_id_list = ([(unit.get('id', 100001) + unit.get('star', 3) * 10) for unit in record['atk']])
                     buffer_region_cnt[region][unit_id_list] = 1 + buffer_region_cnt[region].get(unit_id_list, 0)
         except:
             continue
 
     best_atk_records_item = sorted(buffer_region_cnt[2].items(), key=lambda x: x[1], reverse=True)[:200]
     best_atk_records = [x[0] for x in best_atk_records_item]
-    with open(join(bufferpath, "best_atk_records.json"), "w", encoding="utf-8") as fp:
+    with open(os.path.join(buffer_path, "best_atk_records.json"), "w", encoding="utf-8") as fp:
+        # noinspection PyTypeChecker
         json.dump(best_atk_records, fp, ensure_ascii=False, indent=4)
 
     return f'从{tot_file_cnt}个文件中搜索到{len(buffer_region_cnt[2])}个进攻阵容（不计日台服查询）\n已缓存最频繁使用的{len(best_atk_records)}个阵容'
