@@ -4,7 +4,6 @@ import json
 import os
 import random
 import re
-from urllib import request
 
 from rocksdict import Rdict
 
@@ -12,6 +11,7 @@ from yuiChyan import logger
 from yuiChyan.config.xqa_config import *
 from yuiChyan.resources import xqa_db_, xqa_img_path, base_db_path
 from yuiChyan.util import filter_message
+from yuiChyan.util.parse import extract_file, save_image
 
 
 # 获取数据库
@@ -96,7 +96,7 @@ async def get_search(que_list: list, search_str: str) -> list:
     if not search_str:
         return que_list
     search_list = []
-    search_str_ = await adjust_img(None, search_str, False, False)
+    search_str_ = await adjust_img(search_str, False, False)
     for question in que_list:
         if re.search(rf'\S*{search_str_}\S*', question):
             search_list.append(question)
@@ -132,81 +132,25 @@ async def adjust_list(list_tmp: list, char: str) -> list:
 
 
 # 下载图片并转换图片路径
-async def doing_img(bot, img_name: str, img_file: str, img_url: str, save: bool) -> str:
-    file = os.path.join(xqa_img_path, img_name)
+async def doing_img(image_file: str, image_name: str, image_url: str, save: bool) -> str:
+    image_path = os.path.join(xqa_img_path, image_name)
 
     # 调用协议客户端实现接口下载图片
     if save:
-        # 如果没有image_url，说明是GO-CQ的客户端，重新取一下图片URL
-        if not img_url:
-            img_data = None
-            try:
-                img_data = await bot.get_image(file=img_file)
-            except Exception as e:
-                logger.critical(f'XQA: 调用get_image接口查询图片{img_file}出错:' + str(e))
-                assert Exception(f'调用get_image接口查询图片{img_file}出错:' + str(e))
-            img_url = img_data['url']
-
-        # 开始下载图片
-        try:
-            if not os.path.isfile(file):
-                request.urlretrieve(url=img_url, filename=file)
-                logger.critical(f'XQA: 已从{img_url}下载到图片{img_name}')
-        except Exception as e:
-            logger.critical(f'XQA: 从{img_url}下载图片{img_name}出错:' + str(e))
-            assert Exception(f'调用get_image接口查询图片{img_name}出错:' + str(e))
-
+        await save_image(None, image_file, image_name, image_url, image_path)
         # 只有在需要保存后，并且开启BASE64模式的时候才转化，普通的问题不需要转
         if IS_BASE64:
-            with open(file, 'rb') as file_:
+            with open(image_path, 'rb') as file_:
                 return 'base64://' + base64.b64encode(file_.read()).decode()
     else:
         # 如果是问题的话不用保存图片，原来是啥就是啥，但是没关系，问题只用作匹配
-        return img_file
+        return image_file
     # 正常的回答还是返回文件路径
-    return 'file:///' + os.path.abspath(file)
-
-
-# 根据CQ中的"xxx=xxxx,yyy=yyyy,..."提取出file和file_name还有url
-async def extract_file(cq_code_str: str) -> (bool, str, str, str):
-    # 解析所有CQ码参数
-    cq_split = cq_code_str.split(',')
-
-    # 拿到file参数 | 如果是单文件名：原始CQ | 如果是带路径的文件名：XQA本地已保存的图片，需要获取到单文件名
-    image_file_raw = next(filter(lambda x: x.startswith('file='), cq_split), '')
-    file_data = image_file_raw.replace('file=', '')
-
-    # base64就不需要花里胡哨的代码了，肯定是已经保存过了的
-    if 'base64://' in file_data:
-        return True, file_data, None, None
-
-    # 文件参数
-    image_file = file_data.split('\\')[-1].split('/')[-1] if 'file:///' in file_data else file_data
-
-    # 文件URL参数：LLOneBot 和 NapCat 有这个参数
-    image_url = (next(filter(lambda x: x.startswith('url='), cq_split), '').replace('url=', ''))
-
-    # 文件名参数：对于LLOneBot | 需要取 filename 参数做文件名
-    image_file_name = (next(filter(lambda x: x.startswith('filename='), cq_split), '')
-                       .replace('filename=', ''))
-    # 文件名参数：对于NapCat | 需要取 file_unique 参数做文件名
-    image_file_name = (next(filter(lambda x: x.startswith('file_unique='), cq_split), '')
-                       .replace('file_unique=', '')) if not image_file_name else image_file_name
-    # 文件名参数：对于其他可能的协议 | 需要取 file_id 参数做文件名
-    image_file_name = (next(filter(lambda x: x.startswith('file_id='), cq_split), '')
-                       .replace('file_id=', '')) if not image_file_name else image_file_name
-    # 文件名参数：对于GO-CQ | image_file 和 image_file_name 一致即可
-    image_file_name = image_file_name if image_file_name else image_file
-    # 文件名参数：替换特殊字符为下划线
-    image_file_name = re.sub(r'[\\/:*?"<>|{}]', '_', image_file_name)
-    # 文件名参数：最后10个字符里没有点号 | 补齐文件拓展名
-    image_file_name = image_file_name if '.' in image_file_name[-10:] else image_file_name + '.image'
-
-    return False, image_file, image_file_name, image_url
+    return 'file:///' + os.path.abspath(image_path)
 
 
 # 进行图片处理 | 问题：无需过滤敏感词，回答：需要过滤敏感词
-async def adjust_img(bot, str_raw: str, is_ans: bool, save: bool) -> str:
+async def adjust_img(str_raw: str, is_ans: bool, save: bool) -> str:
     # 找出其中所有的CQ码
     cq_list = re.findall(r'(\[CQ:(\S+?),(\S+?)])', str_raw)
     # 整个消息过滤敏感词，问题：无需过滤
@@ -222,7 +166,7 @@ async def adjust_img(bot, str_raw: str, is_ans: bool, save: bool) -> str:
             # 不是base64才需要保存图片或处理图片路径
             if not is_base64:
                 # 对图片单独保存图片，并修改图片路径为真实路径
-                image_file = await doing_img(bot, image_file_name, image_file, image_url, save)
+                image_file = await doing_img(image_file, image_file_name, image_url, save)
             # 图片CQ码：替换
             flit_msg = flit_msg.replace(flit_cq, f'[CQ:{cq_code[1]},file={image_file}]')
         else:

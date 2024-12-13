@@ -7,6 +7,8 @@ from os.path import dirname, join, exists
 from pathlib import Path
 from random import random
 
+from curl_cffi.requests import AsyncSession
+
 from yuiChyan.config.princess_config import AUTH_KEY
 from . import sv
 from .. import chara
@@ -44,7 +46,6 @@ def findApproximateTeamResult(id_list):
     if len(id_list) != 5:
         raise
     logger.info(f'查询近似解：{list(sorted(id_list))}')
-    buffer = {}
     result = []
     with open(buffer_path, 'r', encoding="utf-8") as fp:
         buffer = json.load(fp)
@@ -68,7 +69,7 @@ def findApproximateTeamResult(id_list):
     return render
 
 
-def caculateVal(record) -> float:
+def calculateVal(record) -> float:
     up_vote = int(record["up"])
     down_vote = int(record["down"])
     val_1 = up_vote / (down_vote + up_vote + 0.0001) * 2 - 1  # 赞踩比占比 [-1, 1]
@@ -76,8 +77,8 @@ def caculateVal(record) -> float:
     return val_1 + val_2 + random() / 1000  # 阵容推荐度权值
 
 
-def result2render(result, team_type="normal", id_list=[]):
-    '''
+def result2render(result, team_type="normal", id_list=None):
+    """
     team_type:
     "normal":正常查询的阵容
     "approximation":根据近似解推荐的阵容 由id_list字段自动计算uid_4_1 uid_4_2
@@ -85,7 +86,9 @@ def result2render(result, team_type="normal", id_list=[]):
     "approximation uid_4_1 uid_4_2":根据近似解推荐的阵容 原查询角色uid_4_1 被替换为 近似查询角色uid_4_2 # 本函数不支持
     "frequency":根据频率推荐的阵容 # 本函数不支持
     "youshu":五个佑树 # 本函数不支持
-    '''
+    """
+    if id_list is None:
+        id_list = []
     render = []
     for entry in result:
         # atk up down val: 都一样
@@ -104,12 +107,11 @@ def result2render(result, team_type="normal", id_list=[]):
             "atk": [chara.get_chara_by_id(c["id"] // 100, c["star"], c["equip"]) for c in entry["atk"]],
             "up": entry["up"],
             "down": entry["down"],
-            "val": caculateVal(entry),
+            "val": calculateVal(entry),
             "team_type": write_type
         })
 
     return render
-    # return [{"atk": [chara.fromid(c["id"] // 100, c["star"], c["equip"]) for c in entry["atk"]], "up": entry["up"], "down": entry["down"], "val": caculateVal(entry), "team_type": team_type} for entry in result]
 
 
 async def do_query(id_list, region=1, try_cnt=1):
@@ -128,7 +130,6 @@ async def do_query(id_list, region=1, try_cnt=1):
         logger.info(f'查询阵容：{key} 仅使用缓存')
     value = int(time.time())
 
-    buffer = {}
     with open(buffer_path, 'r', encoding="utf-8") as fp:
         buffer = json.load(fp)
 
@@ -167,7 +168,8 @@ async def do_query(id_list, region=1, try_cnt=1):
         else:
             id_list_query = [x * 100 + 1 for x in id_list]
             header = {
-                "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.87 Safari/537.36",
+                "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
+                              "Chrome/78.0.3904.87 Safari/537.36",
                 "authorization": __get_auth_key(),
             }
             payload = {
@@ -187,14 +189,14 @@ async def do_query(id_list, region=1, try_cnt=1):
             async with query_lock:
                 if should_sleep:
                     await asyncio.sleep(1)
-                res = None
                 try:
-                    resp = await aiorequests.post(
-                        "https://api.pcrdfans.com/x/v1/search",
-                        headers=header,
-                        json=payload,
-                        timeout=5,
-                    )
+                    async with AsyncSession() as session:
+                        resp = await session.post(
+                            "https://api.pcrdfans.com/x/v1/search",
+                            headers=header,
+                            json=payload,
+                            timeout=5,
+                        )
                     res = await resp.json()
                     logger.info("    服务器有返回")
                     if res["code"]:
@@ -215,10 +217,12 @@ async def do_query(id_list, region=1, try_cnt=1):
                         buffer[key] = value
 
                         with open(buffer_path, 'w', encoding="utf-8") as fp:
+                            # noinspection PyTypeChecker
                             json.dump(buffer, fp, ensure_ascii=False, indent=4)
 
-                        homeworkpath = join(cur_path, f'buffer/{key}.json')
-                        with open(homeworkpath, 'w', encoding="utf-8") as fp:
+                        homework_path = join(cur_path, f'buffer/{key}.json')
+                        with open(homework_path, 'w', encoding="utf-8") as fp:
+                            # noinspection PyTypeChecker
                             json.dump(result, fp, ensure_ascii=False, indent=4)
                     else:
                         if degrade_result:

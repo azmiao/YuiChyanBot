@@ -1,11 +1,12 @@
+import json
+import os
+import re
+from os.path import dirname, join
+
 import numpy as np
 from PIL import Image
-import os
-from os.path import dirname, join
-import json
+
 from hoshino import R
-from .. import chara
-import re
 
 
 def update_dic():

@@ -171,7 +171,7 @@ async def delete_question(bot, ev):
         user_id = user_id if str(user_id_at) == str(ev.self_id) else user_id_at
 
     # 仅调整不要回答的问题中的图片
-    no_que_str = await adjust_img(bot, no_que_str, False, False)
+    no_que_str = await adjust_img(no_que_str, False, False)
     msg, del_image = await del_que(group_id, user_id, no_que_str, True, get_user_permission(ev) < ADMIN)
     await bot.send(ev, msg)
     # 删除图片
@@ -185,7 +185,7 @@ async def xqa(bot, ev):
     db = await get_database()
     group_dict = db.get(group_id, {'all': {}})
     # 仅调整问题中的图片
-    message = await adjust_img(None, message, False, False)
+    message = await adjust_img(message, False, False)
 
     # 优先回复自己的问答
     ans = None
@@ -198,7 +198,7 @@ async def xqa(bot, ev):
     # 没有自己的问答才回复有人问
     ans = await match_ans(group_dict['all'], message, ans) if not ans else ans
     if ans:
-        ans = await adjust_img(None, ans, True, False)
+        ans = await adjust_img(ans, True, False)
         await bot.send(ev, ans)
 
 

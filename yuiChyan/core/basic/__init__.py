@@ -1,4 +1,4 @@
-from yuiChyan import LakePermissionException, CommandErrorException
+from yuiChyan import LakePermissionException, CommandErrorException, FunctionException
 from yuiChyan.config import NICKNAME
 from yuiChyan.permission import check_permission, ADMIN
 from yuiChyan.service import Service
@@ -51,7 +51,7 @@ async def manga_translate(bot, ev):
     if not img_text.startswith('[CQ:image,'):
         raise CommandErrorException(ev, '> 文字识别指令错误! \n示例：漫画翻译 {图片}，注意{图片}换成自己实际需要的图片')
     # 保存图片
-    img_name = await parse_and_save_image(bot, ev, img_text)
+    img_name = await parse_and_save_image(ev, img_text)
     await bot.send(ev, '> 已收到翻译非常慢，请耐心等待')
     try:
         msg = await manga_tran(img_name)

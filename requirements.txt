@@ -14,3 +14,5 @@ markdown>=3.7
 pillow>=11.0.0
 fuzzywuzzy>=1.18.0
 beautifulsoup4>=4.12.3
+numpy>=2.2.0
+opencv-python>=4.10.0.84

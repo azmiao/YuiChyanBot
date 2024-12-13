@@ -6,7 +6,7 @@ async def set_que(bot, group_id: str, user_id: str, que_raw: str, ans_raw: str, 
     db = await get_database()
 
     # 新问题只调整 | 但不要下载图片，只要能匹配上就可以
-    que_raw = await adjust_img(bot, que_raw, False, False)
+    que_raw = await adjust_img(que_raw, False, False)
     # 已有问答再次设置的话，就先删除旧图片
     gid = gid if group_id == 'all' else group_id
     ans_old = db.get(gid, {}).get(user_id, {}).get(que_raw, [])
@@ -14,7 +14,7 @@ async def set_que(bot, group_id: str, user_id: str, que_raw: str, ans_raw: str, 
         await delete_img(ans_old)
 
     # 保存新的回答
-    ans_raw = await adjust_img(bot, ans_raw, True, True)
+    ans_raw = await adjust_img(ans_raw, True, True)
     ans = ans_raw.split('#')
     ans = await adjust_list(ans, '#')
 
@@ -86,7 +86,7 @@ async def show_all_group_que(search_str: str, group_list: list) -> list:
 async def del_que(group_id: str, user_id: str, no_que_str: str, is_singer_group: bool = True, is_self: bool = False):
     db = await get_database()
     # 调整问题文本图片
-    no_que_str = await adjust_img(None, no_que_str, False, False)
+    no_que_str = await adjust_img(no_que_str, False, False)
     group_dict = db.get(group_id, {'all': {}})
     user_dict = group_dict.get(user_id, {})
     # 删除我问
@@ -112,7 +112,7 @@ async def del_que(group_id: str, user_id: str, no_que_str: str, is_singer_group:
             group_dict['all'].pop(no_que_str)
     ans_str = '#'.join(ans)
     # 调整回答文本图片
-    ans_str = await adjust_img(None, ans_str, True, False)
+    ans_str = await adjust_img(ans_str, True, False)
     ans.append(no_que_str)
     db[group_id] = group_dict
     return f'我不再回答 “{ans_str}” 了', ans  # 返回输出文件以及需要删除的图片

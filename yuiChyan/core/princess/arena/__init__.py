@@ -1,111 +1,49 @@
-from aiocqhttp import Message, Event as CQEvent
+import re
+from enum import IntEnum, unique
+
+from aiocqhttp import Event as CQEvent
 
 from yuiChyan.service import Service
-from .qq_context_requests import *
+from yuiChyan.util.parse import parse_single_image, get_real_url
+from .old_main import _QueryArenaImageAsync, _QueryArenaTextAsync
 
 sv = Service('pcr-arena')
 
-gs_prefix_all = ('怎么拆', '怎么解', '怎么打', '如何拆', '如何解', '如何打', 'jjc查询')
-gs_prefix_bilibili = tuple(["bjjc"] + ['b' + x for x in gs_prefix_all] + ['B' + x for x in gs_prefix_all])
-gs_prefix_taiwan = tuple(["tjjc"] + ['t' + x for x in gs_prefix_all] + ['T' + x for x in gs_prefix_all])
-gs_prefix_japan = tuple(["rjjc"] + ['r' + x for x in gs_prefix_all] + ['R' + x for x in gs_prefix_all])
+
+@unique
+class RegionEnum(IntEnum):
+    All = 1
+    Bilibili = 2
+    Taiwan = 3
+    Japan = 4
 
 
-def IsEmptyMessage(message: Message) -> bool:
-    return all([x.type == 'text' and x.data['text'].strip() == '' for x in message])
+@sv.on_rex(r'([bB台日]?)怎么[拆解](.+)')
+async def query_arena(bot, ev):
+    # # (b|B|台|日) | 阵容
+    que_type, str_raw = ev['match'].group(1), ev['match'].group(2)
+    match str(que_type):
+        case '台':
+            region = RegionEnum.Taiwan
+        case '日':
+            region = RegionEnum.Japan
+        case '':
+            region = RegionEnum.All
+        case _:
+            region = RegionEnum.Bilibili
+    await parse_and_query(bot, ev, region, str(str_raw).strip())
 
 
-@sv.on_prefix(gs_prefix_all)
-async def QueryAllInterface(bot, ev: CQEvent):
-    if IsEmptyMessage(ev.message):
-        return
+# 解析图片或者文字阵容
+async def parse_and_query(bot, ev: CQEvent, region: RegionEnum, str_raw: str):
+    cq_code = re.match(r'(\[CQ:image,(\S+?)])', str_raw)
+    if not cq_code:
+        # 不是图片 | 解析阵容
+        await _QueryArenaTextAsync(str_raw, region, bot, ev)
     else:
-        await QueryArenaInterface(bot, ev, ev.message, RegionEnum.All)
-        await bot.send(ev, f'请使用 bjjc/rjjc/tjjc 以过滤查询的服务器。')
-
-
-@sv.on_prefix(gs_prefix_bilibili)
-async def QueryBilibiliInterface(bot, ev: CQEvent):
-    if IsEmptyMessage(ev.message):
-        await bot.send(ev, f'已收到查作业（B服）请求，请在 {gs_seconds_to_wait} 秒内发送防守队伍截图')
-        gs_qq_id2request[ev.user_id] = QueryRequestContext(RegionEnum.Bilibili)
-    else:
-        await QueryArenaInterface(bot, ev, ev.message, RegionEnum.Bilibili)
-
-
-@sv.on_prefix(gs_prefix_taiwan)
-async def QueryTaiwanInterface(bot, ev: CQEvent):
-    if IsEmptyMessage(ev.message):
-        await bot.send(ev, f'已收到查作业（台服）请求，请在 {gs_seconds_to_wait} 秒内发送防守队伍截图')
-        gs_qq_id2request[ev.user_id] = QueryRequestContext(RegionEnum.Taiwan)
-    else:
-        await QueryArenaInterface(bot, ev, ev.message, RegionEnum.Taiwan)
-
-
-@sv.on_prefix(gs_prefix_japan)
-async def QueryJapanInterface(bot, ev: CQEvent):
-    if IsEmptyMessage(ev.message):
-        await bot.send(ev, f'已收到查作业（日服）请求，请在 {gs_seconds_to_wait} 秒内发送防守队伍截图')
-        gs_qq_id2request[ev.user_id] = QueryRequestContext(RegionEnum.Japan)
-    else:
-        await QueryArenaInterface(bot, ev, ev.message, RegionEnum.Japan)
-
-
-def GetImageUrlFromMessage(message: Message) -> Optional[str]:
-    images = [x.data for x in message if x.type == 'image']
-    url = images[0].get("url", None) if len(images) else None
-    if url is not None:
-        url = url.replace("&amp;", "&").split(",file_size=")[0]  # temp
-    return url
-
-
-async def QueryArenaInterface(bot, ev: CQEvent, msg: Message, region: RegionEnum):
-    image_url = GetImageUrlFromMessage(msg)
-    if image_url:
-        await QueryArenaImageAsync(image_url, region, bot, ev)
-    else:
-        await QueryArenaTextAsync(msg.extract_plain_text().strip(), region, bot, ev)
-
-
-@sv.on_message('group')
-async def QueryArenaGroupMessageContextInterface(bot, ev: CQEvent):
-    await QueryArenaMessageContextInterface(bot, ev)
-
-
-@sv.on_message('private')
-async def QueryArenaPrivateMessageContextInterface(bot, ev: CQEvent):
-    await QueryArenaMessageContextInterface(bot, ev)
-
-
-async def QueryArenaMessageContextInterface(bot, ev: CQEvent):
-    image_url = GetImageUrlFromMessage(ev.message)
-    if not image_url:
-        return
-
-    req = PopRequest(ev.user_id)
-    if req is None:
-        return
-
-    await QueryArenaImageAsync(image_url, req.region, bot, ev)
-
-
-async def QueryArenaImageAsync(image_url: str, region: RegionEnum, bot, ev: CQEvent) -> None:
-    from .old_main import _QueryArenaImageAsync
-    await _QueryArenaImageAsync(image_url, Region2Int(region), bot, ev)
-
-
-async def QueryArenaTextAsync(text: str, region: RegionEnum, bot, ev: CQEvent) -> None:
-    from .old_main import _QueryArenaTextAsync
-    await _QueryArenaTextAsync(text, Region2Int(region), bot, ev)
-
-
-def Region2Int(region: RegionEnum) -> int:
-    if region == RegionEnum.All:
-        return 1
-    if region == RegionEnum.Bilibili:
-        return 2
-    if region == RegionEnum.Taiwan:
-        return 3
-    if region == RegionEnum.Japan:
-        return 4
-    return -1
+        # 是图片 | 解析图片
+        image_file, _, image_url = await parse_single_image(ev, str_raw)
+        # 如果没有image_url，说明是GO-CQ的客户端，重新取一下图片URL
+        image_url = image_url if image_url else await get_real_url(ev, image_file)
+        # 查询
+        await _QueryArenaImageAsync(image_url, region, bot, ev)

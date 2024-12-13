@@ -1,30 +1,26 @@
 import base64
-import re
 import json
+import re
 from io import BytesIO
-from os.path import dirname, join, exists
 from os import remove, listdir
+from os.path import dirname, join, exists
 
+import cv2
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageColor
-import cv2
 
-from hoshino import Service, R, aiorequests
-from hoshino.typing import *
-from hoshino.util import FreqLimiter, concat_pic, pic2b64
-
+from . import arena
+from . import sv
 from .record import update_dic, update_record
 from .. import chara
-from .. import chara_manager
-from . import sv
-from . import arena
-from ..chara import roster
 
 try:
     thumb_up_a = R.img('priconne/gadget/thumb-up-a.png').open().resize((16, 16), Image.LANCZOS)
     thumb_down_a = R.img('priconne/gadget/thumb-down-a.png').open().resize((16, 16), Image.LANCZOS)
 except Exception as e:
-    sv.logger.warning(f"pcr-arena 模块缺少 点赞（priconne/gadget/thumb-up-a.png）和/或 点踩（priconne/gadget/thumb-down-a.png）图标资源，将改用文字代替。")
+    sv.logger.warning(
+        f"pcr-arena 模块缺少 点赞（priconne/gadget/thumb-up-a.png）和/或 点踩（priconne/gadget/thumb-down-a.png）图标资源，将改用文字代替。")
+
 
 async def render_atk_def_teams(entries, border_pix=5):
     '''
@@ -284,8 +280,10 @@ async def getPos(img: Image):
             def highlight(rec, color="red"):  # 识别成功red 被其它代码排除的识别项blue 超过五列未识别的green 识别不出角色的black 识别出是100031的yellow
                 x, y, w, h = rec
                 cropped = img.crop([x + 2, y + 2, x + w - 2, y + h - 2])
-                outpImgText.paste(cropped, (actual_x + x + 2, actual_y + y + 2, actual_x + x + w - 2, actual_y + y + h - 2))
-                outpImgTextDraw.rectangle((actual_x + x, actual_y + y, actual_x + x + w, actual_y + y + h), fill=None, outline=color, width=4)
+                outpImgText.paste(cropped,
+                                  (actual_x + x + 2, actual_y + y + 2, actual_x + x + w - 2, actual_y + y + h - 2))
+                outpImgTextDraw.rectangle((actual_x + x, actual_y + y, actual_x + x + w, actual_y + y + h), fill=None,
+                                          outline=color, width=4)
 
             for i in otherborder:
                 highlight(i, 'blue')
@@ -326,9 +324,12 @@ async def getPos(img: Image):
                             highlight(rec, "red" if unit_id != 1000 else "yellow")
                             most_near_row = 0
                             for row_index in range(1, len(arr)):
-                                if abs(last_col_recs_xpos[row_index] - rec[1]) < abs(last_col_recs_xpos[most_near_row] - rec[1]):
+                                if abs(last_col_recs_xpos[row_index] - rec[1]) < abs(
+                                        last_col_recs_xpos[most_near_row] - rec[1]):
                                     most_near_row = row_index
-                            if arr[most_near_row][col_index] is None or abs(last_col_recs_xpos[most_near_row] - arr[most_near_row][col_index][1]) > abs(last_col_recs_xpos[most_near_row] - rec[1]):
+                            if arr[most_near_row][col_index] is None or abs(
+                                    last_col_recs_xpos[most_near_row] - arr[most_near_row][col_index][1]) > abs(
+                                    last_col_recs_xpos[most_near_row] - rec[1]):
                                 arr[most_near_row][col_index] = rec
                                 arr_id[most_near_row].append(unit_id)
                                 arr_id_6[most_near_row][col_index] = uid_6
@@ -338,7 +339,8 @@ async def getPos(img: Image):
 
                 # 创建一个 rowcnt行 5列 的画布，行间及四周留16px空隙，每行中的每列分为上下两个头像：截出来的和通过识别的id render出来的（均为64*64)。头像间隙0px。
                 icon_size = 64
-                compare_img = Image.new("RGBA", (icon_size * 5 + 16 * 2, icon_size * 2 * row_cnt + 16 * (row_cnt + 1)), (255, 255, 255, 255))
+                compare_img = Image.new("RGBA", (icon_size * 5 + 16 * 2, icon_size * 2 * row_cnt + 16 * (row_cnt + 1)),
+                                        (255, 255, 255, 255))
 
                 for row_index in range(row_cnt):
                     none_cnt = arr[row_index].count(None)
@@ -353,7 +355,8 @@ async def getPos(img: Image):
                         x, y, w, h = arr[row_index][4 - col_index]
                         cropped = img.crop([x + 2, y + 2, x + w - 2, y + h - 2]).resize((64, 64), Image.ANTIALIAS)
                         compare_img.paste(cropped, (pos_x, pos_y), cropped)  # 要不要加cropped
-                        c = chara.get_chara_by_id(arr_id_6[row_index][4 - col_index] // 100, arr_id_6[row_index][4 - col_index] % 100 // 10)
+                        c = chara.get_chara_by_id(arr_id_6[row_index][4 - col_index] // 100,
+                                                  arr_id_6[row_index][4 - col_index] % 100 // 10)
                         icon = await c.render_icon(icon_size)
                         compare_img.paste(icon, (pos_x, pos_y + 64), icon)
 
@@ -366,7 +369,8 @@ async def getPos(img: Image):
                 outpImg = Image.blend(outpImg, actual_img, 0.2)
                 outpImg.alpha_composite(outpImgText)
                 ratio = max(1, max((outpImg.size)[0], (outpImg.size)[1]) / 500)
-                outpImg = outpImg.resize((int((outpImg.size)[0] / ratio), int((outpImg.size)[1] / ratio)), Image.ANTIALIAS)
+                outpImg = outpImg.resize((int((outpImg.size)[0] / ratio), int((outpImg.size)[1] / ratio)),
+                                         Image.ANTIALIAS)
 
                 return arr_id, f'{outp_b64(outpImg)}\n{outp_b64(compare_img)}'
 
@@ -381,7 +385,8 @@ async def getPos(img: Image):
         actual_y += border[1]
 
         nowcolor = (nowcolor + 60) % 300
-        outpImg.paste(ImageColor.getrgb(f'rgb({nowcolor},{nowcolor},{nowcolor})'), (actual_x, actual_y, actual_x + border[2], actual_y + border[3]))
+        outpImg.paste(ImageColor.getrgb(f'rgb({nowcolor},{nowcolor},{nowcolor})'),
+                      (actual_x, actual_y, actual_x + border[2], actual_y + border[3]))
 
         # outpImg.show()  # test
 
@@ -494,7 +499,8 @@ def recommend1Team(already_used_units: List[int]):
         record_4 = [x // 100 for x in record_6]  # [1114,1012,1103,1034,1032]
         team_mix = already_used_units + record_4
         if len(team_mix) == len(set(team_mix)):  # 推荐配队成功
-            return {"atk": [chara.get_chara_by_id(uid_6 // 100, uid_6 % 100 // 10) for uid_6 in record_6], "team_type": "frequency"}
+            return {"atk": [chara.get_chara_by_id(uid_6 // 100, uid_6 % 100 // 10) for uid_6 in record_6],
+                    "team_type": "frequency"}
     return "placeholder"
 
 
@@ -521,7 +527,10 @@ def recommend2Teams(already_used_units: List[int]):
         team_mix = already_used_units + record_4_1 + record_4_2
         if len(team_mix) == len(set(team_mix)):  # 推荐配队成功
             # print(f'\n\n成功配队{already_used_units}\n{record_4_1}\n{record_4_2}')  # test
-            return {"atk": [chara.get_chara_by_id(uid_6 // 100, uid_6 % 100 // 10) for uid_6 in record_6_2], "team_type": "frequency"}, {"atk": [chara.get_chara_by_id(uid_6 // 100, uid_6 % 100 // 10) for uid_6 in record_6_1], "team_type": "frequency"}
+            return {"atk": [chara.get_chara_by_id(uid_6 // 100, uid_6 % 100 // 10) for uid_6 in record_6_2],
+                    "team_type": "frequency"}, {
+                "atk": [chara.get_chara_by_id(uid_6 // 100, uid_6 % 100 // 10) for uid_6 in record_6_1],
+                "team_type": "frequency"}
 
     return "placeholder", "placeholder"
 
@@ -667,7 +676,7 @@ async def generateCollisionFreeTeam(bot: HoshinoBot, ev: CQEvent, all_query_reco
             elif team_has_result == 1:
                 for index, records in enumerate(all_query_records):
                     if len(records) > 1:
-                        await bot.send(ev, f"仅第{index+1}队查询到解法！")
+                        await bot.send(ev, f"仅第{index + 1}队查询到解法！")
                         await __arena_query(bot, ev, region, boxDict[index], only_use_cache=True)
             else:  # 2队有结果，但凑不满2队无冲
                 await bot.send(ev, "无冲配对失败，返回单步查询结果")
@@ -677,7 +686,7 @@ async def generateCollisionFreeTeam(bot: HoshinoBot, ev: CQEvent, all_query_reco
             if team_has_result == 1:
                 for index, records in enumerate(all_query_records):
                     if len(records) > 1:
-                        await bot.send(ev, f"仅第{index+1}队查询到解法！")
+                        await bot.send(ev, f"仅第{index + 1}队查询到解法！")
                         await __arena_query(bot, ev, region, boxDict[index], only_use_cache=True)
             else:  # 2~3队有结果，但凑不满2队无冲
                 await bot.send(ev, "无冲配对失败，返回单步查询结果")
@@ -704,6 +713,7 @@ def remove_buffer(uid: str):
         with open(bufferpath, 'w', encoding="utf-8") as fp:
             json.dump(buffer, fp, ensure_ascii=False, indent=4)
 
+
 async def _QueryArenaTextAsync(text: str, region: int, bot: HoshinoBot, ev: CQEvent):
     defen = re.sub(r'[?？，,_]', '', text)
     defen, unknown = chara.roster.parse_team(defen)
@@ -714,7 +724,8 @@ async def _QueryArenaTextAsync(text: str, region: int, bot: HoshinoBot, ev: CQEv
         msg = f'无法识别"{unknown}"' if score < 50 else f'无法识别"{unknown}" 您说的有{score}%可能是{name}'
         await bot.finish(ev, msg)
     await __arena_query(bot, ev, region, defen)
-    
+
+
 async def __arena_query(bot, ev: CQEvent, region: int, defen, raw=0, only_use_cache=False):
     if len(defen) > 5:
         await bot.finish(ev, '编队不能多于5名角色', at_sender=True)

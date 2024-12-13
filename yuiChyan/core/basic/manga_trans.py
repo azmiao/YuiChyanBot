@@ -2,7 +2,6 @@ import base64
 import json
 import mimetypes
 import os
-import re
 from io import BytesIO
 from urllib import request
 
@@ -11,44 +10,20 @@ import websockets
 from PIL import Image
 from aiocqhttp import MessageSegment
 
-from yuiChyan import FunctionException
-from yuiChyan.core.xqa import extract_file
 from yuiChyan.resources import base_img_path
 from yuiChyan.util import FreqLimiter
+from yuiChyan.util.parse import parse_single_image, save_image
 
 manga_path = os.path.join(base_img_path, 'manga')
 os.makedirs(manga_path, exist_ok=True)
 
 
 # 解析并保存
-async def parse_and_save_image(bot, ev, str_raw: str) -> str:
-    # 找出第一个CQ码
-    cq_code = re.search(r'(\[CQ:iamge,(\S+?)])', str_raw)
-    if not cq_code:
-        raise FunctionException(ev, f'无法从消息中获取图片，请检查')
-    is_base64, image_file, image_file_name, image_url = await extract_file(cq_code[1])
+async def parse_and_save_image(ev, str_raw: str) -> str:
+    image_file, image_file_name, image_url = await parse_single_image(ev, str_raw)
+    image_path = os.path.join(manga_path, image_file_name)
     # 保存
-    return await save_image(bot, ev, image_file_name, image_file, image_url)
-
-
-# 保存图片
-async def save_image(bot, ev, img_name: str, img_file: str, img_url: str) -> str:
-    file = os.path.join(manga_path, img_name)
-    # 如果没有image_url，说明是GO-CQ的客户端，重新取一下图片URL
-    if not img_url:
-        try:
-            img_data = await bot.get_image(file=img_file)
-        except Exception as e:
-            raise FunctionException(ev, f'调用get_image接口查询图片{img_file}出错:{str(e)}')
-        img_url = img_data['url']
-
-    # 开始下载图片
-    try:
-        if not os.path.isfile(file):
-            request.urlretrieve(url=img_url, filename=file)
-    except Exception as e:
-        raise FunctionException(ev, f'从{img_url}下载图片{img_name}出错:{str(e)}')
-    return img_name
+    return await save_image(ev, image_file, image_file_name, image_url, image_path)
 
 
 # 接收WS数据
