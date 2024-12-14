@@ -7,8 +7,8 @@ from os import remove
 from os.path import join, exists
 from typing import List, Optional
 
-import aiohttp
 import cv2
+import httpx
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageColor
 from PIL.Image import Resampling
@@ -173,7 +173,7 @@ async def cutting(img, mode):
     列表中每个元素为正方形区域在原图的[x, y, w, h]。第一个列表为聚类结果，第二个列表为排除结果。若无正方形区域，返回[], []。
     """
     im_grey = img.convert('L')
-    totArea = im_grey.size[0] * im_grey.size[1]
+    tot_area = im_grey.size[0] * im_grey.size[1]
     im_grey = im_grey.point(lambda _x: 255 if _x > 210 else 0)  # 没有用自带的二值化。考虑修改，使用更合适的函数。
     thresh = np.array(im_grey)
 
@@ -192,7 +192,7 @@ async def cutting(img, mode):
                 x, y, w, h = cv2.boundingRect(contours[i])  # 获取contour的aabb包围盒
                 if 0.95 < w / h < 1.05:  # 近似正方形
                     are = (w + h) // 2
-                    areaRatio = are * are / totArea * 100  # 获取该范围占整个输入图像的占比
+                    areaRatio = are * are / tot_area * 100  # 获取该范围占整个输入图像的占比
                     # print(f"{areaRatio:2f}%")
                     if areaRatio >= 0.5:  # 过滤占比小于0.5%的正方形（可能为文字）
                         icon.append([are, [x, y, w, h]])
@@ -430,9 +430,9 @@ async def getUnit(img2):
 
 
 async def get_pic(address: str):
-    async with aiohttp.ClientSession() as session:
+    async with httpx.AsyncClient() as session:
         resp = await session.get(address, timeout=6)
-    return await resp.read()
+    return resp.read()
 
 
 async def _QueryArenaImageAsync(image_url: str, region: int, bot, ev):

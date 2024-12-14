@@ -7,8 +7,9 @@ from math import log
 from random import random
 from typing import List
 
-import aiohttp
+import httpx
 
+from yuiChyan.config import PROXY
 from yuiChyan.config.princess_config import AUTH_KEY
 from yuiChyan.service import Service
 from .. import chara
@@ -195,14 +196,14 @@ async def do_query(id_list, region=1, try_cnt=1):
                 if should_sleep:
                     await asyncio.sleep(1)
                 try:
-                    async with aiohttp.ClientSession() as session:
+                    async with httpx.AsyncClient(proxy=PROXY) as session:
                         resp = await session.post(
                             "https://api.pcrdfans.com/x/v1/search",
                             headers=header,
                             json=payload,
                             timeout=5,
                         )
-                    res = await resp.json()
+                    res = resp.json()
                     sv.logger.info("    服务器有返回")
                     if res["code"]:
                         sv.logger.info(f'        服务器报错：返回值{res["code"]}')

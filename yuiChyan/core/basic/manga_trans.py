@@ -5,7 +5,7 @@ import os
 from io import BytesIO
 from urllib import request
 
-import requests
+import httpx
 import websockets
 from PIL import Image
 from aiocqhttp import MessageSegment
@@ -77,7 +77,8 @@ async def manga_tran(img_name: str) -> MessageSegment:
     with open(img_path, 'rb') as f:
         data['file'] = (img_name, f.read(), mime_type)
     # 上传图片
-    upload_resp = requests.put(upload_url, files=data, headers=header)
+    async with httpx.AsyncClient() as session:
+        upload_resp = await session.put(upload_url, files=data, headers=header)
     # 等待翻译完成
     id_ = upload_resp.json()['id']
     wss_url = f'wss://api.cotrans.touhou.ai/task/{id_}/event/v1'

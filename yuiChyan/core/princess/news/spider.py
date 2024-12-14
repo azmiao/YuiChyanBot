@@ -3,7 +3,7 @@ import re
 from dataclasses import dataclass
 from typing import List, Union
 
-import aiohttp
+import httpx
 from bs4 import BeautifulSoup
 
 from yuiChyan.config import PROXY
@@ -27,9 +27,9 @@ class BaseSpider(abc.ABC):
 
     @classmethod
     async def get_response(cls):
-        proxy = {} if cls.src_name == "国服官网" else PROXY
-        async with aiohttp.ClientSession() as session:
-            resp = await session.get(cls.url, headers=cls.header, proxies=proxy, timeout=15)
+        proxy:str = None if cls.src_name == "国服官网" else PROXY
+        async with httpx.AsyncClient(proxy=proxy) as session:
+            resp = await session.get(cls.url, headers=cls.header, timeout=15)
         resp.raise_for_status()
         return resp
 
@@ -53,8 +53,8 @@ class BaseSpider(abc.ABC):
         return f'> PCR{cls.src_name}新闻\n' + '\n'.join(map(lambda i: i.content, items))
 
 
-class SonetSpider(BaseSpider):
-    url = "http://www.princessconnect.so-net.tw/news/"
+class TwSpider(BaseSpider):
+    url = "https://www.princessconnect.so-net.tw/news/"
     src_name = "台服官网"
 
     @staticmethod
@@ -68,7 +68,7 @@ class SonetSpider(BaseSpider):
 
 
 class BiliSpider(BaseSpider):
-    url = "http://api.biligame.com/news/list?gameExtensionId=267&positionId=2&pageNum=1&pageSize=7&typeId="
+    url = "https://api.biligame.com/news/list?gameExtensionId=267&positionId=2&pageNum=1&pageSize=7&typeId="
     src_name = "国服官网"
 
     @staticmethod

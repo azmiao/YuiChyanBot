@@ -5,7 +5,7 @@ import time
 import urllib.parse
 from typing import Optional
 
-from requests import Session
+from httpx import Client
 
 from yuiChyan.http_request import get_session_or_create, close_session
 
@@ -51,20 +51,20 @@ class Youdao(Tse):
         self.host_headers = self.get_headers(self.host_url, if_api=False)
         self.api_headers = self.get_headers(self.host_url, if_api=True)
         self.language_map = None
-        self.session: Optional[Session] = None
+        self.session: Optional[Client] = None
         self.sign_key = None
         self.query_count = 0
         self.output_zh = 'zh-CHS'
         self.input_limit = 5000
 
-    def get_sign_key(self, host_html, ss, timeout, proxies):
+    def get_sign_key(self, host_html, ss, timeout):
         try:
             if not self.get_sign_url:
                 self.get_sign_url = re.compile(self.get_sign_pattern).search(host_html).group()
-            r = ss.get(self.get_sign_url, headers=self.host_headers, timeout=timeout, proxies=proxies)
+            r = ss.get(self.get_sign_url, headers=self.host_headers, timeout=timeout)
             r.raise_for_status()
         except:
-            r = ss.get(self.get_sign_old_url, headers=self.host_headers, timeout=timeout, proxies=proxies)
+            r = ss.get(self.get_sign_old_url, headers=self.host_headers, timeout=timeout)
             r.raise_for_status()
         sign = re.compile(r'md5\("fanyideskweb" \+ e \+ i \+ "(.*?)"\)').findall(r.text)
         return sign[0] if sign and sign != [''] else "Ygy_4c=r#e#4EX^NUGUc5"  # v1.1.10
@@ -95,8 +95,7 @@ class Youdao(Tse):
         return form
 
     def youdao_api(self, query_text: str, from_language: str = 'auto', to_language: str = 'en', **kwargs):
-        timeout = kwargs.get('timeout', None)
-        proxies = kwargs.get('proxies', None)
+        timeout = kwargs.get('timeout', 10)
         is_detail_result = kwargs.get('is_detail_result', False)
         sleep_seconds = kwargs.get('sleep_seconds', random.random())
         update_session_after_seconds = kwargs.get('update_session_after_seconds', self.default_session_seconds)
@@ -105,13 +104,12 @@ class Youdao(Tse):
         if not (self.session and not_update_cond_time and self.language_map and self.sign_key):
             # 超时了就先关闭
             close_session('Youdao', self.session)
-            self.session: Session = get_session_or_create('Youdao')
-            host_html = self.session.get(self.host_url, headers=self.host_headers, timeout=timeout,
-                                         proxies=proxies).text
-            self.sign_key = self.get_sign_key(host_html, self.session, timeout, proxies)
+            self.session: Client = get_session_or_create('Youdao', False)
+            host_html = self.session.get(self.host_url, headers=self.host_headers, timeout=timeout).text
+            self.sign_key = self.get_sign_key(host_html, self.session, timeout)
 
         form = self.get_form(query_text, from_language, to_language, self.sign_key)
-        r = self.session.post(self.api_url, data=form, headers=self.api_headers, timeout=timeout, proxies=proxies)
+        r = self.session.post(self.api_url, data=form, headers=self.api_headers, timeout=timeout)
         r.raise_for_status()
         data = r.json()
         time.sleep(sleep_seconds)
