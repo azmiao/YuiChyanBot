@@ -146,7 +146,7 @@ async def translate(text: str, from_: str = 'auto', to_: str = 'zh') -> str:
     error_msg = ' - 目前支持的语言有：\n' + '\n'.join([f'{key}: {value}' for key, value in trans_dict.items()])
     assert from_ in trans_dict, f'源语言 [{from_}] 不存在\n{error_msg}'
     assert to_ in trans_dict, f'目标语言 [{to_}] 不存在\n{error_msg}'
-    return _youdao.youdao_api(text, from_, to_)
+    return await _youdao.youdao_api(text, from_, to_)
 
 
 # 图片转base64

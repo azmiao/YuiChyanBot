@@ -5,7 +5,7 @@ import time
 import urllib.parse
 from typing import Optional
 
-from httpx import Client
+from httpx import Client, AsyncClient
 
 from yuiChyan.http_request import get_session_or_create, close_session
 
@@ -57,19 +57,19 @@ class Youdao(Tse):
         self.output_zh = 'zh-CHS'
         self.input_limit = 5000
 
-    def get_sign_key(self, host_html, ss, timeout):
+    async def get_sign_key(self, host_html, session: AsyncClient, timeout):
         try:
             if not self.get_sign_url:
                 self.get_sign_url = re.compile(self.get_sign_pattern).search(host_html).group()
-            r = ss.get(self.get_sign_url, headers=self.host_headers, timeout=timeout)
+            r = await session.get(self.get_sign_url, headers=self.host_headers, timeout=timeout)
             r.raise_for_status()
         except:
-            r = ss.get(self.get_sign_old_url, headers=self.host_headers, timeout=timeout)
+            r = await session.get(self.get_sign_old_url, headers=self.host_headers, timeout=timeout)
             r.raise_for_status()
         sign = re.compile(r'md5\("fanyideskweb" \+ e \+ i \+ "(.*?)"\)').findall(r.text)
         return sign[0] if sign and sign != [''] else "Ygy_4c=r#e#4EX^NUGUc5"  # v1.1.10
 
-    def get_form(self, query_text, from_language, to_language, sign_key):
+    async def get_form(self, query_text, from_language, to_language, sign_key):
         ts = str(int(time.time() * 1000))
         salt = str(ts) + str(random.randrange(0, 10))
         sign_text = ''.join(['fanyideskweb', query_text, salt, sign_key])
@@ -94,7 +94,7 @@ class Youdao(Tse):
         }
         return form
 
-    def youdao_api(self, query_text: str, from_language: str = 'auto', to_language: str = 'en', **kwargs):
+    async def youdao_api(self, query_text: str, from_language: str = 'auto', to_language: str = 'en', **kwargs):
         timeout = kwargs.get('timeout', 10)
         is_detail_result = kwargs.get('is_detail_result', False)
         sleep_seconds = kwargs.get('sleep_seconds', random.random())
@@ -104,12 +104,12 @@ class Youdao(Tse):
         if not (self.session and not_update_cond_time and self.language_map and self.sign_key):
             # 超时了就先关闭
             close_session('Youdao', self.session)
-            self.session: Client = get_session_or_create('Youdao', False)
-            host_html = self.session.get(self.host_url, headers=self.host_headers, timeout=timeout).text
-            self.sign_key = self.get_sign_key(host_html, self.session, timeout)
+            self.session: AsyncClient = get_session_or_create('Youdao', True)
+            host_html = await self.session.get(self.host_url, headers=self.host_headers, timeout=timeout)
+            self.sign_key = await self.get_sign_key(host_html.text, self.session, timeout)
 
-        form = self.get_form(query_text, from_language, to_language, self.sign_key)
-        r = self.session.post(self.api_url, data=form, headers=self.api_headers, timeout=timeout)
+        form = await self.get_form(query_text, from_language, to_language, self.sign_key)
+        r = await self.session.post(self.api_url, data=form, headers=self.api_headers, timeout=timeout)
         r.raise_for_status()
         data = r.json()
         time.sleep(sleep_seconds)
