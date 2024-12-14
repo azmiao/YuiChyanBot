@@ -59,7 +59,7 @@ class TwSpider(BaseSpider):
 
     @staticmethod
     async def get_items(resp):
-        soup = BeautifulSoup(await resp.text, 'lxml')
+        soup = BeautifulSoup(resp.text, 'lxml')
         return [
             Item(idx=dd.a["href"],
                  content=f"{dd.text}\n▲www.princessconnect.so-net.tw{dd.a['href']}"
@@ -73,7 +73,7 @@ class BiliSpider(BaseSpider):
 
     @staticmethod
     async def get_items(resp):
-        content = await resp.json()
+        content = resp.json()
         items = [
             Item(idx=n["id"],
                  content="{title}\n▲game.bilibili.com/pcr/news.html#detail={id}".format_map(n)
@@ -92,7 +92,7 @@ class JpSpider(BaseSpider):
 
     @staticmethod
     async def get_items(resp):
-        data = await resp.content
+        data = resp.content
         data = data.decode()
         title = re.findall('<h4>(.*?)</h4>', data)  # 全部标题
 
