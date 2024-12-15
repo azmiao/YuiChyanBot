@@ -16,3 +16,6 @@ python-Levenshtein>=0.26.1
 beautifulsoup4>=4.12.3
 numpy>=2.2.0
 opencv-python>=4.10.0.84
+pandas>=2.2.3
+matplotlib>=3.10.0
+plottable>=0.1.5
