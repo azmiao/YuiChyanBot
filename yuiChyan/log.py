@@ -2,7 +2,8 @@ import logging
 import os
 import sys
 
-current_dir = os.path.dirname(__file__)
+from yuiChyan.resources import current_dir
+
 log_dir = os.path.join(current_dir, 'logs')
 os.makedirs(log_dir, exist_ok=True)
 error_file = os.path.abspath(os.path.join(log_dir, 'errors.log'))

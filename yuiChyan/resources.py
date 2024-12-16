@@ -1,7 +1,10 @@
 import os
 
+from matplotlib import font_manager
 from rocksdict import Rdict
 
+# 基础文件路径
+current_dir = os.path.dirname(__file__)
 # 基础资源路径
 base_res_path = os.path.join(os.path.dirname(__file__), 'res')
 os.makedirs(base_res_path, exist_ok=True)
@@ -22,3 +25,7 @@ auth_db_ = Rdict(os.path.join(base_db_path, 'auth.db'))
 service_db_ = Rdict(os.path.join(base_db_path, 'service.db'))
 # XQA数据库
 xqa_db_ = Rdict(os.path.join(base_db_path, 'xqa.db'))
+
+# 全局本地字体
+local_font = os.path.join(current_dir, 'core', 'manager', 'help_res', 'static', 'fonts', 'HarmonyOS_SansSC_Regular.ttf')
+font_prop = font_manager.FontProperties(fname=local_font)

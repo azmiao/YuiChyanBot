@@ -7,7 +7,8 @@ from nonebot import NoneBot, load_plugins
 
 import yuiChyan.config
 from yuiChyan.exception import *
-from yuiChyan.log import *
+from yuiChyan.log import new_logger
+from yuiChyan.resources import *
 from yuiChyan.trigger import trigger_chain
 
 
