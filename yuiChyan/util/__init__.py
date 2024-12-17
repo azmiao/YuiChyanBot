@@ -129,7 +129,7 @@ class DailyNumberLimiter:
 
 
 # 敏感词替换
-async def filter_message(message: Union[Message, str]):
+async def filter_message(message: Union[Message, str]) -> str:
     if isinstance(message, str):
         return _search.Replace(message)
     elif isinstance(message, Message):

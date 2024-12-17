@@ -58,7 +58,7 @@ def save_session(name: str, session: Client | AsyncClient):
 def create_session(name: str, is_save: bool = False, proxy: Optional[str] = None) -> Client:
     if name in session_map or name in async_session_map:
         raise SessionExistException(f'Session [{name}] 已经存在')
-    session = httpx.Client(proxy=proxy)
+    session = httpx.Client(proxy=proxy, verify=False)
     if is_save:
         save_session(name, session)
     return session
@@ -68,7 +68,7 @@ def create_session(name: str, is_save: bool = False, proxy: Optional[str] = None
 def create_async_session(name: str, is_save: bool = False, proxy: Optional[str] = None) -> AsyncClient:
     if name in session_map or name in async_session_map:
         raise SessionExistException(f'AsyncSession [{name}] 已经存在')
-    async_session = httpx.AsyncClient(proxy=proxy)
+    async_session = httpx.AsyncClient(proxy=proxy, verify=False)
     if is_save:
         save_session(name, async_session)
     return async_session
