@@ -46,7 +46,7 @@ async def download_comic(session: AsyncClient, id_: str):
             pic_name = get_pic_name(episode)
             save_path = os.path.join(comic_path, pic_name)
             with open(save_path, 'wb') as f:
-                f.write(resp.read())
+                f.write(await resp.aread())
             sv.logger.info(f'PCR官方漫画: 图片 [{pic_name}] 已保存')
 
     # 保存官漫目录信息

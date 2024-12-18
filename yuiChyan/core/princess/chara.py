@@ -12,6 +12,7 @@ from yuiChyan.http_request import get_session_or_create, close_async_session
 from .chara_manager import chara_manager, gadget_star, gadget_star_dis, gadget_star_pink, gadget_equip, is_npc
 from .util import unit_path, sv
 from ... import CommandErrorException
+from ...config import PROXY
 from ...permission import SUPERUSER
 
 
@@ -45,7 +46,7 @@ class Chara:
             if os.path.exists(path):
                 return path
 
-        session: AsyncClient = get_session_or_create('PcrUnit', True)
+        session: AsyncClient = get_session_or_create('PcrUnit', True, PROXY)
         # 文件均不存在，则下载资源
         await asyncio.gather(
             download_chara_icon(session, self.id, 6),
@@ -104,20 +105,20 @@ async def download_chara_icon(session: AsyncClient, id_: int, star: int) -> int:
     save_path = os.path.join(unit_path, f'icon_unit_{id_}{star}1.png')
     sv.logger.info(f'> 开始下载PCR角色 [{id_}] URL={url}')
     try:
-        rsp = await session.get(url, timeout=5)
-        if 200 == rsp.status_code:
-            img = Image.open(BytesIO(rsp.read()))
-            img.save(save_path)
-            sv.logger.info(f'- 已保存至 [{save_path}]')
-            return 0
-        elif 404 == rsp.status_code:
-            sv.logger.info(f'- 角色头像 [{id_}{star}1] 不存在，将跳过')
-            return 1
-        else:
-            sv.logger.info(f'- 角色头像 [{id_}{star}1] 下载失败：CODE={rsp.status_code}')
-            return 2
+        async with session.stream('GET', url, timeout=5) as rsp:
+            if 200 == rsp.status_code:
+                img = Image.open(BytesIO(await rsp.aread()))
+                img.save(save_path)
+                sv.logger.info(f'- 已保存至 [{save_path}]')
+                return 0
+            elif 404 == rsp.status_code:
+                sv.logger.info(f'- 角色头像 [{id_}{star}1] 不存在，将跳过')
+                return 1
+            else:
+                sv.logger.info(f'- 角色头像 [{id_}{star}1] 下载失败：CODE={rsp.status_code}')
+                return 2
     except Exception as e:
-        sv.logger.error(f'- 角色头像 [{id_}{star}1] 下载出错：{str(e)}')
+        sv.logger.error(f'- 角色头像 [{id_}{star}1] 下载出错：{type(e)} {str(e)}')
         return 3
 
 
