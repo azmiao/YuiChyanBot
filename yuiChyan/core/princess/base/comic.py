@@ -1,4 +1,3 @@
-import json
 import os.path
 import re
 from urllib.parse import urlparse, parse_qs
@@ -6,7 +5,7 @@ from urllib.parse import urlparse, parse_qs
 from aiocqhttp import MessageSegment
 from httpx import AsyncClient
 
-from yuiChyan.config import PROXY
+from yuiChyan import FunctionException
 from yuiChyan.http_request import get_session_or_create, close_async_session
 from ..util import *
 
@@ -29,7 +28,7 @@ async def download_comic(session: AsyncClient, id_: str):
     if 200 != resp.status_code:
         sv.logger.error(f'PCR官方漫画: 详细信息获取失败，URL={url}')
         return
-    data = await resp.json()
+    data = resp.json()
     data = data[0]
 
     episode = data['episode_num']
@@ -55,10 +54,33 @@ async def download_comic(session: AsyncClient, id_: str):
         json.dump(index, f, ensure_ascii=False)
 
 
+@sv.on_prefix('PCR官漫')
+async def comic(bot, ev):
+    episode = str(ev.message).strip()
+    if not re.fullmatch(r'\d{0,4}', episode):
+        return
+    episode = episode.lstrip('0')
+    if not episode:
+        raise FunctionException(ev, '命令错误，示例：官漫100')
+
+    with open(os.path.join(comic_path, 'index.json'), encoding='utf8') as f:
+        index = json.load(f)
+
+    if episode not in index:
+        raise FunctionException(ev, f'未查找到第{episode}话，敬请期待官方更新')
+    title = index[episode]['title']
+
+    pic_name = get_pic_name(episode)
+    pic_path = os.path.abspath(os.path.join(comic_path, pic_name))
+    image = MessageSegment.image(f'file:///{pic_path}')
+    msg = f'PCR官漫第{episode}话 {title}\n{image}'
+    await bot.send(ev, msg)
+
+
 # 定时任务
-@sv.scheduled_job(minute='*/30', second='15')
+@sv.scheduled_job(minute='*/1', second='15')
 async def update_manga():
-    session: AsyncClient = get_session_or_create('PcrComic', True, PROXY)
+    session: AsyncClient = get_session_or_create('PcrComic', True)
     # 获取最新漫画信息
     try:
         resp = await session.get(

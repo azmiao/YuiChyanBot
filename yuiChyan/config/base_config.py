@@ -3,7 +3,7 @@
 HOST = '0.0.0.0'
 PORT = 2333
 # 调试模式
-DEBUG = True
+DEBUG = False
 # 超级管理员列表
 SUPERUSERS = [2362020227]
 # 机器人昵称

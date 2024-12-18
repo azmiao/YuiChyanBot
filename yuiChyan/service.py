@@ -350,7 +350,7 @@ class Service:
                 if force_private and event.detail_type != 'private':
                     raise FunctionException(event, '> 该命令只支持私聊')
                 # 校验权限
-                if not check_permission(event, cmd_permission):
+                if (not force_private) and (not check_permission(event, cmd_permission)):
                     raise LakePermissionException(event, f'您的权限不足，需要权限 [{cmd_permission.name}]')
                 return await func(bot, event)
 

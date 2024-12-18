@@ -7,13 +7,12 @@ from PIL.Image import Resampling
 from aiocqhttp import MessageSegment
 from httpx import AsyncClient
 
-from yuiChyan.exception import FunctionException
+from yuiChyan.config import PROXY
+from yuiChyan.exception import FunctionException, CommandErrorException
 from yuiChyan.http_request import get_session_or_create, close_async_session
+from yuiChyan.permission import SUPERUSER
 from .chara_manager import chara_manager, gadget_star, gadget_star_dis, gadget_star_pink, gadget_equip, is_npc
 from .util import unit_path, sv
-from ... import CommandErrorException
-from ...config import PROXY
-from ...permission import SUPERUSER
 
 
 class Chara:

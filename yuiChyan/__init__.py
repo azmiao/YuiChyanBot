@@ -137,9 +137,13 @@ async def _process_message(bot: YuiChyan, event: CQEvent):
             if service_func.only_to_me and not event['to_me']:
                 continue
 
-            # 如果有群ID | 群消息判断是否启用服务
+            # 如果有群ID
             if event.group_id:
                 group_id = int(event.group_id)
+                # 判断是否有授权
+                if service_func.sv.need_auth and group_id not in auth_db_:
+                    continue
+                # 群消息判断是否启用服务
                 if not service_func.sv.judge_enable(group_id):
                     continue
 

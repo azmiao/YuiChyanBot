@@ -1,3 +1,4 @@
+import json
 import os
 
 from yuiChyan.service import Service
@@ -21,6 +22,11 @@ os.makedirs(unit_path, exist_ok=True)
 # 漫画路径
 comic_path = os.path.join(base_pcr_path, 'comic')
 os.makedirs(comic_path, exist_ok=True)
+# 官漫目录信息
+if not os.path.exists(os.path.join(comic_path, 'index.json')):
+    with open(os.path.join(comic_path, 'index.json'), 'w', encoding='utf8') as af:
+        # noinspection PyTypeChecker
+        json.dump({}, af, ensure_ascii=False)
 
 sv = Service('pcr')
 
