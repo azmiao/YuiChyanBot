@@ -53,12 +53,13 @@ class Service:
             visible: bool = True,  # 是否可见
             need_auth: bool = True  # 是否需要群授权
     ):
-        service_config = _read_service_config(name)
         self.name = name
-        self.manage = service_config.get('manage') if service_config.get('manage') else manage
-        self.use_exclude = service_config.get('use_exclude') or use_exclude
-        self.visible = service_config.get('visible') or visible
-        self.need_auth = service_config.get('need_auth') or need_auth
+        self.manage = manage
+        self.use_exclude = use_exclude
+        self.visible = visible
+        self.need_auth = need_auth
+
+        service_config = _read_service_config(name)
         self.include_group: List[int] = service_config.get('include_group', [])
         self.exclude_group: List[int] = service_config.get('exclude_group', [])
         self.logger: Logger = new_logger(name, yuiChyan.config.DEBUG)

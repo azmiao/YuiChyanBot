@@ -1,28 +1,9 @@
 from yuiChyan.exception import *
 from yuiChyan.permission import *
 from yuiChyan.service import Service
+from yuiChyan.util.chart_generator import generate_image_from_markdown, save_image_to_file
 from .operate_msg import *
 from .util import *
-
-# 帮助文本
-sv_help = '''
-===== XQA =====
-[我问A你答B] 设置个人问题
-[有人问C你答D] 群管理员设置本群的有人问
-[看看有人问] 看本群设置的有人问
-[看看有人问X] 搜索本群设置的有人问，X为搜索内容
-[看看我问] 看自己设置的问题
-[看看我问Y] 搜索自己设置的问题，Y为搜索内容
-[查问答@某人] 限群管理单独查某人的全部问答
-[查问答@某人G] 限群管理单独查某人的问答，G为搜索内容
-[不要回答H] 删除某个回答H，优先删除我问其次有人问
-[@某人不要回答H] 限群管理删除某人的某个回答H
-
-其他：
-1.回答可以用'#'分割回答，可以随机回复这几个回答,'\\#'将不会分割
-2.支持正则表达式，请用英文括号分组，回流用$加数字
-===============
-'''.strip()
 
 sv = Service('core_xqa')
 
@@ -30,7 +11,14 @@ sv = Service('core_xqa')
 # 帮助界面
 @sv.on_match('问答帮助')
 async def get_help(bot, ev):
-    await bot.send(ev, sv_help)
+    with open(os.path.join(os.path.dirname(__file__), 'HELP.md'), 'r', encoding='utf-8') as md_file:
+        md_content = md_file.read()
+    # 生成帮助图片
+    img_bytes = await generate_image_from_markdown(md_content)
+    img_path = os.path.join(os.path.dirname(__file__), 'HELP.png')
+    await save_image_to_file(img_bytes, img_path)
+    # 编辑好的一张图片发送
+    await bot.send(ev, f'[CQ:image,file=files:///{img_path}]')
 
 
 # 设置问答，支持正则表达式和回流

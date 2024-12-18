@@ -1,10 +1,15 @@
 import base64
 import io
+import os.path
 
+import imgkit
+import markdown
 import matplotlib.pyplot as plt
 import pandas as pd
 from plottable import Table
+from quart import Markup, render_template
 
+from yuiChyan import md_css_path, font_path
 from yuiChyan.resources import font_prop
 
 
@@ -25,6 +30,7 @@ from yuiChyan.resources import font_prop
 #         }
 #     ]
 # }
+
 
 # 创建表格
 async def create_table(_raw_data: dict) -> plt.Figure:
@@ -74,6 +80,30 @@ async def create_table(_raw_data: dict) -> plt.Figure:
     return fig
 
 
+# 从Markdown生成图片
+async def generate_image_from_markdown(markdown_content: str) -> bytes:
+    # 将 Markdown 文本转换为 HTML
+    html_content = markdown.markdown(markdown_content, extensions=['markdown.extensions.fenced_code',
+                                                                   'markdown.extensions.tables'])
+    html_content = Markup(html_content)
+    full_html = await render_template(
+        'help_image.html',
+        md_css_path=format_path(md_css_path),
+        font_path=format_path(font_path),
+        help_body=html_content
+    )
+
+    wk_path = os.path.join(os.path.dirname(__file__), 'wkhtmltox', 'bin', 'wkhtmltoimage.exe')
+    config = imgkit.config(wkhtmltoimage=wk_path)
+    # 渲染 HTML 到图片并返回字节数据
+    options = {
+        'enable-local-file-access': None,
+        'format': 'png'
+    }
+    img_bytes = imgkit.from_string(full_html, False, config=config, options=options)
+    return img_bytes
+
+
 # 保存 fig 为 PNG 文件
 async def save_fig_as_image(fig: plt.Figure, file_path: str):
     fig.savefig(file_path, format='png', bbox_inches='tight')
@@ -88,3 +118,22 @@ async def fig_to_base64(fig: plt.Figure) -> str:
     img_base64 = base64.b64encode(buf.read()).decode('utf-8')
     plt.close(fig)
     return img_base64
+
+
+# 导出图片到文件
+async def save_image_to_file(img_bytes: bytes, file_path: str):
+    with open(file_path, 'wb') as img_file:
+        img_file.write(img_bytes)
+
+
+# 将图片转换为Base64
+async def convert_image_to_base64(img_bytes: bytes) -> str:
+    image_base64 = base64.b64encode(img_bytes).decode('utf-8')
+    return image_base64
+
+
+# 格式化路径
+def format_path(raw_path: str) -> str:
+    abs_path = os.path.abspath(raw_path)
+    replace = abs_path.replace('\\', '/')
+    return f'file:///{replace}'

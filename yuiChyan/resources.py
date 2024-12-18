@@ -27,5 +27,13 @@ service_db_ = Rdict(os.path.join(base_db_path, 'service.db'))
 xqa_db_ = Rdict(os.path.join(base_db_path, 'xqa.db'))
 
 # 全局本地字体
-local_font = os.path.join(current_dir, 'core', 'manager', 'help_res', 'static', 'fonts', 'HarmonyOS_SansSC_Regular.ttf')
-font_prop = font_manager.FontProperties(fname=local_font)
+font_path = os.path.join(current_dir, 'core', 'manager', 'help_res', 'static', 'fonts', 'HarmonyOS_SansSC_Regular.ttf')
+font_prop = font_manager.FontProperties(fname=font_path)
+
+# 全局CSS
+base_css_path = os.path.join(current_dir, 'core', 'manager', 'help_res', 'static', 'css', 'bootstrap.min.css')
+md_css_path = os.path.join(current_dir, 'core', 'manager', 'help_res', 'static', 'css', 'github-markdown.css')
+
+# 全局JS
+base_js_path = os.path.join(current_dir, 'core', 'manager', 'help_res', 'static', 'js', 'bootstrap.bundle.min.js')
+jq_js_path = os.path.join(current_dir, 'core', 'manager', 'help_res', 'static', 'js', 'jquery.min.js')
