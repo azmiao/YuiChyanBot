@@ -8,7 +8,7 @@ sv = Service('core_xqa')
 
 
 # 帮助界面
-@sv.on_match('问答帮助')
+@sv.on_help()
 async def get_help(bot, ev):
     await bot.send(ev, await sv.get_sv_help())
 

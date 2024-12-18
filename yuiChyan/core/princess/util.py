@@ -23,3 +23,7 @@ comic_path = os.path.join(base_pcr_path, 'comic')
 os.makedirs(comic_path, exist_ok=True)
 
 sv = Service('pcr')
+
+@sv.on_help()
+async def get_help(bot, ev):
+    await bot.send(ev, await sv.get_sv_help())

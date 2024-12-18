@@ -13,6 +13,7 @@ from nonebot import CQHttpError
 
 import yuiChyan.config
 from yuiChyan import get_bot, YuiChyan, trigger, config, logger as bot_logger
+from yuiChyan.config import CORE_PLUGINS
 from yuiChyan.exception import *
 from yuiChyan.log import new_logger
 from yuiChyan.permission import ADMIN, check_permission, Permission
@@ -161,6 +162,16 @@ class Service:
                 self_id_list.append(self_id)
                 group_self_dict[group] = self_id_list
         return group_self_dict
+
+    def on_help(self, only_to_me: bool = False) -> Callable:
+        """
+        > 帮助触发 - 完全匹配 | 默认是
+
+        only_to_me: 是否需要@BOT，默认不需要
+        """
+        basename = os.path.basename(os.path.dirname(self.file_path))
+        value = CORE_PLUGINS.get(basename)
+        return self.on_match(f'{value}帮助', only_to_me)
 
     def on_message(self, message_type: str = 'group') -> Callable:
         """
