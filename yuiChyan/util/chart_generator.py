@@ -98,7 +98,8 @@ async def generate_image_from_markdown(markdown_content: str) -> bytes:
     # 渲染 HTML 到图片并返回字节数据
     options = {
         'enable-local-file-access': None,
-        'format': 'png'
+        'format': 'png',
+        'quiet': ''
     }
     img_bytes = imgkit.from_string(full_html, False, config=config, options=options)
     return img_bytes

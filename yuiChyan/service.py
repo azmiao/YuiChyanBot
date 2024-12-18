@@ -1,5 +1,7 @@
 import asyncio
 import functools
+import inspect
+import os
 import random
 import re
 from logging import Logger
@@ -15,6 +17,7 @@ from yuiChyan.exception import *
 from yuiChyan.log import new_logger
 from yuiChyan.permission import ADMIN, check_permission, Permission
 from yuiChyan.resources import auth_db_ as auth_db, service_db_ as service_db
+from yuiChyan.util.chart_generator import generate_image_from_markdown, convert_image_to_base64
 
 # 全局服务配置缓存
 _loaded_services: Dict[str, 'Service'] = {}
@@ -59,6 +62,13 @@ class Service:
         self.visible = visible
         self.need_auth = need_auth
 
+        # sv实际的实例所在文件路径
+        self.file_path: Optional[str] = None
+        self.get_caller_file_path()
+
+        # 内存中缓存的帮助图片字节
+        self.help_bytes: Optional[bytes] = None
+
         service_config = _read_service_config(name)
         self.include_group: List[int] = service_config.get('include_group', [])
         self.exclude_group: List[int] = service_config.get('exclude_group', [])
@@ -77,6 +87,30 @@ class Service:
     @staticmethod
     def get_loaded_services() -> Dict[str, 'Service']:
         return _loaded_services
+
+    # 获取sv实际的实例所在文件路径
+    def get_caller_file_path(self):
+        # 获取调用栈
+        stack = inspect.stack()
+        # 获取调用Service的位置
+        caller_frame = stack[2]
+        self.file_path = caller_frame.filename
+
+    # 获取自带的帮助
+    async def get_sv_help(self):
+        help_path = os.path.join(os.path.dirname(self.file_path), 'HELP.md')
+        if not os.path.exists(help_path):
+            raise InterFunctionException('帮助文件 [HELP.md] 不存在')
+
+        if not self.help_bytes:
+            with open(help_path, 'r', encoding='utf-8') as md_file:
+                md_content = md_file.read()
+            # 生成帮助图片
+            self.help_bytes = await generate_image_from_markdown(md_content)
+
+        # 转base64发送
+        image_base64 = await convert_image_to_base64(self.help_bytes)
+        return f'[CQ:image,file=base64://{image_base64}]'
 
     # 将自身服务保存至缓存
     def save_loaded_services(self):

@@ -1,7 +1,6 @@
 from yuiChyan.exception import *
 from yuiChyan.permission import *
 from yuiChyan.service import Service
-from yuiChyan.util.chart_generator import generate_image_from_markdown, save_image_to_file
 from .operate_msg import *
 from .util import *
 
@@ -11,14 +10,7 @@ sv = Service('core_xqa')
 # 帮助界面
 @sv.on_match('问答帮助')
 async def get_help(bot, ev):
-    with open(os.path.join(os.path.dirname(__file__), 'HELP.md'), 'r', encoding='utf-8') as md_file:
-        md_content = md_file.read()
-    # 生成帮助图片
-    img_bytes = await generate_image_from_markdown(md_content)
-    img_path = os.path.join(os.path.dirname(__file__), 'HELP.png')
-    await save_image_to_file(img_bytes, img_path)
-    # 编辑好的一张图片发送
-    await bot.send(ev, f'[CQ:image,file=files:///{img_path}]')
+    await bot.send(ev, await sv.get_sv_help())
 
 
 # 设置问答，支持正则表达式和回流

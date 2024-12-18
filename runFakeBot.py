@@ -183,7 +183,7 @@ async def connect_ws(ws_url, reconnect_interval, rate_limiter, headers):
     while True:
         try:
             print(f'> 正在尝试连接至[{ws_url}]...')
-            async with websockets.connect(ws_url, additional_headers=headers) as websocket:
+            async with websockets.connect(ws_url, additional_headers=headers, max_size=2**20*10) as websocket:
                 print(f'> 已连接至[{ws_url}]')
 
                 # 使用 asyncio.gather 来同时运行发送和接收函数
