@@ -1,8 +1,10 @@
+from nonebot import on_notice, NoticeSession
+
 from yuiChyan import LakePermissionException, CommandErrorException, FunctionException
 from yuiChyan.config import NICKNAME
 from yuiChyan.permission import check_permission, ADMIN
 from yuiChyan.service import Service
-from yuiChyan.util import translate
+from yuiChyan.util import translate, DailyNumberLimiter
 from .create_info import *
 from .group_gacha import *
 from .manga_trans import *
@@ -159,3 +161,52 @@ async def join_gacha(bot, ev):
 async def query_gacha(bot, ev):
     msg = await query_group_gacha(str(ev.group_id))
     await bot.send(ev, msg)
+
+
+# 让 YuiChyan 戳戳你
+@sv.on_match(('戳一戳我', '戳戳我'), only_to_me=True)
+async def send_point(bot, ev):
+    await bot.send(ev, f'[CQ:poke,qq={int(ev.user_id)}]')
+
+
+# YuiChyan 被戳提醒
+@on_notice('notify.poke')
+async def poke_back(session: NoticeSession):
+    # 单次戳我的冷却
+    time_limit = 10
+    # 每日戳我的总上限
+    daily_limit = 10
+    # 返回的消息列表
+    msg_list = [
+        f'呜喵~',
+        f'嗯哼？找{NICKNAME}有啥事呢',
+        f'{NICKNAME}饿了，能给我买点吃的吗~',
+        f'嘎哦~ 嘎哦~',
+        f'每天最多戳我十次哦~',
+        f'嗯...{NICKNAME}..正在睡大觉呢',
+        f'看我的必杀技————花朵射击！',
+        f'喵喵喵？',
+        f'{NICKNAME}我啊，以前可是{NICKNAME}哦',
+        f'你戳的对，{NICKNAME}我啊是由{NICKNAME}自主研发的{NICKNAME}',
+        f'大家要早睡早起哦，指第一天早上睡，第二天早上起',
+        f'俗话说的好，早期的虫儿被鸟吃',
+        f'欸嘿嘿，{NICKNAME}打牌又赢了，荣！段幺九！',
+        f'偷偷告诉你，{NICKNAME}其实不是机器人，我只是打字比较快而已'
+    ]
+
+    uid = session.ctx['user_id']
+    self_ids = session.bot.get_self_ids()
+    if session.ctx['target_id'] not in self_ids:
+        return
+
+    # 频次和单日次数检测
+    lmt = FreqLimiter(time_limit)
+    daily_limit = DailyNumberLimiter(daily_limit)
+    if not lmt.check(uid):
+        return
+    if not daily_limit.check(uid):
+        return
+
+    lmt.start_cd(uid)
+    daily_limit.increase(uid, 1)
+    await session.send(random.choice(msg_list))

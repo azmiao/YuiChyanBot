@@ -3,6 +3,7 @@ from functools import total_ordering
 from aiocqhttp import Event as CQEvent
 
 from yuiChyan import config
+from yuiChyan.exception import InterFunctionException
 
 
 # 权限类
@@ -30,12 +31,12 @@ class Permission:
     @classmethod
     def get_permission_by_level(cls, level: int) -> 'Permission':
         if level not in cls._permissions_by_level:
-            raise Exception(f'权限级别 {level} 不存在，请检查')
+            raise InterFunctionException(f'权限级别 {level} 不存在，请检查')
         return cls._permissions_by_level.get(level)
 
 
 # 权限级别
-BLACK: Permission = Permission('黑名单', -999 )
+BLACK: Permission = Permission('黑名单', -999)
 NORMAL: Permission = Permission('群员', 1)
 PRIVATE: Permission = Permission('私聊', 10)
 ADMIN: Permission = Permission('群管理', 20)
