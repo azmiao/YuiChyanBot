@@ -28,4 +28,4 @@ if not os.path.exists(os.path.join(comic_path, 'index.json')):
         # noinspection PyTypeChecker
         json.dump({}, af, ensure_ascii=False)
 
-sv = Service('pcr')
+sv = Service('pcr', need_help=True)

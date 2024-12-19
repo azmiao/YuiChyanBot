@@ -56,7 +56,7 @@ class Service:
             use_exclude: bool = True,  # 是否使用排除列表，即黑名单模式，否则使用白名单模式
             visible: bool = True,  # 是否在服务列表可见
             need_auth: bool = True,  # 是否需要群授权
-            need_help: bool = True  # 是否使用内置的将HELP.md转图片的帮助文档，HELP.md不存在就会跳过
+            need_help: bool = False  # 是否注册内置的将HELP.md转图片的帮助文档，HELP.md不存在就会跳过，默认不注册
     ):
         self.name = name
         self.manage = manage
@@ -81,7 +81,7 @@ class Service:
         assert self.name not in _loaded_services, f'服务 [{self.name}] 已存在！'
         _loaded_services[self.name] = self
 
-        # 帮助文档
+        # 帮助文档命令注册
         if self.need_help:
             @self.on_help()
             async def get_help(bot, ev):

@@ -4,7 +4,7 @@ from yuiChyan.service import Service
 from .operate_msg import *
 from .util import *
 
-sv = Service('core_xqa')
+sv = Service('core_xqa', need_help=True)
 
 
 # 设置问答，支持正则表达式和回流

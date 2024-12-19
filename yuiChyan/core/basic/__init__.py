@@ -9,7 +9,7 @@ from .create_info import *
 from .group_gacha import *
 from .manga_trans import *
 
-sv = Service('base_func')
+sv = Service('base_func', need_help=True)
 
 
 # 翻译
