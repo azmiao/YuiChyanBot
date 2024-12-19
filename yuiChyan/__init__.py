@@ -23,7 +23,7 @@ class YuiChyan(NoneBot):
         keys_as_int = map(int, self._wsr_api_clients.keys())
         self_ids = list(keys_as_int)
         if not self_ids:
-            raise BotException(None, '> 获取YuiChyan自身QQ号列表失败，可能是协议实现客户端未启动')
+            raise InterFunctionException('> 获取YuiChyan自身QQ号列表失败，可能是协议实现客户端未启动')
         return self_ids
 
 

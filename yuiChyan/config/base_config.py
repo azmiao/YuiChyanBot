@@ -23,4 +23,6 @@ CORE_PLUGINS = {
 }
 # 第三方插件文件夹和对应的名称 | key是plugins下的文件夹名，value是想给它取的名称，内置的帮助生成命令为：f'{value}帮助'
 EXTRA_PLUGINS = {
+    'clan_manage': 'PCR公会管理',
+    'pcrjjc_tw_new': 'PCR竞技场'
 }
