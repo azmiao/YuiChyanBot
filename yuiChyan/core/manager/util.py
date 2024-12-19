@@ -1,9 +1,10 @@
 from datetime import timedelta, datetime
+from typing import Optional
 
 from rocksdict import Rdict
 
 import yuiChyan
-from yuiChyan import get_bot
+from yuiChyan import get_bot, FunctionException
 from yuiChyan.config import NICKNAME, REMIND_BEFORE_EXPIRED
 from yuiChyan.resources import auth_db_
 from yuiChyan.service import Service
@@ -36,10 +37,16 @@ async def get_auth_group_list(self_id):
 
 
 # 获取所有群
-async def get_all_group_list(self_id):
+async def get_all_group_list(self_id: Optional[int]) -> list:
     if not self_id:
-        self_id = yuiChyan.yui_bot.get_self_ids()[0]
-    group_list = await get_bot().get_group_list(self_id=self_id)
+        self_id_list = yuiChyan.yui_bot.get_self_ids()
+    else:
+        self_id_list = [self_id]
+    group_list = []
+    # 分ID查
+    for _self_id in self_id_list:
+        _group_list = await get_bot().get_group_list(self_id=_self_id)
+        group_list.extend(_group_list)
     return group_list
 
 
@@ -65,7 +72,13 @@ async def group_notice(group_id, msg):
 
 
 # 修改授权时间
-async def change_authed_time(group_id, time_change=0):
+async def change_authed_time(ev, group_id: int, time_change: int = 0):
+    # 判断群是否在BOT列表里
+    group_list = await get_all_group_list(None)
+    group_id_list = [x['group_id'] for x in group_list]
+    if group_id not in group_id_list:
+        raise FunctionException(ev, f'群 [{str(group_id)}] 不存在，请检查！')
+    # 判断群是否在数据库里
     auth_db = await get_database()
     if group_id in auth_db:
         auth_db[group_id] = auth_db[group_id] + timedelta(days=time_change)

@@ -6,6 +6,7 @@ from jinja2 import FileSystemLoader
 from nonebot import NoneBot, load_plugins
 
 import yuiChyan.config
+from yuiChyan.config import ENABLE_AUTH
 from yuiChyan.exception import *
 from yuiChyan.log import new_logger
 from yuiChyan.resources import *
@@ -141,7 +142,7 @@ async def _process_message(bot: YuiChyan, event: CQEvent):
             if event.group_id:
                 group_id = int(event.group_id)
                 # 判断是否有授权
-                if service_func.sv.need_auth and group_id not in auth_db_:
+                if ENABLE_AUTH and service_func.sv.need_auth and group_id not in auth_db_:
                     continue
                 # 群消息判断是否启用服务
                 if not service_func.sv.judge_enable(group_id):

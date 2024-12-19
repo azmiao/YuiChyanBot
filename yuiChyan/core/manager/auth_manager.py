@@ -85,7 +85,7 @@ async def modify_time_chat(bot, ev):
     group_id = int(m.group(1))
     days = int(m.group(2))
 
-    expiration = await change_authed_time(group_id, days)
+    expiration = await change_authed_time(ev, group_id, days)
     msg = await process_group_msg(ev.self_id, group_id, None, expiration, title='变更成功, 变更后的群授权信息:\n')
     await group_notice(group_id, f'本群已增加{days}天授权时长，当前授权信息：\n{msg}')
     await bot.send(ev, msg)

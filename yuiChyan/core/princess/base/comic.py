@@ -78,7 +78,7 @@ async def comic(bot, ev):
 
 
 # 定时任务
-@sv.scheduled_job(minute='*/1', second='15')
+@sv.scheduled_job(minute='*/30', second='15')
 async def update_manga():
     session: AsyncClient = get_session_or_create('PcrComic', True)
     # 获取最新漫画信息

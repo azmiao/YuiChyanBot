@@ -349,6 +349,8 @@ class Service:
                 # 校验是否是私聊
                 if force_private and event.detail_type != 'private':
                     raise FunctionException(event, '> 该命令只支持私聊')
+                if (not force_private) and event.detail_type != 'group':
+                    raise nonebot.command.SwitchException(nonebot.message.Message(event.raw_message))
                 # 校验权限
                 if (not force_private) and (not check_permission(event, cmd_permission)):
                     raise LakePermissionException(event, f'您的权限不足，需要权限 [{cmd_permission.name}]')
