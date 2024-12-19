@@ -210,3 +210,31 @@ async def poke_back(session: NoticeSession):
     lmt.start_cd(uid)
     daily_limit.increase(uid, 1)
     await session.send(random.choice(msg_list))
+
+
+# 掷骰子
+@sv.on_rex(r'掷骰子 ?(\d{1,3})d(\d{1,3})')
+async def query_dice(bot, ev):
+    # 次数和面数
+    times, ranges = int(ev['match'].group(1)), int(ev['match'].group(2))
+
+    if times == 0:
+        raise FunctionException(ev, '欸欸欸...0个骰子？')
+    if ranges == 0:
+        raise FunctionException(ev, '欸欸欸...0面的骰子？')
+
+    # 骰子的结果列表
+    results = []
+    # 投掷 times 次骰子
+    for _ in range(times):
+        result = random.randint(1, ranges)
+        results.append(result)
+    # 计算所有投掷的总和
+    total = sum(results)
+    # 格式化每一次投掷的结果为字符串
+    results_str = '+'.join(map(str, results))
+    if len(results) == 1:
+        msg = f'掷骰子{times}次的结果是：\n{results_str}'
+    else:
+        msg = f'掷骰子{times}次的结果是：\n{results_str}={total}'
+    await bot.send(ev, msg, at_sender=True)
