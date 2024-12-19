@@ -29,7 +29,3 @@ if not os.path.exists(os.path.join(comic_path, 'index.json')):
         json.dump({}, af, ensure_ascii=False)
 
 sv = Service('pcr')
-
-@sv.on_help()
-async def get_help(bot, ev):
-    await bot.send(ev, await sv.get_sv_help())

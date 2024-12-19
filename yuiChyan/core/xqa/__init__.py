@@ -7,12 +7,6 @@ from .util import *
 sv = Service('core_xqa')
 
 
-# 帮助界面
-@sv.on_help()
-async def get_help(bot, ev):
-    await bot.send(ev, await sv.get_sv_help())
-
-
 # 设置问答，支持正则表达式和回流
 @sv.on_message('group')
 async def set_question(bot, ev):

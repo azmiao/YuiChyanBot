@@ -12,11 +12,6 @@ from .manga_trans import *
 sv = Service('base_func')
 
 
-@sv.on_help()
-async def get_help(bot, ev):
-    await bot.send(ev, await sv.get_sv_help())
-
-
 # 翻译
 @sv.on_prefix('翻译', only_to_me=True)
 async def translate_text(bot, ev):

@@ -5,11 +5,6 @@ from yuiChyan.config import *
 from .util import *
 
 
-@sv.on_help()
-async def get_help(bot, ev):
-    await bot.send(ev, await sv.get_sv_help())
-
-
 # 查询本群授权
 @sv.on_match('查询授权')
 async def query_group_auth(bot, ev):

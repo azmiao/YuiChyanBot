@@ -54,14 +54,16 @@ class Service:
             name: str,  # 服务名称
             manage: Permission = ADMIN,  # 管理启用和禁用的权限
             use_exclude: bool = True,  # 是否使用排除列表，即黑名单模式，否则使用白名单模式
-            visible: bool = True,  # 是否可见
-            need_auth: bool = True  # 是否需要群授权
+            visible: bool = True,  # 是否在服务列表可见
+            need_auth: bool = True,  # 是否需要群授权
+            need_help: bool = True  # 是否使用内置的将HELP.md转图片的帮助文档，HELP.md不存在就会跳过
     ):
         self.name = name
         self.manage = manage
         self.use_exclude = use_exclude
         self.visible = visible
         self.need_auth = need_auth
+        self.need_help = need_help
 
         # sv实际的实例所在文件路径
         self.file_path: Optional[str] = None
@@ -78,6 +80,12 @@ class Service:
         # 载入缓存
         assert self.name not in _loaded_services, f'服务 [{self.name}] 已存在！'
         _loaded_services[self.name] = self
+
+        # 帮助文档
+        if self.need_help:
+            @self.on_help()
+            async def get_help(bot, ev):
+                await bot.send(ev, await self.get_sv_help())
 
     # 获取bot
     @property
@@ -101,7 +109,7 @@ class Service:
     async def get_sv_help(self):
         help_path = os.path.join(os.path.dirname(self.file_path), 'HELP.md')
         if not os.path.exists(help_path):
-            raise InterFunctionException('帮助文件 [HELP.md] 不存在')
+            raise InterFunctionException('帮助文件 [HELP.md] 不存在，将忽略')
 
         if not self.help_bytes:
             with open(help_path, 'r', encoding='utf-8') as md_file:
