@@ -1,3 +1,4 @@
+import importlib
 from typing import List, LiteralString, Dict
 
 import nonebot
@@ -16,6 +17,7 @@ class YuiChyan(NoneBot):
 
     def __init__(self, config_object=None):
         super().__init__(config_object)
+        logger.info('> YuiChyanBot实例 启动成功')
 
     # 获取所有的bot的QQ
     def get_self_ids(self) -> List[int]:
@@ -56,6 +58,9 @@ async def _start_scheduler():
 def create_instance() -> YuiChyan:
     global yui_bot
 
+    config_logger = new_logger('config', config.DEBUG)
+    config_logger.info("=== 开始加载核心配置 ===")
+    importlib.import_module('yuiChyan.config')
     # 使用基础配置启动
     yui_bot = YuiChyan(config)
 
@@ -66,7 +71,6 @@ def create_instance() -> YuiChyan:
     yui_bot.server_app.before_serving(_start_scheduler)
 
     # 加载插件
-    config_logger = new_logger('config', config.DEBUG)
     _load_core_plugins(config_logger)
     _load_external_plugins(config_logger)
     config_logger.info("=== 所有插件加载完成 ===")
@@ -145,5 +149,6 @@ async def _process_message(bot: YuiChyan, event: CQEvent):
             except nonebot.message.CanceledException:
                 raise
             except Exception as e:
-                service_func.sv.logger.error(f'消息ID [{event.message_id}] 触发服务 [{service_func.__name__}] 出错！')
+                service_func.sv.logger.error(f'消息ID [{event.message_id}] 触发服务 [{service_func.__name__}] 出错：'
+                                             f'{type(e)} {str(e)}')
                 service_func.sv.logger.exception(e)
