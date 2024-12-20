@@ -12,5 +12,3 @@ __pycache__/
 *.npy
 
 yuiChyan/res/
-
-yuiChyan/config/plugins/

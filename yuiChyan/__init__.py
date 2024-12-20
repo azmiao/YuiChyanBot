@@ -105,11 +105,6 @@ def _load_core_plugins(config_logger):
 def _load_external_plugins(config_logger):
     config_logger.info("=== 开始加载拓展插件 ===")
     for plugin_name in config.MODULES_ON:
-        try:
-            importlib.import_module('yuiChyan.config.plugins.' + plugin_name)
-            config_logger.info(f'> 拓展配置 [{plugin_name}] 加载成功')
-        except ModuleNotFoundError:
-            pass
         load_plugins(str(os.path.join(os.path.dirname(__file__), 'plugins', plugin_name)),
                      f'yuiChyan.plugins.{plugin_name}')
         help_path = os.path.join(os.path.dirname(__file__), 'plugins', plugin_name, 'HELP.md')
