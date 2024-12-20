@@ -14,16 +14,17 @@
     "PUBLIC_DOMAIN": "",
     // 全局统一的网络代理配置 | 需要自己代码调用
     "PROXY": "http://127.0.0.1:1081",
-    // 核心插件文件夹和对应的名称 | key是plugins下的文件夹名，value是想给它取的名称，内置的帮助生成命令为：f"{value}帮助"
+    // 核心插件文件夹和对应的名称 | key是plugins下的文件夹名，value是想给它取的名称，会在帮助页面显示
     "CORE_PLUGINS": {
         "basic": "基础功能",
         "manager": "核心管理",
-        "xqa": "问答",
-        "princess": "PCR"
+        "xqa": "XQA你问我答",
+        "princess": "PCR公主连结基础插件"
     },
-    // 第三方插件文件夹和对应的名称 | key是plugins下的文件夹名，value是想给它取的名称，内置的帮助生成命令为：f"{value}帮助"
+    // 第三方插件文件夹和对应的名称 | key是plugins下的文件夹名，value是想给它取的名称，会在帮助页面显示
     "EXTRA_PLUGINS": {
-        "clan_manage": "PCR公会管理",
-        "pcrjjc_tw_new": "PCR竞技场"
+        "clan_manage": "PCR台服公会管理(私用版)",
+        "pcrjjc_tw_new": "PCR台服竞技场",
+        "bf_search_v2": "简易战地系列助手"
     }
 }

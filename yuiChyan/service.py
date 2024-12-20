@@ -13,7 +13,6 @@ from nonebot import CQHttpError
 
 import yuiChyan.config
 from yuiChyan import get_bot, YuiChyan, trigger, config, logger as bot_logger
-from yuiChyan.config import CORE_PLUGINS
 from yuiChyan.exception import *
 from yuiChyan.log import new_logger
 from yuiChyan.permission import ADMIN, check_permission, Permission
@@ -56,14 +55,16 @@ class Service:
             use_exclude: bool = True,  # 是否使用排除列表，即黑名单模式，否则使用白名单模式
             visible: bool = True,  # 是否在服务列表可见
             need_auth: bool = True,  # 是否需要群授权
-            need_help: bool = False  # 是否注册内置的将HELP.md转图片的帮助文档，HELP.md不存在就会跳过，默认不注册
+            help_cmd: Union[str, Tuple[str, ...], Iterable[str]] = None,  # 服务帮助文档命令，为空就不需要 | 通过service所在文件目录下的HELP.md生成图片
+            help_at: bool = False  # 服务帮助文档命令是否需要@BOT触发
     ):
         self.name = name
         self.manage = manage
         self.use_exclude = use_exclude
         self.visible = visible
         self.need_auth = need_auth
-        self.need_help = need_help
+        self.help_cmd = help_cmd
+        self.help_at = help_at
 
         # sv实际的实例所在文件路径
         self.file_path: Optional[str] = None
@@ -82,10 +83,10 @@ class Service:
         _loaded_services[self.name] = self
 
         # 帮助文档命令注册
-        if self.need_help:
-            @self.on_help()
-            async def get_help(bot, ev):
-                await bot.send(ev, await self.get_sv_help())
+        if self.help_cmd:
+            @self.on_match(help_cmd, help_at)
+            async def __get_help(bot, ev):
+                await bot.send(ev, await self.__get_sv_help())
 
     # 获取bot
     @property
@@ -106,7 +107,7 @@ class Service:
         self.file_path = caller_frame.filename
 
     # 获取自带的帮助
-    async def get_sv_help(self):
+    async def __get_sv_help(self):
         help_path = os.path.join(os.path.dirname(self.file_path), 'HELP.md')
         if not os.path.exists(help_path):
             raise InterFunctionException('帮助文件 [HELP.md] 不存在，将忽略')
@@ -170,16 +171,6 @@ class Service:
                 self_id_list.append(self_id)
                 group_self_dict[group] = self_id_list
         return group_self_dict
-
-    def on_help(self, only_to_me: bool = False) -> Callable:
-        """
-        > 帮助触发 - 完全匹配 | 默认是
-
-        only_to_me: 是否需要@BOT，默认不需要
-        """
-        basename = os.path.basename(os.path.dirname(self.file_path))
-        value = CORE_PLUGINS.get(basename)
-        return self.on_match(f'{value}帮助', only_to_me)
 
     def on_message(self, message_type: str = 'group') -> Callable:
         """
