@@ -1,14 +1,13 @@
 import asyncio
 import base64
 import json
-import os
 import random
 import re
 
 from rocksdict import Rdict
 
 from yuiChyan import logger
-from yuiChyan.config.xqa_config import *
+from yuiChyan.config import *
 from yuiChyan.resources import xqa_db_, xqa_img_path, base_db_path
 from yuiChyan.util import filter_message
 from yuiChyan.util.parse import extract_file, save_image

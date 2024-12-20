@@ -1,4 +1,3 @@
-import importlib
 from typing import List, LiteralString, Dict
 
 import nonebot
@@ -84,11 +83,6 @@ def create_instance() -> YuiChyan:
 def _load_core_plugins(config_logger):
     config_logger.info("=== 开始加载核心插件 ===")
     for core_plugin in config.CORE_MODULE:
-        try:
-            importlib.import_module('yuiChyan.config.' + core_plugin + '_config')
-            config_logger.info(f'> 核心配置 [{core_plugin}_config] 加载成功')
-        except ModuleNotFoundError:
-            pass
         load_plugins(str(os.path.join(os.path.dirname(__file__), 'core', core_plugin)),
                      f'yuiChyan.core.{core_plugin}')
         help_path = os.path.join(os.path.dirname(__file__), 'core', core_plugin, 'HELP.md')

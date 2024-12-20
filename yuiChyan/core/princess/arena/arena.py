@@ -10,7 +10,6 @@ from typing import List
 import httpx
 
 from yuiChyan.config import PROXY
-from yuiChyan.config.princess_config import AUTH_KEY
 from yuiChyan.service import Service
 from .. import chara
 
@@ -29,6 +28,11 @@ if not os.path.exists(buffer_json_path):
     with open(buffer_json_path, 'w', encoding='utf8') as f:
         # noinspection PyTypeChecker
         json.dump({}, f, ensure_ascii=False)
+
+config_path = os.path.join(cur_path, 'pcr_config.json')
+with open(config_path, 'r', encoding='utf-8') as _config:
+    _data = json.load(_config)
+AUTH_KEY: str = _data.get('AUTH_KEY', '')
 
 
 # ID列表转字符串
