@@ -77,6 +77,10 @@ async def create_table(_raw_data: dict) -> plt.Figure:
         odd_row_color='#FFF0F0',
         even_row_color='#E0F6FF'
     )
+    # 添加左下角水印
+    fig.text(0.02, 0.02, 'Power By YuiChyanBot', fontproperties=font_prop, fontsize=12, color='gray', ha='left', va='bottom', alpha=0.5)
+    # 添加右下角水印
+    fig.text(0.98, 0.02, 'Author: AZMIAO', fontproperties=font_prop, fontsize=12, color='gray', ha='right', va='bottom', alpha=0.5)
     # 自动调整布局
     plt.tight_layout(pad=2.0)
     return fig
