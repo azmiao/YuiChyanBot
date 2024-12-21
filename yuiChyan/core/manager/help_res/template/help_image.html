@@ -49,6 +49,22 @@
         pre, code {
             font-family: 'HarmonyFont', Arial, sans-serif !important;
         }
+        {# 水印 #}
+        .watermark {
+            position: absolute;
+            color: gray;
+            font-size: 12px;
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        .watermark-left {
+            bottom: 10px;
+            left: 10px;
+        }
+        .watermark-right {
+            bottom: 10px;
+            right: 10px;
+        }
     </style>
 </head>
 
@@ -57,6 +73,8 @@
     <div>
         {{ help_body | safe }}
     </div>
+    <span class="watermark watermark-left">Power By YuiChyanBot</span>
+    <span class="watermark watermark-right">Author: AZMIAO</span>
 </body>
 
 </html>
