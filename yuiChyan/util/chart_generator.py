@@ -34,12 +34,14 @@ from yuiChyan.resources import font_prop
 
 # 创建表格
 async def create_table(_raw_data: dict) -> plt.Figure:
+    _index = _raw_data.get('index_column', '')
     show_columns = _raw_data.get('show_columns', {})
     data_list = _raw_data.get('data_list', [])
     # 创建 DataFrame
     df = pd.DataFrame([{col: entry.get(col, None) for col in show_columns.keys()} for entry in data_list])
     # 手动设置索引列
-    df.set_index(_raw_data.get('index_column', ''), inplace=True)
+    df.set_index(_index, inplace=True)
+    df.index.name = show_columns.get(_index, '')
     # 重命名列
     df.rename(columns=show_columns, inplace=True)
 
@@ -72,7 +74,7 @@ async def create_table(_raw_data: dict) -> plt.Figure:
         ax=ax,
         textprops=text_props,
         row_dividers=False,
-        odd_row_color='#FFE1E1',
+        odd_row_color='#FFF0F0',
         even_row_color='#E0F6FF'
     )
     # 自动调整布局
