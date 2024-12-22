@@ -77,10 +77,9 @@ async def silence(ev: CQEvent, ban_time, skip_su=True):
         yuiChyan.logger.exception(e)
 
 
-# 规范化unicode字符串 并 转为小写 并 转为简体
+# 规范化unicode字符串 并 转为简体
 def normalize_str(string) -> str:
     string = unicodedata.normalize('NFKC', string)
-    string = string.lower()
     string = zhconv.convert(string, 'zh-hans')
     return string
 
