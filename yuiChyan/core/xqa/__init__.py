@@ -41,6 +41,10 @@ async def set_question(bot, ev):
     if IS_JUDGE_LENGTH and len(ans_raw) > MSG_LENGTH:
         raise FunctionException(ev, f'回答的长度超过最大字符限制，限制{MSG_LENGTH}字符，包括符号和图片转码后的长度，您设置的回答字符长度为[{len(ans_raw)}]')
 
+    # 检查是否泛匹配
+    if re.match(fr'{que_raw}', '检测文本'):
+        raise FunctionException(ev, f'不可设置泛匹配问题哦')
+
     # 设置问答
     msg = await set_que(bot, group_id, user_id, que_raw, ans_raw, str(ev.group_id))
     await bot.send(ev, msg)
