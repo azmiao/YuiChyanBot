@@ -98,6 +98,7 @@ async def connect_ws(ws_url, reconnect_interval, rate_limiter, headers):
                         data['message'] = _match.group(2)
                         data['raw_message'] = message_
                         data['group_id'] = config['group_id']
+                        data['sender'] = {'card': config["nickname"]}
                         print(f'收到群 {config["group_name"]}({config["group_id"]}) 的消息: {message_} ({msg_id})')
 
                 await rate_limit_middleware(rate_limiter, ws.send(json.dumps(data)))
