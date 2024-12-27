@@ -168,6 +168,9 @@ async def connect_ws(ws_url, reconnect_interval, rate_limiter, headers):
                                 'nickname': config["nickname"]
                             }
                         ]
+                    case 'send_group_forward_msg':
+                        print(f'发送群 {config["group_name"]}({config["group_id"]}) 的合并转发消息: {msg} ({msg_id})')
+                        data = {'message_id': msg_id}
                     case _:
                         print(f'> 检测到未知Action: {action}')
                         continue

@@ -55,7 +55,8 @@ class Service:
             use_exclude: bool = True,  # 是否使用排除列表，即黑名单模式，否则使用白名单模式
             visible: bool = True,  # 是否在服务列表可见
             need_auth: bool = True,  # 是否需要群授权
-            help_cmd: Union[str, Tuple[str, ...], Iterable[str]] = None,  # 服务帮助文档命令，为空就不需要 | 通过service所在文件目录下的HELP.md生成图片
+            # 服务帮助文档命令，为空就不需要 | 通过service所在文件目录下的HELP.md生成图片
+            help_cmd: Union[str, Tuple[str, ...], Iterable[str]] = None,
             help_at: bool = False  # 服务帮助文档命令是否需要@BOT触发
     ):
         self.name = name
