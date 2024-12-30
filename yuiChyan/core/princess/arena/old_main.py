@@ -441,7 +441,8 @@ async def _QueryArenaImageAsync(image_url: str, region: int, bot, ev):
     boxDict, s = await getBox(image)
 
     if not boxDict:
-        await bot.finish(ev, "未识别到有4个及以上角色的阵容！")
+        await bot.send(ev, "未识别到有4个及以上角色的阵容！")
+        return
 
     try:
         await bot.send(ev, s)
@@ -453,7 +454,8 @@ async def _QueryArenaImageAsync(image_url: str, region: int, bot, ev):
         return
 
     if len(boxDict) > 3:
-        await bot.finish(ev, "请截图pjjc详细对战记录（对战履历详情）（含敌我双方2或3队阵容）")
+        await bot.send(ev, "请截图pjjc详细对战记录（对战履历详情）（含敌我双方2或3队阵容）")
+        return
 
     team_has_result = 0
     # lmt.start_cd(uid)
@@ -495,7 +497,8 @@ async def _QueryArenaImageAsync(image_url: str, region: int, bot, ev):
             all_query_records[query_index].append([record_team, record["val"], record])
 
     if team_has_result == 0 and len(boxDict) == 3:
-        await bot.finish(ev, "均未查询到解法！")
+        await bot.send(ev, "均未查询到解法！")
+        return
 
     await generateCollisionFreeTeam(bot, ev, all_query_records, team_has_result, region, boxDict)  # 最多允许补两队
 
@@ -675,14 +678,17 @@ async def generateCollisionFreeTeam(bot, ev, all_query_records, team_has_result,
     if collision_free_match_cnt:
         # print(f'\n\n总共无冲配队数={collision_free_match_cnt} len(outp_render)={len(outp_render)}')  # test
         teams = await render_atk_def_teams(outp_render[:-1])
-        await bot.finish(ev, str(MessageSegment.image(pic2b64(teams))))
+        await bot.send(ev, str(MessageSegment.image(pic2b64(teams))))
+        return
     elif collision_free_match_cnt_2:
         teams = await render_atk_def_teams(outp_render_2[:-1])
-        await bot.finish(ev, str(MessageSegment.image(pic2b64(teams))))
+        await bot.send(ev, str(MessageSegment.image(pic2b64(teams))))
+        return
     else:
         if len(all_query_records) == 2:  # 查两队
             if team_has_result == 0:
-                await bot.finish(ev, "均未查询到解法！")
+                await bot.send(ev, "均未查询到解法！")
+                return
             elif team_has_result == 1:
                 for index, records in enumerate(all_query_records):
                     if len(records) > 1:
@@ -729,19 +735,24 @@ async def _QueryArenaTextAsync(text: str, region: int, bot, ev):
         if score < 50 and not defense:
             return  # 忽略无关对话
         msg = f'无法识别"{unknown}"' if score < 50 else f'无法识别"{unknown}" 您说的有{score}%可能是{name}'
-        await bot.finish(ev, msg)
+        await bot.send(ev, msg)
+        return
     await __arena_query(bot, ev, region, defense)
 
 
 async def __arena_query(bot, ev, region: int, defense, raw=0, only_use_cache=False):
     if len(defense) > 5:
-        await bot.finish(ev, '编队不能多于5名角色', at_sender=True)
+        await bot.send(ev, '编队不能多于5名角色', at_sender=True)
+        return
     if len(defense) < 4:
-        await bot.finish(ev, '编队角色过少', at_sender=True)
+        await bot.send(ev, '编队角色过少', at_sender=True)
+        return
     if len(defense) != len(set(defense)):
-        await bot.finish(ev, '编队中含重复角色', at_sender=True)
+        await bot.send(ev, '编队中含重复角色', at_sender=True)
+        return
     if any(chara.is_npc(i) for i in defense):
-        await bot.finish(ev, '编队中含未实装角色', at_sender=True)
+        await bot.send(ev, '编队中含未实装角色', at_sender=True)
+        return
 
     key = ''.join([str(x) for x in sorted(defense)]) + str(region)
     res = await arena.do_query(defense, region, -1 if only_use_cache else 1)
@@ -753,13 +764,15 @@ async def __arena_query(bot, ev, region: int, defense, raw=0, only_use_cache=Fal
     if res is None:
         remove_buffer(key)
         if not raw:
-            await bot.finish(ev, f'{defense}\npcrdfans未返回数据')
+            await bot.send(ev, f'{defense}\npcrdfans未返回数据')
+            return
         else:
             return []
     if not len(res):
         remove_buffer(key)
         if not raw:
-            await bot.finish(ev, f'{defense}\n未查询到解法')
+            await bot.send(ev, f'{defense}\n未查询到解法')
+            return
         else:
             return []
 
