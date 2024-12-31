@@ -42,7 +42,7 @@ async def auth_group_list(bot, ev):
 
     start = (page - 1) * GROUPS_IN_PAGE
     end = min(page * GROUPS_IN_PAGE - 1, length)
-    result_list = auth_list[start:end]
+    result_list = auth_list[start:end+1]
     msg += '\n\n'.join(result_list)
     msg += f'\n\n===== 当前页 {page}/{pages_all} ====='
     await bot.send(ev, msg)
