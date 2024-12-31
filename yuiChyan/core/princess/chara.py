@@ -126,7 +126,7 @@ async def download_chara_icon(session: AsyncClient, id_: int, star: int) -> int:
 async def download_all_chara_icon(bot, ev):
     try:
         tasks = []
-        session: AsyncClient = get_session_or_create('PcrUnitUpdate', True)
+        session: AsyncClient = get_session_or_create('PcrUnitUpdate', True, PROXY)
         for id_ in chara_manager.CHARA_NAME:
             if is_npc(id_):
                 continue
