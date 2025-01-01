@@ -125,27 +125,22 @@ async def download_chara_icon(session: AsyncClient, id_: int, star: int) -> int:
 @sv.on_command('PCR更新所有头像', cmd_permission=SUPERUSER)
 async def download_all_chara_icon(bot, ev):
     try:
-        tasks = []
-        session: AsyncClient = get_session_or_create('PcrUnitUpdate', True, PROXY)
+        success = 0
+        all_sum = 0
         for id_ in chara_manager.CHARA_NAME:
             if is_npc(id_):
                 continue
-
-            if not os.path.exists(os.path.join(unit_path, f'icon_unit_{id_}11.png')):
-                tasks.append(download_chara_icon(session, id_, 1))
-
-            if not os.path.exists(os.path.join(unit_path, f'icon_unit_{id_}31.png')):
-                tasks.append(download_chara_icon(session, id_, 3))
-
-            if not os.path.exists(os.path.join(unit_path, f'icon_unit_{id_}61.png')):
-                tasks.append(download_chara_icon(session, id_, 6))
-
-        ret = await asyncio.gather(*tasks)
-        # 关闭会话
-        await close_async_session('PcrUnitUpdate', session)
-
-        success = sum(r == 0 for r in ret)
-        await bot.send(ev, f'> PCR头像更新完成! \n下载成功 {success}/{len(ret)} 个头像')
+            session: AsyncClient = get_session_or_create('PcrUnitUpdate', True, PROXY)
+            # 文件均不存在，则下载资源
+            ret = await asyncio.gather(
+                download_chara_icon(session, id_, 6),
+                download_chara_icon(session, id_, 3),
+                download_chara_icon(session, id_, 1),
+            )
+            await close_async_session('PcrUnitUpdate', session)
+            success += sum(r == 0 for r in ret)
+            all_sum += len(ret)
+        await bot.send(ev, f'> PCR头像更新完成! \n下载成功 {success}/{all_sum} 个头像')
     except Exception as e:
         raise FunctionException(ev, f'> PCR头像更新出错: {type(e)}，{str(e)}')
 
