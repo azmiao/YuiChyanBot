@@ -62,7 +62,8 @@ class CharaManager:
         if isinstance(names, str):
             name_get.append(names)
         elif isinstance(names, list):
-            name_get += names
+            for n in names:
+                name_get.append(n)
         else:
             pass
         self.CHARA_NAME[_id] = name_get

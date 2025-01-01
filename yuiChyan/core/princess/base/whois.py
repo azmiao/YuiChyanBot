@@ -7,7 +7,7 @@ from ..util import *
 lmt = FreqLimiter(5)
 
 
-@sv.on_prefix('PCR谁是')
+@sv.on_prefix(('PCR谁是', 'pcr谁是'))
 async def whois(bot, ev):
     name = str(ev.message).strip()
     if not name:
@@ -18,7 +18,7 @@ async def whois(bot, ev):
     if id_ != chara_manager.UNKNOWN_ID:
         chara = get_chara_by_id(id_)
         image = await chara.get_icon_image()
-        msg = f'> {chara.name}\n{image}'
+        msg = f'\n> ID[{id_}] {chara.name}\n{image}'
         await bot.send(ev, msg, at_sender=True)
         return
 
@@ -28,7 +28,7 @@ async def whois(bot, ev):
     image = await chara.get_icon_image()
     
     if confi < 60:
-        msg = f'> PCR似乎没有和 [{name}] 名字相近的人'
+        msg = f'> PCR似乎没有和 [{name}] 名字相近的人欸'
     else:
-        msg = f'> PCR似乎没有叫 [{name}] 的人，您有 {confi}% 的可能在找{guess_name}:\n{image}'
+        msg = f'> PCR似乎没有叫 [{name}] 的人欸\n您有 {confi}% 的可能在找:\n> ID[{id_}] {guess_name}\n{image}'
     await bot.send(ev, msg)

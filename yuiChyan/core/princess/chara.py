@@ -161,7 +161,8 @@ async def update_chara(bot, ev):
 
     # 添加别称
     try:
-        chara_manager.add_chara_name(int(id_str), args[1])
-        await bot.send(ev, f'已成功为PCR角色ID [{id_str}] 添加名称 [{args[1]}]')
+        split_list = args[1].split(',')
+        chara_manager.add_chara_name(int(id_str), split_list)
+        await bot.send(ev, f'已成功为PCR角色ID [{id_str}] 添加名称 {split_list}')
     except Exception as e:
         raise FunctionException(ev, f'> PCR添加角色名称出错: {type(e)}，{str(e)}')
