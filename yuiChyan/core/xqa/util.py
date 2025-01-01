@@ -192,7 +192,7 @@ async def match_ans(info: dict, message: str, ans: str) -> str:
             for cq_msg in cq_list:
                 que_new = que_new.replace(cq_msg[0], '[' + cq_msg[1] + ']')
             try:
-                match = re.match(que_new, message)
+                match = re.match(fr'^{que_new}$', message)
                 if match:
                     ans = await replace_message(match, info, que)
                     break
