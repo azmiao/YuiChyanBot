@@ -191,8 +191,9 @@ async def match_ans(info: dict, message: str, ans: str) -> str:
             que_new = que
             for cq_msg in cq_list:
                 que_new = que_new.replace(cq_msg[0], '[' + cq_msg[1] + ']')
-            if re.match(que_new + '$', message):
-                ans = await replace_message(re.match(que_new + '$', message), info, que)
+            match = re.match(fr'{que_new}$', message)
+            if match:
+                ans = await replace_message(match, info, que)
                 break
         except re.error:
             # 如果que不是re.pattern的形式就跳过
