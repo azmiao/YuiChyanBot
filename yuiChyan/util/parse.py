@@ -35,7 +35,7 @@ async def get_real_url(ev: Optional[CQEvent], image_file: str) -> str:
         img_data = await get_bot().get_image(file=image_file)
     except Exception as e:
         raise FunctionException(ev, f'调用get_image接口查询图片{image_file}出错:{str(e)}')
-    return img_data.get['url']  # type: ignore
+    return img_data['url']  # type: ignore
 
 
 # 保存图片
