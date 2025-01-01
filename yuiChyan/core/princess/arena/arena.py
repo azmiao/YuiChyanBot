@@ -9,7 +9,6 @@ from typing import List
 
 import httpx
 
-from yuiChyan.config import PROXY
 from yuiChyan.service import Service
 from .. import chara
 
@@ -200,7 +199,7 @@ async def do_query(id_list, region=1, try_cnt=1):
                 if should_sleep:
                     await asyncio.sleep(1)
                 try:
-                    async with httpx.AsyncClient(proxy=PROXY) as session:
+                    async with httpx.AsyncClient() as session:
                         resp = await session.post(
                             "https://api.pcrdfans.com/x/v1/search",
                             headers=header,
