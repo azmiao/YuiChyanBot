@@ -28,7 +28,7 @@ class BaseSpider(abc.ABC):
     @classmethod
     async def get_response(cls):
         proxy:str = None if cls.src_name == "国服官网" else PROXY
-        async with httpx.AsyncClient(proxy=proxy) as session:
+        async with httpx.AsyncClient(proxy=proxy, verify=False) as session:
             resp = await session.get(cls.url, headers=cls.header, timeout=15)
         resp.raise_for_status()
         return resp
@@ -54,7 +54,7 @@ class BaseSpider(abc.ABC):
 
 
 class TwSpider(BaseSpider):
-    url = "http://www.princessconnect.so-net.tw/news"
+    url = "https://www.princessconnect.so-net.tw/news"
     src_name = "台服官网"
 
     @staticmethod
