@@ -10,7 +10,7 @@ async def set_que(bot, group_id: str, user_id: str, que_raw: str, ans_raw: str) 
 
     # 已有问答再次设置的话，就检测是否是唯一的问答，如果是就删除旧图片，防止删错别的群的相同问答
     ans_list = []
-    for _group_id in db:
+    for _group_id in db.keys():
         user_dict = db.get(_group_id, {})
         for _user_id in user_dict:
             # 有人问只找有人问的问题，我问只找我问的问题
