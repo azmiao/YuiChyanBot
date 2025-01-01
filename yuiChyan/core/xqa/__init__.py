@@ -46,7 +46,7 @@ async def set_question(bot, ev):
         raise FunctionException(ev, f'不可设置泛匹配问题哦')
 
     # 设置问答
-    msg = await set_que(bot, group_id, user_id, que_raw, ans_raw, str(ev.group_id))
+    msg = await set_que(bot, group_id, user_id, que_raw, ans_raw)
     await bot.send(ev, msg)
 
 
