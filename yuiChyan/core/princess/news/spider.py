@@ -21,7 +21,7 @@ class Item:
 class BaseSpider(abc.ABC):
     url = None
     src_name = None
-    header = {"Connection": "close"}
+    header = {}
     idx_cache = set()
     item_cache = []
 

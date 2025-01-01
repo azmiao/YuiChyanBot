@@ -3,9 +3,9 @@
 from yuiChyan.service import Service
 from .spider import *
 
-sv_tw = Service('pcr-news-tw')
-sv_bl = Service('pcr-news-bili')
-sv_jp = Service('pcr-news-jp')
+sv_tw = Service('pcr-news-tw', use_exclude=False)
+sv_bl = Service('pcr-news-bili', use_exclude=False)
+sv_jp = Service('pcr-news-jp', use_exclude=False)
 
 
 @sv_tw.on_match('PCR台服新闻')
@@ -36,10 +36,10 @@ async def tw_news_poller():
 
 @sv_bl.scheduled_job(minute='*/5')
 async def bili_news_poller():
-    # try:
-    await news_poller(BiliSpider(), sv_bl)
-    # except Exception as e:
-    #     sv_bl.logger.info(f'PCR国服官网新闻获取失败: {type(e)}, {str(e)}')
+    try:
+        await news_poller(BiliSpider(), sv_bl)
+    except Exception as e:
+        sv_bl.logger.info(f'PCR国服官网新闻获取失败: {type(e)}, {str(e)}')
 
 
 @sv_jp.scheduled_job(minute='*/5')
