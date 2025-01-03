@@ -732,7 +732,7 @@ async def _QueryArenaTextAsync(text: str, region: int, bot, ev):
     defense, unknown = chara_manager.parse_team(defense)
     if unknown:
         _, name, score = chara_manager.guess_id(unknown)
-        if score < 50 and not defense:
+        if score < 70 and not defense:
             return  # 忽略无关对话
         msg = f'无法识别"{unknown}"' if score < 50 else f'无法识别"{unknown}" 您说的有{score}%可能是{name}'
         await bot.send(ev, msg)
