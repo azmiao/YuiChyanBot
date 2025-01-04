@@ -122,37 +122,24 @@ class RegularTrigger(BaseTrigger):
         yuiChyan.logger.debug(f'成功添加 [正则匹配] 条件 [{x.pattern}]')
 
     def find_handler(self, event: CQEvent) -> Iterable['ServiceFunc']:
+        plain_text = str(event.message).strip()
+        normal_text = normalize_str(plain_text)
         for rex, sfs in self.regular_dict.items():
             for service_func in sfs:
-                text = event.normal_text
-                match = rex.search(text)
+                match = rex.search(normal_text)
                 if match:
                     event['match'] = match
                     yield service_func
 
 
-# 普通消息匹配
-class NormalTrigger(BaseTrigger):
-
-    def __init__(self):
-        super().__init__()
-
-    def find_handler(self, event: CQEvent):
-        plain_text = event.message.extract_plain_text().strip()
-        event.normal_text = normalize_str(plain_text)
-        return []
-
-
 # 四种基本匹配触发器
 prefix = PrefixTrigger()
 suffix = SuffixTrigger()
-normal = NormalTrigger()
 regular = RegularTrigger()
 
-# 匹配触发链 | 优先级：前缀 > 后缀 > 普通 > 正则
+# 匹配触发链 | 优先级：前缀 > 后缀 > 正则
 trigger_chain: List[BaseTrigger] = [
     prefix,
     suffix,
-    normal,
     regular
 ]
