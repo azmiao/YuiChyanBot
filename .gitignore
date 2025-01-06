@@ -9,3 +9,6 @@ __pycache__/
 *.npy
 yuiChyan/res/
 yuiChyan/plugins/
+yuiChyan/config/base_config.json5
+yuiChyan/core/princess/CHARA_NAME.json
+yuiChyan/core/princess/arena/pcr_config.json
