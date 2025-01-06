@@ -1,11 +1,7 @@
-import base64
 import json
 import mimetypes
 import os
-from io import BytesIO
-from urllib import request
 
-import httpx
 import websockets
 from PIL import Image
 from aiocqhttp import MessageSegment
@@ -14,7 +10,7 @@ from httpx import AsyncClient
 from yuiChyan import logger
 from yuiChyan.http_request import get_session_or_create, close_async_session
 from yuiChyan.resources import base_img_path
-from yuiChyan.util import FreqLimiter
+from yuiChyan.util import FreqLimiter, pic2b64
 from yuiChyan.util.parse import parse_single_image, save_image
 
 manga_path = os.path.join(base_img_path, 'manga')
@@ -53,10 +49,8 @@ async def create_image(img_path: str, mask_path: str) -> MessageSegment:
     old_image = Image.open(img_path).convert("RGBA")
     mask = Image.open(mask_path).convert("RGBA")
     old_image.paste(im=mask, mask=mask)
-    buf = BytesIO()
-    old_image.save(buf, format='PNG')
-    base64_str = base64.b64encode(buf.getvalue()).decode()
-    return MessageSegment.image(base64_str)
+    b_ = pic2b64(old_image)
+    return MessageSegment.image(b_)
 
 
 # 漫画翻译
