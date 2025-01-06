@@ -9,8 +9,10 @@ import httpx
 import websockets
 from PIL import Image
 from aiocqhttp import MessageSegment
+from httpx import AsyncClient
 
-from yuiChyan.config import PROXY
+from yuiChyan import logger
+from yuiChyan.http_request import get_session_or_create, close_async_session
 from yuiChyan.resources import base_img_path
 from yuiChyan.util import FreqLimiter
 from yuiChyan.util.parse import parse_single_image, save_image
@@ -79,14 +81,20 @@ async def manga_tran(img_name: str) -> MessageSegment:
     with open(img_path, 'rb') as f:
         data['file'] = (img_name, f.read(), mime_type)
     # 上传图片
-    async with httpx.AsyncClient(verify=False, timeout=httpx.Timeout(20, read=30)) as session:
-        upload_resp = await session.put(upload_url, files=data, headers=header)
+    session: AsyncClient = get_session_or_create(f'Manga-{img_name}', True)
+    upload_resp = await session.put(upload_url, files=data, headers=header)
     # 等待翻译完成
     id_ = upload_resp.json()['id']
+    logger.info(f'> 漫画翻译：当前漫画ID为 [{id_}]')
     wss_url = f'wss://api.cotrans.touhou.ai/task/{id_}/event/v1'
     mask_url = await receive_wss(wss_url, 180)
+    logger.info(f'> 漫画翻译：蒙板URL为 [{mask_url}]')
     # 保存蒙板
-    request.urlretrieve(url=mask_url, filename=mask_path)
+    async with session.stream('GET', mask_url, headers=header) as resp:
+        with open(mask_path, 'wb') as f:
+            f.write(await resp.aread())
+    # 关闭连接
+    await close_async_session(f'Manga-{img_name}', session)
     # 开始合成全新图片
     message = await create_image(img_path, mask_path)
     # 删除不需要的图片资源
