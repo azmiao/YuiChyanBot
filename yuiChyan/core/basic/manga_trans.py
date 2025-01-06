@@ -10,6 +10,7 @@ import websockets
 from PIL import Image
 from aiocqhttp import MessageSegment
 
+from yuiChyan.config import PROXY
 from yuiChyan.resources import base_img_path
 from yuiChyan.util import FreqLimiter
 from yuiChyan.util.parse import parse_single_image, save_image
@@ -78,12 +79,12 @@ async def manga_tran(img_name: str) -> MessageSegment:
     with open(img_path, 'rb') as f:
         data['file'] = (img_name, f.read(), mime_type)
     # 上传图片
-    async with httpx.AsyncClient() as session:
+    async with httpx.AsyncClient(proxy=PROXY, verify=False) as session:
         upload_resp = await session.put(upload_url, files=data, headers=header)
     # 等待翻译完成
     id_ = upload_resp.json()['id']
     wss_url = f'wss://api.cotrans.touhou.ai/task/{id_}/event/v1'
-    mask_url = await receive_wss(wss_url, 60)
+    mask_url = await receive_wss(wss_url, 180)
     # 保存蒙板
     request.urlretrieve(url=mask_url, filename=mask_path)
     # 开始合成全新图片
