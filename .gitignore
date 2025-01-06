@@ -1,6 +1,7 @@
 
 __pycache__/
 .idea/
+*.pyc
 *.json
 *.json5
 *.sqlite
