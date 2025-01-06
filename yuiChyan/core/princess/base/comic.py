@@ -9,6 +9,8 @@ from yuiChyan import FunctionException
 from yuiChyan.http_request import get_session_or_create, close_async_session
 from ..util import *
 
+sv_comic = Service('pcr-comic', use_exclude=False)
+
 
 # 图片名称
 def get_pic_name(id_):
@@ -54,7 +56,7 @@ async def download_comic(session: AsyncClient, id_: str):
         json.dump(index, f, ensure_ascii=False)
 
 
-@sv.on_prefix('PCR官漫')
+@sv_comic.on_prefix('PCR官漫')
 async def comic(bot, ev):
     episode = str(ev.message).strip()
     if not re.fullmatch(r'\d{0,4}', episode):
@@ -78,7 +80,7 @@ async def comic(bot, ev):
 
 
 # 定时任务
-@sv.scheduled_job(minute='*/30', second='15')
+@sv_comic.scheduled_job(minute='*/30', second='15')
 async def update_manga():
     session: AsyncClient = get_session_or_create('PcrComic', True)
     # 获取最新漫画信息
