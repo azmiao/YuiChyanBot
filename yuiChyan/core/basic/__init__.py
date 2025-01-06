@@ -54,7 +54,7 @@ async def manga_translate(bot, ev):
         raise CommandErrorException(ev, '> 文字识别指令错误! \n示例：漫画翻译 {图片}，注意{图片}换成自己实际需要的图片')
     # 保存图片
     img_name = await parse_and_save_image(ev, img_text)
-    await bot.send(ev, '> 已收到翻译非常慢，请耐心等待')
+    await bot.send(ev, '> 已收到图片，翻译非常慢，请耐心等待')
     try:
         msg = await manga_tran(img_name)
         await bot.send(ev, msg)

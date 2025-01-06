@@ -21,6 +21,7 @@ os.makedirs(manga_path, exist_ok=True)
 # 解析并保存
 async def parse_and_save_image(ev, str_raw: str) -> str:
     image_file, image_file_name, image_url = await parse_single_image(ev, str_raw)
+    image_file_name = image_file_name.replace('.image', '.png')
     image_path = os.path.join(manga_path, image_file_name)
     # 保存
     return await save_image(ev, image_file, image_file_name, image_url, image_path)
@@ -86,4 +87,8 @@ async def manga_tran(img_name: str) -> MessageSegment:
     # 保存蒙板
     request.urlretrieve(url=mask_url, filename=mask_path)
     # 开始合成全新图片
-    return await create_image(img_path, mask_path)
+    message = await create_image(img_path, mask_path)
+    # 删除不需要的图片资源
+    os.remove(img_path)
+    os.remove(mask_path)
+    return message
