@@ -79,7 +79,7 @@ async def manga_tran(img_name: str) -> MessageSegment:
     with open(img_path, 'rb') as f:
         data['file'] = (img_name, f.read(), mime_type)
     # 上传图片
-    async with httpx.AsyncClient(proxy=PROXY, verify=False) as session:
+    async with httpx.AsyncClient(verify=False, timeout=httpx.Timeout(20, read=30)) as session:
         upload_resp = await session.put(upload_url, files=data, headers=header)
     # 等待翻译完成
     id_ = upload_resp.json()['id']
