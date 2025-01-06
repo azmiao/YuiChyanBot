@@ -66,6 +66,7 @@ class Service:
         self.need_auth = need_auth
         self.help_cmd = help_cmd
         self.help_at = help_at
+        self.task_lock = asyncio.Lock()
 
         # sv实际的实例所在文件路径
         self.file_path: Optional[str] = None
@@ -380,23 +381,26 @@ class Service:
             @functools.wraps(func)
             @exception_handler
             async def wrapper():
-                # 如果压根没有群启用了就直接跳过
-                group_self_dict = await self.get_enable_groups()
-                if not group_self_dict:
-                    self.logger.info(f'> 定时任务 {func.__name__} 已在所有群禁用，将跳过执行')
-                    return
-                if not silence:
-                    self.logger.info(f'> 定时任务 {func.__name__} 开始运行...')
-                ret = await func()
-                if not silence:
-                    self.logger.info(f'> 定时任务 {func.__name__} 执行完成！')
-                return ret
+                # 异步锁 | 定时任务一个一个执行
+                async with self.task_lock:
+                    # 如果压根没有群启用了就直接跳过
+                    group_self_dict = await self.get_enable_groups()
+                    if not group_self_dict:
+                        self.logger.info(f'> 定时任务 {func.__name__} 已在所有群禁用，将跳过执行')
+                        return
+                    if not silence:
+                        self.logger.info(f'> 定时任务 {func.__name__} 开始运行...')
+                    ret = await func()
+                    if not silence:
+                        self.logger.info(f'> 定时任务 {func.__name__} 执行完成！')
+                    return ret
 
             # 使用 YuiChyanBot 生成的全局唯一计时器添加任务
             nonebot.scheduler.add_job(
                 wrapper,
                 CronTrigger(**kwargs),
                 id=f'{self.name}_{func.__name__}_job',
+                misfire_grace_time=300,
                 replace_existing=True
             )
 
