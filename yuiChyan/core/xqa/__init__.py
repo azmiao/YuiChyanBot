@@ -153,7 +153,7 @@ async def delete_question(bot, ev):
     msg, del_image = await del_que(group_id, user_id, no_que_str, True, get_user_permission(ev) < ADMIN)
     await bot.send(ev, msg)
     # 删除图片
-    await delete_img(del_image)
+    delete_img(del_image)
 
 
 # 回复问答
