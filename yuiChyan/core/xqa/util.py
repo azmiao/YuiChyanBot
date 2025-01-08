@@ -205,7 +205,7 @@ async def match_ans(info: dict, message: str, ans: str) -> str:
 
 
 # 删啊删
-async def delete_img(list_raw: list):
+def delete_img(list_raw: list):
     for str_raw in list_raw:
         # 这里理论上是已经规范好了的图片 | file参数就直接是路径或者base64
         cq_list = re.findall(r'(\[CQ:(\S+?),(\S+?)])', str_raw)

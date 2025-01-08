@@ -22,7 +22,7 @@ async def set_que(bot, group_id: str, user_id: str, que_raw: str, ans_raw: str) 
             if que_raw in que_dict:
                 ans_list.append(que_dict.get(que_raw, []))
     if ans_list and len(ans_list) == 1:
-        await delete_img(ans_list[0])
+        delete_img(ans_list[0])
 
     # 保存新的回答
     ans_raw = await adjust_img(ans_raw, True, True)
