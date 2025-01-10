@@ -1,10 +1,11 @@
+import httpx
 from nonebot import on_notice, NoticeSession
 
 from yuiChyan import LakePermissionException, CommandErrorException, FunctionException
 from yuiChyan.config import NICKNAME
 from yuiChyan.permission import check_permission, ADMIN
 from yuiChyan.service import Service
-from yuiChyan.util import translate, DailyNumberLimiter
+from yuiChyan.util import translate, DailyNumberLimiter, filter_message
 from .create_info import *
 from .group_gacha import *
 from .manga_trans import *
@@ -233,3 +234,41 @@ async def query_dice(bot, ev):
     else:
         msg = f'掷骰子{times}次的结果是：\n{results_str}={total}'
     await bot.send(ev, msg, at_sender=True)
+
+
+@sv.on_match('我好了')
+async def are_you_ok(bot, ev):
+    await bot.send(ev, '不许好，憋回去！')
+
+
+@sv.on_suffix('是啥', only_to_me=True)
+async def what_to_say(bot, ev):
+    text = str(ev.message).strip()
+    if not text:
+        return
+
+    async with httpx.AsyncClient() as session:
+        response = await session.post(
+            'https://lab.magiconch.com/api/nbnhhsh/guess',
+            data={'text': text},
+            timeout=5,
+            headers={'content-type': 'application/json'},
+        )
+    data = list(response.json())
+    if not data:
+        await bot.send(ev, f'{NICKNAME}也不知道 [{text}] 是啥呢~')
+        return
+
+    msg_list = []
+    for translated in data:
+        name = translated.get('name')
+        trans_list = translated.get('trans', [])
+        msg = f'> [{name}] 可能的翻译为：\n' + '\n'.join(trans_list)
+        msg_list.append(msg)
+
+    msg_result = '\n'.join(msg_list).strip()
+    if not msg_result:
+        await bot.send(ev, f'{NICKNAME}也不知道 [{text}] 是啥呢~')
+        return
+
+    await bot.send(ev, filter_message(msg_result))
