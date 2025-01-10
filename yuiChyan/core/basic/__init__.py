@@ -247,10 +247,10 @@ async def what_to_say(bot, ev):
     if not text:
         return
 
-    async with httpx.AsyncClient() as session:
+    async with httpx.AsyncClient(verify=False) as session:
         response = await session.post(
             'https://lab.magiconch.com/api/nbnhhsh/guess',
-            data={'text': text},
+            json={'text': text},
             timeout=5,
             headers={'content-type': 'application/json'},
         )
