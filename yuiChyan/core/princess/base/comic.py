@@ -28,7 +28,7 @@ async def download_comic(session: AsyncClient, id_: str):
     url = base + id_
     resp = await session.get(url)
     if 200 != resp.status_code:
-        sv.logger.error(f'PCR官方漫画: 详细信息获取失败，URL={url}')
+        sv_comic.logger.error(f'PCR官方漫画: 详细信息获取失败，URL={url}')
         return
     data = resp.json()
     data = data[0]
@@ -38,17 +38,17 @@ async def download_comic(session: AsyncClient, id_: str):
     link = data['cartoon']
     index[episode] = {'title': title, 'link': link}
 
-    sv.logger.info(f'PCR官方漫画: 图片URL={link}')
+    sv_comic.logger.info(f'PCR官方漫画: 图片URL={link}')
     async with session.stream('GET', link) as resp:
         if 200 != resp.status_code:
-            sv.logger.error(f'PCR官方漫画: 图片下载失败，{resp.text}')
+            sv_comic.logger.error(f'PCR官方漫画: 图片下载失败，{resp.text}')
             return
         if re.search(r'image', resp.headers['content-type'], re.I):
             pic_name = get_pic_name(episode)
             save_path = os.path.join(comic_path, pic_name)
             with open(save_path, 'wb') as f:
                 f.write(await resp.aread())
-            sv.logger.info(f'PCR官方漫画: 图片 [{pic_name}] 已保存')
+            sv_comic.logger.info(f'PCR官方漫画: 图片 [{pic_name}] 已保存')
 
     # 保存官漫目录信息
     with open(os.path.join(comic_path, 'index.json'), 'w', encoding='utf8') as f:
