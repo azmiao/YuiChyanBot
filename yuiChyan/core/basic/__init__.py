@@ -271,4 +271,4 @@ async def what_to_say(bot, ev):
         await bot.send(ev, f'{NICKNAME}也不知道 [{text}] 是啥呢~')
         return
 
-    await bot.send(ev, filter_message(msg_result))
+    await bot.send(ev, await filter_message(msg_result))
