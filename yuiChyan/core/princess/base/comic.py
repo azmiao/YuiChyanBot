@@ -90,7 +90,7 @@ async def update_manga():
             timeout=15
         )
     except:
-        sv.logger.info(f'PCR官方漫画: 网站连接失败，将于下次定时任务尝试')
+        sv_comic.logger.info(f'PCR官方漫画: 网站连接失败，将于下次定时任务尝试')
         return
     data = resp.json()
     id_ = data['latest_cartoon']['id']
@@ -107,11 +107,11 @@ async def update_manga():
         qs = urlparse(index.get(episode, {}).get('link', '')).query
         old_id = parse_qs(qs)['id'][0]
         if id_ == old_id:
-            sv.logger.info(f'PCR官方漫画: 未检测到更新')
+            sv_comic.logger.info(f'PCR官方漫画: 未检测到更新')
             return
 
     # 确定已有更新，下载图片
-    sv.logger.info(f'PCR官方漫画: 发现更新 [{id_}]')
+    sv_comic.logger.info(f'PCR官方漫画: 发现更新 [{id_}]')
     await download_comic(session, id_)
 
     # 关闭会话
@@ -122,4 +122,4 @@ async def update_manga():
     pic_path = os.path.abspath(os.path.join(comic_path, pic_name))
     image = MessageSegment.image(f'file:///{pic_path}')
     msg = f'检测到PCR官方漫画更新！\n第{episode}话 {title}\n{image}'
-    await sv.broadcast(msg, 'PCR官方漫画', 1)
+    await sv_comic.broadcast(msg, 'PCR官方漫画', 1)
