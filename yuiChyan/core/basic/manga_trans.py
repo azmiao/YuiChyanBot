@@ -3,13 +3,12 @@ import json
 import mimetypes
 import os
 
+import httpx
 import websockets
 from PIL import Image
 from aiocqhttp import MessageSegment
-from httpx import AsyncClient
 
 from yuiChyan import logger, CQEvent, FunctionException
-from yuiChyan.http_request import get_session_or_create, close_async_session
 from yuiChyan.resources import base_img_path
 from yuiChyan.util import pic2b64
 from yuiChyan.util.parse import parse_single_image, save_image
@@ -19,7 +18,6 @@ os.makedirs(manga_path, exist_ok=True)
 header = {
     'Origin': 'https://cotrans.touhou.ai',
     'Referer': 'https://cotrans.touhou.ai',
-    'host': 'api.cotrans.touhou.ai',
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
                   'Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0'
 }
@@ -51,7 +49,7 @@ async def receive_wss(ev: CQEvent, wss_url: str, timeout: int) -> str:
 
 
 # 生成结果图片
-async def create_image(img_path: str, mask_path: str) -> MessageSegment:
+def create_image(img_path: str, mask_path: str) -> MessageSegment:
     old_image = Image.open(img_path).convert("RGBA")
     mask = Image.open(mask_path).convert("RGBA")
     old_image.paste(im=mask, mask=mask)
@@ -75,29 +73,30 @@ async def manga_tran(ev: CQEvent, img_name: str) -> MessageSegment:
     }
     with open(img_path, 'rb') as f:
         data['file'] = (img_name, f.read(), mime_type)
-    # 上传图片
-    session: AsyncClient = get_session_or_create(f'Manga-{img_name}', True)
-    upload_resp = await session.put(upload_url, files=data, headers=header)
+    # 异步上传图片
+    async with httpx.AsyncClient(verify=False, timeout=httpx.Timeout(10, read=15)) as async_session:
+        upload_resp = await async_session.put(upload_url, files=data, headers=header)
     # 等待翻译完成
     try:
         id_ = upload_resp.json()['id']
     except:
         raise FunctionException(ev, f'上传图片失败，原始返回数据：{upload_resp.json()}')
 
+    # 异步WS获取蒙版URL
     logger.info(f'> 漫画翻译：当前漫画ID为 [{id_}]')
     wss_url = f'wss://api.cotrans.touhou.ai/task/{id_}/event/v1'
     mask_url = await receive_wss(ev, wss_url, 180)
 
+    # 同步保存蒙板
     logger.info(f'> 漫画翻译：蒙板URL为 [{mask_url}]')
-    # 保存蒙板
-    async with session.stream('GET', mask_url, headers=header) as resp:
-        with open(mask_path, 'wb') as f:
-            f.write(await resp.aread())
-    # 关闭连接
-    await close_async_session(f'Manga-{img_name}', session)
+    with httpx.Client(verify=False, timeout=httpx.Timeout(10, read=15)) as session:
+        with session.stream('GET', mask_url, headers=header) as resp:
+            with open(mask_path, 'wb') as f:
+                f.write(resp.read())
+
     # 开始合成全新图片
-    message = await create_image(img_path, mask_path)
+    message = create_image(img_path, mask_path)
     # 删除不需要的图片资源
-    os.remove(img_path)
-    os.remove(mask_path)
+    os.unlink(img_path)
+    os.unlink(mask_path)
     return message
