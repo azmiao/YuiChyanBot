@@ -1,3 +1,4 @@
+import asyncio
 import json
 import mimetypes
 import os
@@ -7,15 +8,21 @@ from PIL import Image
 from aiocqhttp import MessageSegment
 from httpx import AsyncClient
 
-from yuiChyan import logger
+from yuiChyan import logger, CQEvent, FunctionException
 from yuiChyan.http_request import get_session_or_create, close_async_session
 from yuiChyan.resources import base_img_path
-from yuiChyan.util import FreqLimiter, pic2b64
+from yuiChyan.util import pic2b64
 from yuiChyan.util.parse import parse_single_image, save_image
 
 manga_path = os.path.join(base_img_path, 'manga')
 os.makedirs(manga_path, exist_ok=True)
-
+header = {
+    'Origin': 'https://cotrans.touhou.ai',
+    'Referer': 'https://cotrans.touhou.ai',
+    'host': 'api.cotrans.touhou.ai',
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
+                  'Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0'
+}
 
 # 解析并保存
 async def parse_and_save_image(ev, str_raw: str) -> str:
@@ -27,21 +34,20 @@ async def parse_and_save_image(ev, str_raw: str) -> str:
 
 
 # 接收WS数据
-async def receive_wss(wss_url: str, timeout: int) -> str:
-    mask_url = ''
-    lmt = FreqLimiter(timeout)
-    lmt.start_cd(wss_url)
-    async with websockets.connect(wss_url) as ws:
+async def receive_wss(ev: CQEvent, wss_url: str, timeout: int) -> str:
+    cycle_time = 0
+    async with websockets.connect(wss_url, additional_headers=header, max_size=2**20*10) as ws:
         while True:
-            if lmt.check(wss_url):
-                return mask_url
+            await asyncio.sleep(1)
+            cycle_time += 1
+            if cycle_time >= timeout:
+                raise FunctionException(ev, 'WS获取漫画蒙版超时')
             recv = await ws.recv()
             json_dump = json.loads(recv)
             result = json_dump.get('result', {})
             if result:
                 mask_url = result.get('translation_mask', '')
-                break
-    return mask_url
+                return mask_url
 
 
 # 生成结果图片
@@ -54,22 +60,17 @@ async def create_image(img_path: str, mask_path: str) -> MessageSegment:
 
 
 # 漫画翻译
-async def manga_tran(img_name: str) -> MessageSegment:
+async def manga_tran(ev: CQEvent, img_name: str) -> MessageSegment:
     img_path = os.path.join(manga_path, img_name)
     mask_path = os.path.join(manga_path, f'MASK_{img_name}.png')
     mime_type, _ = mimetypes.guess_type(img_name)
     upload_url = 'https://api.cotrans.touhou.ai/task/upload/v1'
-    header = {
-        'Origin': 'https://cotrans.touhou.ai',
-        'Referer': 'https://cotrans.touhou.ai',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
-                      'Chrome/130.0.0.0 Safari/537.36 Edg/130.0.0.0'}
     data = {
         'mime': (None, mime_type, None),
         'target_language': (None, 'CHS', None),
         'detector': (None, 'default', None),
         'direction': (None, 'default', None),
-        'translator': (None, 'youdao', None),
+        'translator': (None, 'offline', None),
         'size': (None, 'L', None)
     }
     with open(img_path, 'rb') as f:
@@ -78,10 +79,15 @@ async def manga_tran(img_name: str) -> MessageSegment:
     session: AsyncClient = get_session_or_create(f'Manga-{img_name}', True)
     upload_resp = await session.put(upload_url, files=data, headers=header)
     # 等待翻译完成
-    id_ = upload_resp.json()['id']
+    try:
+        id_ = upload_resp.json()['id']
+    except:
+        raise FunctionException(ev, f'上传图片失败，原始返回数据：{upload_resp.json()}')
+
     logger.info(f'> 漫画翻译：当前漫画ID为 [{id_}]')
     wss_url = f'wss://api.cotrans.touhou.ai/task/{id_}/event/v1'
-    mask_url = await receive_wss(wss_url, 180)
+    mask_url = await receive_wss(ev, wss_url, 180)
+
     logger.info(f'> 漫画翻译：蒙板URL为 [{mask_url}]')
     # 保存蒙板
     async with session.stream('GET', mask_url, headers=header) as resp:

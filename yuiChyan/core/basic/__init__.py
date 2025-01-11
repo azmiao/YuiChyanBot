@@ -1,7 +1,7 @@
 import httpx
 from nonebot import on_notice, NoticeSession
 
-from yuiChyan import LakePermissionException, CommandErrorException, FunctionException
+from yuiChyan import LakePermissionException, CommandErrorException
 from yuiChyan.config import NICKNAME
 from yuiChyan.permission import check_permission, ADMIN
 from yuiChyan.service import Service
@@ -56,11 +56,8 @@ async def manga_translate(bot, ev):
     # 保存图片
     img_name = await parse_and_save_image(ev, img_text)
     await bot.send(ev, '> 已收到图片，翻译非常慢，请耐心等待')
-    try:
-        msg = await manga_tran(img_name)
-        await bot.send(ev, msg)
-    except Exception as e:
-        raise FunctionException(ev, f'漫画 [{img_name}] 翻译出错，请联系维护组：{str(e)}')
+    msg = await manga_tran(ev, img_name)
+    await bot.send(ev, msg)
 
 
 # 生成消息
