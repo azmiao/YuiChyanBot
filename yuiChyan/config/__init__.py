@@ -12,14 +12,22 @@ HOST: str = _data.get('HOST', '127.0.0.1')
 PORT: int = _data.get('PORT', 2333)
 DEBUG: bool = _data.get('DEBUG', False)
 SUPERUSERS: List[int] = _data.get('SUPERUSERS', [])
-NICKNAME: str = _data.get('NICKNAME', '')
+NICKNAME: str = _data.get('NICKNAME', '优衣酱')
 PUBLIC_PROTOCOL: str = _data.get('PUBLIC_PROTOCOL', 'http')
-PUBLIC_DOMAIN: Optional[str] = _data.get('PUBLIC_DOMAIN')
+PUBLIC_DOMAIN: Optional[str] = _data.get('PUBLIC_DOMAIN', None)
 PROXY: Optional[str] = _data.get('PROXY', None)
-CORE_PLUGINS: Dict[str, str] = _data.get('CORE_PLUGINS', {})
-EXTRA_PLUGINS: Dict[str, str] = _data.get('EXTRA_PLUGINS', {})
 
-# 授权管理系统
+# 核心插件
+with open(os.path.join(os.path.dirname(__file__), 'core_plugins.json5'), 'r', encoding='utf-8') as _config:
+    _data = json5.load(_config)
+CORE_PLUGINS: Dict[str, str] = _data
+
+# 额外插件
+with open(os.path.join(os.path.dirname(__file__), 'extra_plugins.json5'), 'r', encoding='utf-8') as _config:
+    _data = json5.load(_config)
+EXTRA_PLUGINS: Dict[str, str] = _data
+
+# 授权管理配置
 with open(os.path.join(os.path.dirname(__file__), 'auth_config.json5'), 'r', encoding='utf-8') as _config:
     _data = json5.load(_config)
 ENABLE_AUTH: bool = _data.get('ENABLE_AUTH', True)
@@ -27,7 +35,7 @@ REMIND_BEFORE_EXPIRED: int = _data.get('REMIND_BEFORE_EXPIRED', 3)
 GROUPS_IN_PAGE: int = _data.get('GROUPS_IN_PAGE', 5)
 GROUP_LEAVE_MSG: str = _data.get('GROUP_LEAVE_MSG', '管理员操作')
 
-# XQA
+# XQA配置
 with open(os.path.join(os.path.dirname(__file__), 'xqa_config.json5'), 'r', encoding='utf-8') as _config:
     _data = json5.load(_config)
 IS_SPILT_MSG: bool = _data.get('IS_SPILT_MSG', True)
