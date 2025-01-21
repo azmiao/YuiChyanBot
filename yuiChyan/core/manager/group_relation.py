@@ -58,7 +58,7 @@ async def group_welcome(session: NoticeSession):
         case _:
             sex_info = '已隐藏'
 
-    msg = f'> 欢迎新大佬入群！\n昵称：{name}\nQQ：{ev.user_id}\n性别：{sex_info}\n\n> 我是{NICKNAME}~\n发送"菜单"可以查看功能列表哦'
+    msg = f'\n> 欢迎新大佬入群！\n昵称：{name}\nQQ：{ev.user_id}\n性别：{sex_info}\n\n> 我是{NICKNAME}~\n发送"菜单"可以查看功能列表哦'
     await session.send(msg, at_sender=True)
 
 

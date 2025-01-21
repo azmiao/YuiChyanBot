@@ -33,7 +33,7 @@ required_ranges = {
 
 
 # 确认状态
-async def check_status(gid: str, ev: CQEvent, need_on: bool = True) -> dict:
+async def check_status(gid: int, ev: CQEvent, need_on: bool = True) -> dict:
     air_cons = get_group_air_con()
     if gid not in air_cons:
         raise FunctionException(ev, '空调还没装哦~发送“开空调”安装空调')

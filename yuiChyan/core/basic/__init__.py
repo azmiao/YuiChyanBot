@@ -1,21 +1,21 @@
-import httpx
 from nonebot import on_notice, NoticeSession
 
-from yuiChyan import LakePermissionException, CommandErrorException
+from yuiChyan import LakePermissionException, CommandErrorException, YuiChyan
 from yuiChyan.config import NICKNAME
 from yuiChyan.permission import check_permission, ADMIN
 from yuiChyan.service import Service
-from yuiChyan.util import translate, DailyNumberLimiter, filter_message
+from yuiChyan.util import translate, DailyNumberLimiter, filter_message, FreqLimiter
 from .create_info import *
 from .group_gacha import *
 from .manga_trans import *
+from ...util.parse import get_real_url
 
 sv = Service('base_func', help_cmd='基础功能帮助')
 
 
 # 翻译
 @sv.on_prefix('翻译', only_to_me=True)
-async def translate_text(bot, ev):
+async def translate_text(bot: YuiChyan, ev: CQEvent):
     messages = str(ev.message).strip()
     text_list = messages.split(' ', 2)
     try:
@@ -32,24 +32,20 @@ async def translate_text(bot, ev):
 
 # 文字识别
 @sv.on_prefix(('文字识别', 'ocr'), only_to_me=True)
-async def get_ocr(bot, ev):
-    img_text = str(ev.message)
+async def get_ocr(bot: YuiChyan, ev: CQEvent):
+    img_text = str(ev.message).strip()
     if not img_text.startswith('[CQ:image,file='):
         raise CommandErrorException(ev, '> 文字识别指令错误! \n示例：文字识别 {图片}，注意{图片}换成自己实际需要的图片')
-    user_id = ev.user_id
-    img_id_tmp = re.findall(r'CQ:image,file=.+?\.image', img_text)
-    img_id = img_id_tmp[0].replace('CQ:image,file=', '')
-    data = await bot.ocr_image(image=img_id)
-    text_list = list(data['texts'])
-    msg = f'[CQ:at,qq={user_id}]\n'
-    for text_info in text_list:
-        msg = msg + ' | ' + text_info['text']
-    await bot.send(ev, msg)
+    image_file, _, _ = await parse_single_image(ev, img_text)
+    data = await bot.ocr_image(image=image_file)
+    text_list = data.get('texts', [])
+    msg = ' | '.join([x.get('text', '') for x in text_list])
+    await bot.send(ev, msg, at_sender=True)
 
 
 # 漫画翻译
 @sv.on_prefix('漫画翻译', only_to_me=True)
-async def manga_translate(bot, ev):
+async def manga_translate(bot: YuiChyan, ev: CQEvent):
     img_text = str(ev.message)
     if not img_text.startswith('[CQ:image,'):
         raise CommandErrorException(ev, '> 文字识别指令错误! \n示例：漫画翻译 {图片}，注意{图片}换成自己实际需要的图片')
@@ -62,7 +58,7 @@ async def manga_translate(bot, ev):
 
 # 生成消息
 @sv.on_prefix('生成消息', only_to_me=True)
-async def create_msg(bot, ev):
+async def create_msg(bot: YuiChyan, ev: CQEvent):
     group_id = ev.group_id
     all_text = str(ev.message)
     try:
@@ -81,7 +77,7 @@ async def create_msg(bot, ev):
 
 # 生成陌生消息
 @sv.on_prefix('生成陌生消息', only_to_me=True)
-async def create_msg(bot, ev):
+async def create_msg(bot: YuiChyan, ev: CQEvent):
     group_id = ev.group_id
     all_text = str(ev.message)
     try:
@@ -98,7 +94,7 @@ async def create_msg(bot, ev):
 
 # 帮助选择器
 @sv.on_prefix('选择', only_to_me=True)
-async def make_choice(bot, ev):
+async def make_choice(bot: YuiChyan, ev: CQEvent):
     all_text = str(ev.message).strip()
     if '还是' not in all_text:
         return
@@ -113,7 +109,7 @@ async def make_choice(bot, ev):
 
 # 创建抽奖
 @sv.on_prefix('创建抽奖')
-async def create_gacha(bot, ev):
+async def create_gacha(bot: YuiChyan, ev: CQEvent):
     if not check_permission(ev, ADMIN):
         raise LakePermissionException(ev, '创建抽奖仅限群管理员哦~')
     all_text = str(ev.message).strip()
@@ -132,7 +128,7 @@ async def create_gacha(bot, ev):
 
 # 结束抽奖
 @sv.on_prefix('结束抽奖')
-async def finish_gacha(bot, ev):
+async def finish_gacha(bot: YuiChyan, ev: CQEvent):
     if not check_permission(ev, ADMIN):
         raise LakePermissionException(ev, '结束抽奖仅限群管理员哦~')
     all_text = str(ev.message).strip()
@@ -144,21 +140,21 @@ async def finish_gacha(bot, ev):
 
 # 参与抽奖
 @sv.on_match(('参与抽奖', '参加抽奖'))
-async def join_gacha(bot, ev):
+async def join_gacha(bot: YuiChyan, ev: CQEvent):
     msg = await join_group_gacha(str(ev.group_id), int(ev.user_id))
     await bot.send(ev, msg)
 
 
 # 查询抽奖
 @sv.on_match('查询抽奖')
-async def query_gacha(bot, ev):
+async def query_gacha(bot: YuiChyan, ev: CQEvent):
     msg = await query_group_gacha(str(ev.group_id))
     await bot.send(ev, msg)
 
 
 # 让 YuiChyan 戳戳你
 @sv.on_match(('戳一戳我', '戳戳我'), only_to_me=True)
-async def send_point(bot, ev):
+async def send_point(bot: YuiChyan, ev: CQEvent):
     await bot.send(ev, f'[CQ:poke,qq={int(ev.user_id)}]')
 
 
@@ -207,7 +203,7 @@ async def poke_back(session: NoticeSession):
 
 # 掷骰子
 @sv.on_rex(r'掷骰子 ?(\d{1,3})d(\d{1,3})')
-async def query_dice(bot, ev):
+async def query_dice(bot: YuiChyan, ev: CQEvent):
     # 次数和面数
     times, ranges = int(ev['match'].group(1)), int(ev['match'].group(2))
 
@@ -234,12 +230,12 @@ async def query_dice(bot, ev):
 
 
 @sv.on_match('我好了')
-async def are_you_ok(bot, ev):
+async def are_you_ok(bot: YuiChyan, ev: CQEvent):
     await bot.send(ev, '不许好，憋回去！')
 
 
 @sv.on_suffix('是啥', only_to_me=True)
-async def what_to_say(bot, ev):
+async def what_to_say(bot: YuiChyan, ev: CQEvent):
     text = str(ev.message).strip()
     if not text:
         return
@@ -269,3 +265,49 @@ async def what_to_say(bot, ev):
         return
 
     await bot.send(ev, await filter_message(msg_result))
+
+
+@sv.on_prefix('获取b站封面')
+async def query_bili_cover(bot: YuiChyan, ev: CQEvent):
+    text = str(ev.message).strip()
+    if not text:
+        return
+
+    async with httpx.AsyncClient(verify=False) as session:
+        response = await session.get(
+            f'https://v2.alapi.cn/api/bbcover?token=LwExDtUWhF3rH5ib&c={text}',
+            timeout=5,
+            headers={'content-type': 'application/json'},
+        )
+    data = response.json()
+
+    if data.get('code', 0) != 200:
+        await bot.send(ev, f'获取b站封面请求失败：{data.get("msg", "")}')
+        return
+
+    cover_url = data.get('data', {}).get('cover', '')
+    await bot.send(ev, f'\n> 您查询的b站封面URL为：\n{cover_url}', at_sender=True)
+
+
+@sv.on_prefix('解析二维码')
+async def parse_qrcode(bot: YuiChyan, ev: CQEvent):
+    img_text = str(ev.message).strip()
+    if not img_text.startswith('[CQ:image,'):
+        raise CommandErrorException(ev, '> 解析二维码识别错误! \n示例：解析二维码 {图片}，注意{图片}换成自己实际需要的图片')
+    image_file, image_file_name, image_url =  await parse_single_image(ev, img_text)
+    image_url = image_url if image_url else await get_real_url(ev, image_file)
+
+    async with httpx.AsyncClient(verify=False) as session:
+        response = await session.get(
+            f'https://api.uomg.com/api/qr.encode?url={image_url}',
+            timeout=5,
+            headers={'content-type': 'application/json'},
+        )
+    data = response.json()
+
+    if data.get('code', 0) != 1:
+        await bot.send(ev, f'解析二维码请求失败：CODE={data.get("code", 0)}')
+        return
+
+    qrcode_url = data.get('qrurl', '')
+    await bot.send(ev, f'\n> 您的二维码解析结果URL为：\n{qrcode_url}', at_sender=True)
