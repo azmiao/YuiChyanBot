@@ -275,14 +275,14 @@ async def query_bili_cover(bot: YuiChyan, ev: CQEvent):
 
     async with httpx.AsyncClient(verify=False) as session:
         response = await session.get(
-            f'https://v2.alapi.cn/api/bbcover?token=LwExDtUWhF3rH5ib&c={text}',
+            f'https://v3.alapi.cn/api/bilibili/cover?token=8OPxedOvkHqLqKQb&c={text}',
             timeout=5,
             headers={'content-type': 'application/json'},
         )
     data = response.json()
 
     if data.get('code', 0) != 200:
-        await bot.send(ev, f'获取b站封面请求失败：{data.get("msg", "")}')
+        await bot.send(ev, f'获取b站封面请求失败：{data.get("message", "")}')
         return
 
     cover_url = data.get('data', {}).get('cover', '')
@@ -296,6 +296,7 @@ async def parse_qrcode(bot: YuiChyan, ev: CQEvent):
         raise CommandErrorException(ev, '> 解析二维码识别错误! \n示例：解析二维码 {图片}，注意{图片}换成自己实际需要的图片')
     image_file, image_file_name, image_url =  await parse_single_image(ev, img_text)
     image_url = image_url if image_url else await get_real_url(ev, image_file)
+    sv.logger.info(f'> 二维码图片URL={image_url}')
 
     async with httpx.AsyncClient(verify=False) as session:
         response = await session.get(
