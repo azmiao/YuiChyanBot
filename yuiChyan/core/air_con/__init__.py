@@ -13,10 +13,10 @@ air_cons = get_group_air_con()
 
 @sv.on_match('开空调')
 async def air_con_on(bot: YuiChyan, ev: CQEvent):
-    gid = ev.group_id
+    gid = str(ev.group_id)
 
     if gid not in air_cons:
-        g_info = await bot.get_group_info(group_id=gid)
+        g_info = await bot.get_group_info(group_id=ev.group_id)
         g_count = g_info['member_count']
         air_con = new_air_con(num_member=g_count)
         air_cons[gid] = air_con
@@ -36,7 +36,7 @@ async def air_con_on(bot: YuiChyan, ev: CQEvent):
 
 @sv.on_match('关空调')
 async def air_con_off(bot: YuiChyan, ev: CQEvent):
-    gid = ev.group_id
+    gid = str(ev.group_id)
 
     air_con = await check_status(gid, ev)
     if air_con is None:
@@ -51,7 +51,7 @@ async def air_con_off(bot: YuiChyan, ev: CQEvent):
 
 @sv.on_match('当前温度')
 async def air_con_now(bot: YuiChyan, ev: CQEvent):
-    gid = ev.group_id
+    gid = str(ev.group_id)
 
     air_con = await check_status(gid, ev, need_on=False)
     if air_con is None:
@@ -72,7 +72,7 @@ async def air_con_now(bot: YuiChyan, ev: CQEvent):
 
 @sv.on_prefix(('设置温度', '设定温度'))
 async def set_temp(bot: YuiChyan, ev: CQEvent):
-    gid = ev.group_id
+    gid = str(ev.group_id)
 
     air_con = await check_status(gid, ev)
     if air_con is None:
@@ -95,7 +95,7 @@ async def set_temp(bot: YuiChyan, ev: CQEvent):
 
 @sv.on_prefix(('设置风速', '设定风速', '设置风量', '设定风量'))
 async def set_wind_rate(bot: YuiChyan, ev: CQEvent):
-    gid = ev.group_id
+    gid = str(ev.group_id)
 
     air_con = await check_status(gid, ev)
     if air_con is None:
@@ -119,7 +119,7 @@ async def set_wind_rate(bot: YuiChyan, ev: CQEvent):
 
 @sv.on_prefix(('设置环境温度', '设定环境温度'))
 async def set_env_temp(bot: YuiChyan, ev: CQEvent):
-    gid = ev.group_id
+    gid = str(ev.group_id)
 
     air_con = await check_status(gid, ev, need_on=False)
     if air_con is None:
@@ -149,7 +149,7 @@ async def set_env_temp(bot: YuiChyan, ev: CQEvent):
 
 @sv.on_match(('空调类型',))
 async def show_air_con_type(bot: YuiChyan, ev: CQEvent):
-    gid = ev.group_id
+    gid = str(ev.group_id)
 
     air_con = await check_status(gid, ev, need_on=False)
     if air_con is None:
@@ -164,7 +164,7 @@ async def show_air_con_type(bot: YuiChyan, ev: CQEvent):
 
 @sv.on_match(('升级空调', '空调升级'))
 async def upgrade_air_con(bot: YuiChyan, ev: CQEvent):
-    gid = ev.group_id
+    gid = str(ev.group_id)
 
     air_con = await check_status(gid, ev, need_on=False)
     if air_con is None:
@@ -187,7 +187,7 @@ async def upgrade_air_con(bot: YuiChyan, ev: CQEvent):
 
 @sv.on_match(('降级空调', '空调降级'))
 async def downgrade_air_con(bot: YuiChyan, ev: CQEvent):
-    gid = ev.group_id
+    gid = str(ev.group_id)
 
     air_con = await check_status(gid, ev, need_on=False)
     if air_con is None:
