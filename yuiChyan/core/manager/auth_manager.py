@@ -1,13 +1,14 @@
 import re
 from math import ceil
 
+from yuiChyan import YuiChyan, CQEvent
 from yuiChyan.config import *
 from .util import *
 
 
 # 查询本群授权
 @sv.on_match('查询授权')
-async def query_group_auth(bot, ev):
+async def query_group_auth(bot: YuiChyan, ev: CQEvent):
     if not ENABLE_AUTH:
         return
     group_id = ev.group_id
@@ -22,7 +23,7 @@ async def query_group_auth(bot, ev):
 
 # 超管查询授权列表
 @sv.on_command('授权列表', force_private=True)
-async def auth_group_list(bot, ev):
+async def auth_group_list(bot: YuiChyan, ev: CQEvent):
     if not ENABLE_AUTH:
         await bot.send(ev, '当前BOT未启用授权管理系统')
         return
@@ -50,7 +51,7 @@ async def auth_group_list(bot, ev):
 
 # 超管查询好友列表
 @sv.on_command('好友列表', force_private=True)
-async def friend_list(bot, ev):
+async def friend_list(bot: YuiChyan, ev: CQEvent):
     gl = await bot.get_friend_list(self_id=ev.self_id)
     msg_list = ['- {user_id}: {nickname}'.format_map(g) for g in gl]
     msg = f'> 共{len(gl)}个好友:\n' + '\n'.join(msg_list)
@@ -59,7 +60,7 @@ async def friend_list(bot, ev):
 
 # 超管查询BOT列表
 @sv.on_command('BOT列表', force_private=True)
-async def friend_list(bot, ev):
+async def friend_list(bot: YuiChyan, ev: CQEvent):
     self_ids = bot.get_self_ids()
     self_ids_str_list = [str(x) for x in self_ids]
     await bot.send(ev, f'> 共{len(self_ids)}个bot:\n{"\n".join(self_ids_str_list)}')
@@ -67,7 +68,7 @@ async def friend_list(bot, ev):
 
 # 变更授权
 @sv.on_command('变更授权', force_private=True)
-async def modify_time_chat(bot, ev):
+async def modify_time_chat(bot: YuiChyan, ev: CQEvent):
     if not ENABLE_AUTH:
         await bot.send(ev, '当前BOT未启用授权管理系统')
         return
@@ -88,7 +89,7 @@ async def modify_time_chat(bot, ev):
 
 # 立即执行一次检查
 @sv.on_command('检查授权', force_private=True)
-async def quick_check_chat(bot, ev):
+async def quick_check_chat(bot: YuiChyan, ev: CQEvent):
     if not ENABLE_AUTH:
         await bot.send(ev, '当前BOT未启用授权管理系统')
         return

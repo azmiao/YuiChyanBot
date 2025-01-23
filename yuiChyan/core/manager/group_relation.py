@@ -2,6 +2,7 @@ import re
 
 from nonebot import on_notice, NoticeSession, on_request, RequestSession
 
+from yuiChyan import YuiChyan
 from yuiChyan.config import *
 from yuiChyan.util import *
 from .util import group_notice, sv
@@ -73,14 +74,14 @@ async def handle_group_invite(session: RequestSession):
 
 # 主动退群命令
 @sv.on_command('退群', force_private=True)
-async def quit_group(bot, ev):
+async def quit_group(bot: YuiChyan, ev: CQEvent):
     strip = str(ev.message).strip()
     if not strip:
-        await bot.send(ev, '命令错误，实例：退群 123456 管理员操作')
+        await bot.send(ev, '命令错误，样例：退群 123456 管理员操作')
         return
     split = strip.split(' ')
     if not re.fullmatch(r'^\d+$', split[0]):
-        await bot.send(ev, '命令错误，实例：退群 123456 管理员操作')
+        await bot.send(ev, '命令错误，样例：退群 123456 管理员操作')
         return
 
     # 退群原因

@@ -34,6 +34,6 @@ async def help_view():
 
 # 帮助菜单
 @sv.on_match(('help', '帮助', '菜单'))
-async def sv_help(bot, ev):
+async def sv_help(bot: yuiChyan.YuiChyan, ev: yuiChyan.CQEvent):
     address = f'{PUBLIC_PROTOCOL}://{PUBLIC_DOMAIN}' if PUBLIC_DOMAIN else f'{PUBLIC_PROTOCOL}://{HOST}:{PORT}'
     await bot.send(ev, f'【{NICKNAME}菜单】\n> 发送"看看有人问"查看本群管理设置的问答\n> 其他功能请看：\n{address}/help')

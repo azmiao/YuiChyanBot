@@ -1,6 +1,6 @@
 import asyncio
 
-from yuiChyan import get_bot, logger
+from yuiChyan import get_bot, logger, YuiChyan
 from yuiChyan.exception import *
 from .util import sv
 
@@ -27,7 +27,7 @@ def parse_command(ev, command_raw: str):
 
 # 广播消息
 @sv.on_command('广播', force_private=True)
-async def broadcast(bot, ev):
+async def broadcast(bot: YuiChyan, ev: CQEvent):
     command_raw = str(ev.message).strip()
     bc_sv_name, bc_msg = parse_command(ev, command_raw)
     yui_bot = get_bot()

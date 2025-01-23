@@ -5,11 +5,12 @@ from yuiChyan.service import Service
 from .util import sv
 from yuiChyan.permission import check_permission
 from yuiChyan.config import SUPERUSERS
+from yuiChyan import YuiChyan, CQEvent
 
 
 # 查询本群所有可见的服务
 @sv.on_command('服务列表', only_to_me=True)
-async def list_group_services(bot, ev):
+async def list_group_services(bot: YuiChyan, ev: CQEvent):
     group_id = ev.group_id
     enable_list = []
     disable_list = []
@@ -33,7 +34,7 @@ async def list_group_services(bot, ev):
 
 # 对本群启用指定的服务 | 英文逗号间隔多个服务
 @sv.on_command('启用服务', only_to_me=True)
-async def list_group_services(bot, ev):
+async def list_group_services(bot: YuiChyan, ev: CQEvent):
     services = str(ev.message).strip()
     if not services:
         return
@@ -46,7 +47,7 @@ async def list_group_services(bot, ev):
 
 # 对本群禁用指定的服务 | 英文逗号间隔多个服务
 @sv.on_command('禁用服务', only_to_me=True)
-async def list_group_services(bot, ev):
+async def list_group_services(bot: YuiChyan, ev: CQEvent):
     services = str(ev.message).strip()
     if not services:
         return
