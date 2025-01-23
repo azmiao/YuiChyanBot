@@ -56,7 +56,7 @@ async def download_comic(session: AsyncClient, id_: str):
         json.dump(index, f, ensure_ascii=False)
 
 
-@sv_comic.on_prefix('PCR官漫')
+@sv_comic.on_prefix(('PCR官漫', 'pcr官漫'))
 async def comic(bot, ev):
     episode = str(ev.message).strip()
     if not re.fullmatch(r'\d{0,4}', episode):

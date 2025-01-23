@@ -385,8 +385,10 @@ class Service:
                 async with self.task_lock:
                     # 如果压根没有群启用了就直接跳过
                     group_self_dict = await self.get_enable_groups()
-                    if not group_self_dict:
-                        self.logger.info(f'> 定时任务 {func.__name__} 已在所有群禁用，将跳过执行')
+                    # 排除授权过期的群
+                    auth_group = [gid for gid in group_self_dict if gid in auth_db]
+                    if not auth_group:
+                        self.logger.info(f'> 定时任务 {func.__name__} 已在所有群禁用或授权过期，将跳过执行')
                         return
                     if not silence:
                         self.logger.info(f'> 定时任务 {func.__name__} 开始运行...')

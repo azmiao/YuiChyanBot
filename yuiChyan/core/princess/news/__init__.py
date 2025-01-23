@@ -8,19 +8,19 @@ sv_bl = Service('pcr-news-bili', use_exclude=False)
 sv_jp = Service('pcr-news-jp', use_exclude=False)
 
 
-@sv_tw.on_match('PCR台服新闻')
+@sv_tw.on_match(('PCR台服新闻', 'pcr台服新闻'))
 async def send_tw_news(bot, ev):
     msg = await create_news(TwSpider())
     await bot.send(ev, msg, at_sender=True)
 
 
-@sv_bl.on_match('PCR国服新闻')
+@sv_bl.on_match(('PCR国服新闻', 'pcr国服新闻'))
 async def send_bili_news(bot, ev):
     msg = await create_news(BiliSpider())
     await bot.send(ev, msg, at_sender=True)
 
 
-@sv_jp.on_match('PCR日服新闻')
+@sv_jp.on_match(('PCR日服新闻', 'pcr日服新闻'))
 async def send_jp_news(bot, ev):
     msg = await create_news(JpSpider())
     await bot.send(ev, msg, at_sender=True)

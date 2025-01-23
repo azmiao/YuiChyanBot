@@ -122,7 +122,7 @@ async def download_chara_icon(session: AsyncClient, id_: int, star: int) -> int:
 
 
 # 手动更新所有头像 | 只下载不存在的
-@sv.on_command('PCR更新所有头像', cmd_permission=SUPERUSER)
+@sv.on_command(('PCR更新所有头像', 'pcr更新所有头像'), cmd_permission=SUPERUSER)
 async def download_all_chara_icon(bot, ev):
     try:
         success = 0
@@ -146,7 +146,7 @@ async def download_all_chara_icon(bot, ev):
 
 
 # PCR添加角色名称
-@sv.on_command('PCR添加角色名称', cmd_permission=SUPERUSER)
+@sv.on_command(('PCR添加角色名称', 'pcr添加角色名称','PCR添加角色别称', 'pcr添加角色别称'), cmd_permission=SUPERUSER)
 async def update_chara(bot, ev):
     message = str(ev.message).strip()
     if (not message) or (' ' not in message):
