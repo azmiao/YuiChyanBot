@@ -31,7 +31,7 @@ async def broadcast(bot: YuiChyan, ev: CQEvent):
     command_raw = str(ev.message).strip()
     bc_group, bc_msg = parse_command(ev, command_raw)
     for self_id in bot.get_self_ids():
-        match self_id:
+        match bc_group:
             case 'all':
                 _group_id_list = await bot.get_group_list(self_id=self_id)
                 group_id_list = [int(group['group_id']) for group in _group_id_list]
