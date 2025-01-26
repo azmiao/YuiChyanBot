@@ -6,10 +6,10 @@ zhconv==1.4.3
 pygtrie==2.5.0
 pytz==2024.2
 APScheduler==3.11.0
-websockets==14.1
-Jinja2==3.1.4
+websockets==14.2
+Jinja2==3.1.5
 quart==0.20.0
-rocksdict==0.3.24
+rocksdict==0.3.25
 markdown==3.7
 pillow==11.1.0
 fuzzywuzzy==0.18.0
