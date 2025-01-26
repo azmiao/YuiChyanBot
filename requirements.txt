@@ -4,7 +4,7 @@ httpx==0.28.1
 aiocqhttp==1.4.4
 zhconv==1.4.3
 pygtrie==2.5.0
-pytz==2024.1
+pytz==2024.2
 APScheduler==3.11.0
 websockets==14.1
 Jinja2==3.1.4
