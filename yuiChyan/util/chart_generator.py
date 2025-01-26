@@ -95,7 +95,6 @@ async def generate_image_from_markdown(markdown_content: str) -> bytes:
     full_html = await render_template(
         'help_image.html',
         md_css_path=format_path(md_css_path),
-        font_path=format_path(font_path),
         help_body=html_content
     )
 
