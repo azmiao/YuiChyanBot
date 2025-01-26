@@ -1,3 +1,4 @@
+import asyncio
 import importlib
 from typing import List, LiteralString, Dict
 
@@ -17,6 +18,7 @@ from yuiChyan.trigger import trigger_chain
 class YuiChyan(NoneBot):
     cached_self_id: Optional[int] = None
     cached_group_list: Optional[list] = None
+    cache_lock = asyncio.Lock()
 
     def __init__(self, config_object=None):
         super().__init__(config_object)
@@ -33,15 +35,16 @@ class YuiChyan(NoneBot):
 
     # 获取bot所加的群列表
     async def get_cached_group_list(self, use_cache: bool = True) -> list:
-        if (not use_cache) or (self.cached_group_list is None):
-            self_id = self.get_self_id()
-            try:
-                self.cached_group_list = await yui_bot.get_group_list(self_id=self_id)
-            except CQHttpError:
-                self.cached_group_list = []
-        if not self.cached_group_list:
-            raise InterFunctionException('> 获取YuiChyan群列表失败，可能是协议实现客户端未启动')
-        return self.cached_group_list
+        async with self.cache_lock:
+            if (not use_cache) or (self.cached_group_list is None):
+                self_id = self.get_self_id()
+                try:
+                    self.cached_group_list = await yui_bot.get_group_list(self_id=self_id)
+                except CQHttpError:
+                    self.cached_group_list = []
+            if not self.cached_group_list:
+                raise InterFunctionException('> 获取YuiChyan群列表失败，可能是协议实现客户端未启动')
+            return self.cached_group_list
 
 
 # 全局唯一的BOT实例
