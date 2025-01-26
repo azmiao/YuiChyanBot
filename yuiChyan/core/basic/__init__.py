@@ -184,8 +184,8 @@ async def poke_back(session: NoticeSession):
     ]
 
     uid = session.ctx['user_id']
-    self_ids = session.bot.get_self_ids()
-    if session.ctx['target_id'] not in self_ids:
+    self_id = session.bot.get_self_id()
+    if session.ctx['target_id'] != self_id:
         return
 
     # 频次和单日次数检测
