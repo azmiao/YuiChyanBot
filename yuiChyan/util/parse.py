@@ -100,6 +100,6 @@ async def extract_file(cq_code_str: str) -> (bool, str, str, str):
     # 文件名参数：替换特殊字符为下划线
     image_file_name = re.sub(r'[\\/:*?"<>|{}]', '_', image_file_name)
     # 文件名参数：最后10个字符里没有点号 | 补齐文件拓展名
-    image_file_name = image_file_name if '.' in image_file_name[-10:] else image_file_name + '.image'
+    image_file_name = image_file_name if '.' in image_file_name[-10:] else image_file_name + '.png'
 
     return False, image_file, image_file_name, image_url
