@@ -15,7 +15,7 @@ from yuiChyan.trigger import trigger_chain
 
 # 仅支持单个QQ号的YuiChyanBot
 class YuiChyan(NoneBot):
-    cached_self_ids: Optional[int] = None
+    cached_self_id: Optional[int] = None
     cached_group_list: Optional[list] = None
 
     def __init__(self, config_object=None):
@@ -24,16 +24,16 @@ class YuiChyan(NoneBot):
 
     # 获取bot的QQ
     def get_self_id(self) -> int:
-        if self.cached_self_ids is None:
+        if self.cached_self_id is None:
             keys_as_int = map(int, self._wsr_api_clients.keys())
-            self.cached_self_ids = list(keys_as_int)[0]
-        if not self.cached_self_ids:
+            self.cached_self_id = list(keys_as_int)[0]
+        if not self.cached_self_id:
             raise InterFunctionException('> 获取YuiChyan自身QQ号失败，可能是协议实现客户端未启动')
-        return self.cached_self_ids
+        return self.cached_self_id
 
     # 获取bot所加的群列表
     async def get_cached_group_list(self, use_cache: bool = True) -> list:
-        if not use_cache or self.cached_group_list is None:
+        if (not use_cache) or (self.cached_group_list is None):
             self_id = self.get_self_id()
             try:
                 self.cached_group_list = await yui_bot.get_group_list(self_id=self_id)
