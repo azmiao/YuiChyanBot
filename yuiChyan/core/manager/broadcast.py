@@ -30,27 +30,27 @@ def parse_command(ev: CQEvent, command_raw: str):
 async def broadcast(bot: YuiChyan, ev: CQEvent):
     command_raw = str(ev.message).strip()
     bc_group, bc_msg = parse_command(ev, command_raw)
-    for self_id in bot.get_self_ids():
-        match bc_group:
-            case 'all':
-                _group_id_list = await bot.get_group_list(self_id=self_id)
-                group_id_list = [int(group['group_id']) for group in _group_id_list]
-            case bc_group if bc_group.startswith('g-'):
-                bc_l = bc_group.replace('g-', '')
-                group_id_list = [int(x) for x in bc_l.split(r'/')]
-            case bc_group if bc_group.startswith('exg-'):
-                _group_id_list = await bot.get_group_list(self_id=self_id)
-                group_id_list = [int(group['group_id']) for group in _group_id_list]
-                bc_l = bc_group.replace('exg-', '')
-                exclude_gl = [int(x) for x in bc_l.split(r'/')]
-                for ex_gid in exclude_gl:
-                    group_id_list.remove(ex_gid)
-            case _:
-                group_id_list = []
-        for group_id in group_id_list:
-            try:
-                await bot.send_group_msg(self_id=self_id, group_id=group_id, message=bc_msg)
-                logger.info(f'> 广播 [{self_id}, {group_id}, {bc_msg}] 发送成功')
-                await asyncio.sleep(1)
-            except Exception as e:
-                logger.error(f'> 广播 [{self_id}, {group_id}, {bc_msg}] 发送失败：{str(e)}')
+    self_id = bot.get_self_id()
+    match bc_group:
+        case 'all':
+            _group_id_list = await bot.get_cached_group_list()
+            group_id_list = [int(group['group_id']) for group in _group_id_list]
+        case bc_group if bc_group.startswith('g-'):
+            bc_l = bc_group.replace('g-', '')
+            group_id_list = [int(x) for x in bc_l.split(r'/')]
+        case bc_group if bc_group.startswith('exg-'):
+            _group_id_list = await bot.get_cached_group_list()
+            group_id_list = [int(group['group_id']) for group in _group_id_list]
+            bc_l = bc_group.replace('exg-', '')
+            exclude_gl = [int(x) for x in bc_l.split(r'/')]
+            for ex_gid in exclude_gl:
+                group_id_list.remove(ex_gid)
+        case _:
+            group_id_list = []
+    for group_id in group_id_list:
+        try:
+            await bot.send_group_msg(self_id=self_id, group_id=group_id, message=bc_msg)
+            logger.info(f'> 广播 [{self_id}, {group_id}, {bc_msg}] 发送成功')
+            await asyncio.sleep(1)
+        except Exception as e:
+            logger.error(f'> 广播 [{self_id}, {group_id}, {bc_msg}] 发送失败：{str(e)}')

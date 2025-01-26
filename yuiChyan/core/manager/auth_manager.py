@@ -58,14 +58,6 @@ async def friend_list(bot: YuiChyan, ev: CQEvent):
     await bot.send(ev, msg)
 
 
-# 超管查询BOT列表
-@sv.on_command('BOT列表', force_private=True)
-async def friend_list(bot: YuiChyan, ev: CQEvent):
-    self_ids = bot.get_self_ids()
-    self_ids_str_list = [str(x) for x in self_ids]
-    await bot.send(ev, f'> 共{len(self_ids)}个bot:\n{"\n".join(self_ids_str_list)}')
-
-
 # 变更授权
 @sv.on_command('变更授权', force_private=True)
 async def modify_time_chat(bot: YuiChyan, ev: CQEvent):

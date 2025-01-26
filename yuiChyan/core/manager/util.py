@@ -1,9 +1,7 @@
 from datetime import timedelta, datetime
-from typing import Optional
 
 from rocksdict import Rdict
 
-import yuiChyan
 from yuiChyan import get_bot, FunctionException
 from yuiChyan.config import NICKNAME, REMIND_BEFORE_EXPIRED
 from yuiChyan.resources import auth_db_
@@ -20,10 +18,8 @@ async def get_database() -> Rdict:
 
 # 获取授权结果列表
 async def get_auth_group_list(self_id):
-    if not self_id:
-        self_id = yuiChyan.yui_bot.get_self_ids()[0]
     # 所有的群
-    group_list = await get_bot().get_group_list(self_id=self_id)
+    group_list = await get_bot().get_cached_group_list()
     auth_db = await get_database()
 
     msg_list = []
@@ -36,24 +32,8 @@ async def get_auth_group_list(self_id):
     return msg_list
 
 
-# 获取所有群
-async def get_all_group_list(self_id: Optional[int]) -> list:
-    if not self_id:
-        self_id_list = yuiChyan.yui_bot.get_self_ids()
-    else:
-        self_id_list = [self_id]
-    group_list = []
-    # 分ID查
-    for _self_id in self_id_list:
-        _group_list = await get_bot().get_group_list(self_id=_self_id)
-        group_list.extend(_group_list)
-    return group_list
-
-
 # 生成群授权信息
 async def process_group_msg(self_id, group_id, group_name, expiration, title: str = '', end: str = ''):
-    if not self_id:
-        self_id = yuiChyan.yui_bot.get_self_ids()[0]
     # 没有群名就重新获取
     if not group_name:
         group_info = await get_bot().get_group_info(self_id=self_id, group_id=group_id)
@@ -74,7 +54,7 @@ async def group_notice(group_id, msg):
 # 修改授权时间
 async def change_authed_time(ev, group_id: int, time_change: int = 0):
     # 判断群是否在BOT列表里
-    group_list = await get_all_group_list(None)
+    group_list = await get_bot().get_cached_group_list()
     group_id_list = [x['group_id'] for x in group_list]
     if group_id not in group_id_list:
         raise FunctionException(ev, f'群 [{str(group_id)}] 不存在，请检查！')
@@ -91,7 +71,7 @@ async def change_authed_time(ev, group_id: int, time_change: int = 0):
 # 检查授权
 async def check_auth():
     auth_db = await get_database()
-    group_list = await get_all_group_list(None)
+    group_list = await get_bot().get_cached_group_list()
     for group in group_list:
         group_id = group['group_id']
         if group_id not in auth_db:

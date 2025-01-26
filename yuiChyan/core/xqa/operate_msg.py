@@ -1,8 +1,9 @@
+from yuiChyan import YuiChyan
 from .util import *
 
 
 # 保存问答
-async def set_que(bot, group_id: str, user_id: str, que_raw: str, ans_raw: str) -> str:
+async def set_que(bot: YuiChyan, group_id: str, user_id: str, que_raw: str, ans_raw: str) -> str:
     db = await get_database()
 
     # 新问题只调整 | 但不要下载图片，只要能匹配上就可以

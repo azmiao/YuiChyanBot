@@ -9,7 +9,7 @@ sv = Service('core_xqa', help_cmd=('XQA帮助', 'xqa帮助', '问答帮助'))
 
 # 设置问答，支持正则表达式和回流
 @sv.on_message('group')
-async def set_question(bot, ev):
+async def set_question(bot: YuiChyan, ev: CQEvent):
     results = re.match(r'^(全群|有人|我)问([\s\S]*)你答([\s\S]*)$', str(ev.message))
     if not results:
         return
@@ -52,7 +52,7 @@ async def set_question(bot, ev):
 
 # 看问答，支持模糊搜索
 @sv.on_rex(r'^看看(有人|我|全群)问([\s\S]*)$')
-async def show_question(bot, ev):
+async def show_question(bot: YuiChyan, ev: CQEvent):
     # # (全群|有人|我) | 搜索问题
     que_type, search_str = ev['match'].group(1), ev['match'].group(2)
     # 群 | 用户
@@ -79,7 +79,7 @@ async def show_question(bot, ev):
 
 # 搜索某个成员的问题和回答，限群管理员
 @sv.on_prefix('查问答')
-async def search_question(bot, ev):
+async def search_question(bot: YuiChyan, ev: CQEvent):
     if get_user_permission(ev) < ADMIN:
         raise LakePermissionException(ev, f'搜索某个成员的问答只能群管理操作呢。个人查询问答请使用“看看我问”+搜索内容')
 
@@ -105,7 +105,7 @@ async def search_question(bot, ev):
 
 # 不要回答，管理员可以@人删除回答
 @sv.on_message('group')
-async def delete_question(bot, ev):
+async def delete_question(bot: YuiChyan, ev: CQEvent):
     no_que_match = re.match(r'^(\[CQ:at,qq=[0-9]+])? ?(全群)?不要回答([\s\S]*)$', str(ev.message))
     if not no_que_match:
         return
@@ -158,7 +158,7 @@ async def delete_question(bot, ev):
 
 # 回复问答
 @sv.on_message('group')
-async def xqa(bot, ev):
+async def xqa(bot: YuiChyan, ev: CQEvent):
     group_id, user_id, message = str(ev.group_id), str(ev.user_id), str(ev.message)
     db = await get_database()
     group_dict = db.get(group_id, {'all': {}})
@@ -182,7 +182,7 @@ async def xqa(bot, ev):
 
 # 复制问答
 @sv.on_prefix('XQA复制问答from')
-async def copy_question(bot, ev):
+async def copy_question(bot: YuiChyan, ev: CQEvent):
     match = re.match(r'^([0-9]+)to([0-9]+)(full|self)?$', str(ev.message))
     if not match:
         return
@@ -200,7 +200,7 @@ async def copy_question(bot, ev):
 
 # 分群控制个人问答权限-禁用我问
 @sv.on_match('XQA禁用我问')
-async def xqa_disable_self(bot, ev):
+async def xqa_disable_self(bot: YuiChyan, ev: CQEvent):
     if not check_permission(ev, SUPERUSER):
         raise LakePermissionException(ev, permission=SUPERUSER)
 
@@ -213,7 +213,7 @@ async def xqa_disable_self(bot, ev):
 
 # 分群控制个人问答权限-启用我问
 @sv.on_match('XQA启用我问')
-async def xqa_enable_self(bot, ev):
+async def xqa_enable_self(bot: YuiChyan, ev: CQEvent):
     if not check_permission(ev, SUPERUSER):
         raise LakePermissionException(ev, permission=SUPERUSER)
 
@@ -226,7 +226,7 @@ async def xqa_enable_self(bot, ev):
 
 # 清空本群所有我问
 @sv.on_match('XQA清空本群所有我问')
-async def xqa_delete_self(bot, ev):
+async def xqa_delete_self(bot: YuiChyan, ev: CQEvent):
     if not check_permission(ev, SUPERUSER):
         raise LakePermissionException(ev, permission=SUPERUSER)
 
@@ -241,7 +241,7 @@ async def xqa_delete_self(bot, ev):
 
 # 清空本群所有有人问
 @sv.on_match('XQA清空本群所有有人问')
-async def xqa_delete_all(bot, ev):
+async def xqa_delete_all(bot: YuiChyan, ev: CQEvent):
     if not check_permission(ev, SUPERUSER):
         raise LakePermissionException(ev, permission=SUPERUSER)
 
@@ -256,7 +256,7 @@ async def xqa_delete_all(bot, ev):
 
 # 提取数据
 @sv.on_match('XQA提取数据')
-async def xqa_export_data(bot, ev):
+async def xqa_export_data(bot: YuiChyan, ev: CQEvent):
     if not check_permission(ev, SUPERUSER):
         raise LakePermissionException(ev, permission=SUPERUSER)
 
@@ -266,7 +266,7 @@ async def xqa_export_data(bot, ev):
 
 # 重建数据
 @sv.on_match('XQA重建数据')
-async def xqa_import_data(bot, ev):
+async def xqa_import_data(bot: YuiChyan, ev: CQEvent):
     if not check_permission(ev, SUPERUSER):
         raise LakePermissionException(ev, permission=SUPERUSER)
 

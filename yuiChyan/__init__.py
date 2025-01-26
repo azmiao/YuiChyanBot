@@ -3,7 +3,7 @@ from typing import List, LiteralString, Dict
 
 import nonebot
 from jinja2 import FileSystemLoader
-from nonebot import NoneBot, load_plugins
+from nonebot import NoneBot, load_plugins, CQHttpError
 
 import yuiChyan.config
 from yuiChyan.config import ENABLE_AUTH
@@ -13,19 +13,35 @@ from yuiChyan.resources import *
 from yuiChyan.trigger import trigger_chain
 
 
+# 仅支持单个QQ号的YuiChyanBot
 class YuiChyan(NoneBot):
+    cached_self_ids: Optional[int] = None
+    cached_group_list: Optional[list] = None
 
     def __init__(self, config_object=None):
         super().__init__(config_object)
         logger.info('> YuiChyanBot实例 启动成功')
 
-    # 获取所有的bot的QQ
-    def get_self_ids(self) -> List[int]:
-        keys_as_int = map(int, self._wsr_api_clients.keys())
-        self_ids = list(keys_as_int)
-        if not self_ids:
-            raise InterFunctionException('> 获取YuiChyan自身QQ号列表失败，可能是协议实现客户端未启动')
-        return self_ids
+    # 获取bot的QQ
+    def get_self_id(self) -> int:
+        if self.cached_self_ids is None:
+            keys_as_int = map(int, self._wsr_api_clients.keys())
+            self.cached_self_ids = list(keys_as_int)[0]
+        if not self.cached_self_ids:
+            raise InterFunctionException('> 获取YuiChyan自身QQ号失败，可能是协议实现客户端未启动')
+        return self.cached_self_ids
+
+    # 获取bot所加的群列表
+    async def get_cached_group_list(self, use_cache: bool = True) -> list:
+        if not use_cache or self.cached_group_list is None:
+            self_id = self.get_self_id()
+            try:
+                self.cached_group_list = await yui_bot.get_group_list(self_id=self_id)
+            except CQHttpError:
+                self.cached_group_list = []
+        if not self.cached_group_list:
+            raise InterFunctionException('> 获取YuiChyan群列表失败，可能是协议实现客户端未启动')
+        return self.cached_group_list
 
 
 # 全局唯一的BOT实例

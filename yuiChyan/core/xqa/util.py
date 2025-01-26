@@ -6,7 +6,7 @@ import re
 
 from rocksdict import Rdict
 
-from yuiChyan import logger
+from yuiChyan import logger, YuiChyan, CQEvent
 from yuiChyan.config import *
 from yuiChyan.resources import xqa_db_, xqa_img_path, base_db_path
 from yuiChyan.util import filter_message
@@ -45,7 +45,7 @@ async def modify_enable_self(group_id: str, enable: bool) -> str:
 
 
 # 判断是否在群里
-async def judge_ismember(bot, group_id: str, user_id: str) -> bool:
+async def judge_ismember(bot: YuiChyan, group_id: str, user_id: str) -> bool:
     member_list = await bot.get_group_member_list(group_id=int(group_id))
     user_list = []
     for member in member_list:
@@ -81,8 +81,8 @@ async def import_json():
 
 
 # 获取群列表
-async def get_g_list(bot) -> list:
-    group_list = await bot.get_group_list()
+async def get_g_list(bot: YuiChyan) -> list:
+    group_list = await bot.get_cached_group_list()
     g_list = []
     for group in group_list:
         group_id = group['group_id']
@@ -254,7 +254,7 @@ def spilt_msg(msg_list: list, init_msg: str) -> list:
 
 
 # 发送消息函数
-async def send_result_msg(bot, ev, result_list):
+async def send_result_msg(bot: YuiChyan, ev: CQEvent, result_list):
     # 未开启转发消息
     if not IS_FORWARD:
         logger.info('XQA未开启转发消息，将循环分时直接发送')

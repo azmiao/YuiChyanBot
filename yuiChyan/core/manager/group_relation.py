@@ -2,7 +2,7 @@ import re
 
 from nonebot import on_notice, NoticeSession, on_request, RequestSession
 
-from yuiChyan import YuiChyan
+from yuiChyan import YuiChyan, get_bot
 from yuiChyan.config import *
 from yuiChyan.util import *
 from .util import group_notice, sv
@@ -19,6 +19,8 @@ async def kick_me_alert(session: NoticeSession):
             self_id=session.event.self_id,
             user_id=super_id,
             message=f'YuiChyanBot[{session.event.self_id}]被群管理[{operator_id}]踢出群[{group_id}]')
+    # 这时候重新刷新一下群缓存
+    await get_bot().get_cached_group_list(False)
 
 
 # 群员退群提醒
@@ -68,6 +70,8 @@ async def group_welcome(session: NoticeSession):
 async def handle_group_invite(session: RequestSession):
     if session.ctx.user_id in SUPERUSERS:
         await session.approve()
+        # 这时候重新刷新一下群缓存
+        await get_bot().get_cached_group_list(False)
     else:
         await session.reject(reason=f'邀请{NICKNAME}入群请联系维护组哦~')
 
@@ -93,3 +97,5 @@ async def quit_group(bot: YuiChyan, ev: CQEvent):
     await bot.set_group_leave(self_id=ev.self_id, group_id=int(split[0]))
     msg = f'> 已成功退出群：{str(split[0])} | 原因：{leave_reason}'
     await bot.send(ev, msg)
+    # 这时候重新刷新一下群缓存
+    await get_bot().get_cached_group_list(False)

@@ -2,7 +2,6 @@ import asyncio
 import functools
 import inspect
 import os
-import random
 import re
 from logging import Logger
 from typing import Dict, Callable, List, Union, Any, Tuple, Iterable
@@ -156,23 +155,17 @@ class Service:
             return group_id in self.include_group
 
     # 获取所有启用本服务的群 | key: 群号 | value: BOT列表
-    async def get_enable_groups(self) -> Dict[int, List[int]]:
-        group_self_dict = {}
-        for self_id in self.bot.get_self_ids():
-            try:
-                self_group_list = await self.bot.get_group_list(self_id=self_id)
-            except CQHttpError:
-                self_group_list = []
-            self_group_list = list(int(x['group_id']) for x in self_group_list)
-            if self.use_exclude:
-                self_group_list = [item for item in self_group_list if item not in self.exclude_group]
-            else:
-                self_group_list = list(set(self_group_list) & set(self.include_group))
-            for group in self_group_list:
-                self_id_list = group_self_dict.get(group, [])
-                self_id_list.append(self_id)
-                group_self_dict[group] = self_id_list
-        return group_self_dict
+    async def get_enable_groups(self) -> List[int]:
+        try:
+            self_group_list = await self.bot.get_cached_group_list()
+        except CQHttpError:
+            self_group_list = []
+        self_group_list = list(int(x['group_id']) for x in self_group_list)
+        if self.use_exclude:
+            self_group_list = [item for item in self_group_list if item not in self.exclude_group]
+        else:
+            self_group_list = list(set(self_group_list) & set(self.include_group))
+        return self_group_list
 
     def on_message(self, message_type: str = 'group') -> Callable:
         """
@@ -384,9 +377,9 @@ class Service:
                 # 异步锁 | 定时任务一个一个执行
                 async with self.task_lock:
                     # 如果压根没有群启用了就直接跳过
-                    group_self_dict = await self.get_enable_groups()
+                    group_self_list = await self.get_enable_groups()
                     # 排除授权过期的群
-                    auth_group = [gid for gid in group_self_dict if gid in auth_db]
+                    auth_group = [gid for gid in group_self_list if gid in auth_db]
                     if not auth_group:
                         self.logger.info(f'> 定时任务 {func.__name__} 已在所有群禁用或授权过期，将跳过执行')
                         return
@@ -425,17 +418,16 @@ class Service:
         if isinstance(msgs, str):
             msgs = (msgs,)
 
-        bot = self.bot
         # 只对启用服务的群进行广播
-        groups = await self.get_enable_groups()
-        for gid, self_id_list in groups.items():
+        group_list = await self.bot.get_cached_group_list()
+        for gid in group_list:
             if gid not in auth_db:
                 self.logger.info(f'不会向群 [{gid}] 广播{tag}：该群授权已过期')
                 continue
             try:
                 for msg in msgs:
                     await asyncio.sleep(interval_time)
-                    await bot.send_group_msg(self_id=random.choice(self_id_list), group_id=gid, message=msg)
+                    await self.bot.send_group_msg(self_id=self.bot.get_self_id(), group_id=gid, message=msg)
                 length = len(msgs)
                 if length:
                     self.logger.info(f'成功向群 [{gid}] 广播{tag}了 {length} 条消息')
