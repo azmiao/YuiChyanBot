@@ -7,29 +7,33 @@ sv_tw = Service('pcr-news-tw', use_exclude=False)
 sv_bl = Service('pcr-news-bili', use_exclude=False)
 sv_jp = Service('pcr-news-jp', use_exclude=False)
 
+tw_spider = TwSpider()
+bili_spider = BiliSpider()
+jp_spider = JpSpider()
+
 
 @sv_tw.on_match(('PCR台服新闻', 'pcr台服新闻'))
 async def send_tw_news(bot, ev):
-    msg = await create_news(TwSpider())
+    msg = await create_news(tw_spider)
     await bot.send(ev, msg, at_sender=True)
 
 
 @sv_bl.on_match(('PCR国服新闻', 'pcr国服新闻'))
 async def send_bili_news(bot, ev):
-    msg = await create_news(BiliSpider())
+    msg = await create_news(bili_spider)
     await bot.send(ev, msg, at_sender=True)
 
 
 @sv_jp.on_match(('PCR日服新闻', 'pcr日服新闻'))
 async def send_jp_news(bot, ev):
-    msg = await create_news(JpSpider())
+    msg = await create_news(jp_spider)
     await bot.send(ev, msg, at_sender=True)
 
 
 @sv_tw.scheduled_job(minute='*/5')
 async def tw_news_poller():
     try:
-        await news_poller(TwSpider(), sv_tw)
+        await news_poller(tw_spider, sv_tw)
     except Exception as e:
         sv_tw.logger.info(f'PCR台服官网新闻获取失败: {type(e)}, {str(e)}')
 
@@ -37,7 +41,7 @@ async def tw_news_poller():
 @sv_bl.scheduled_job(minute='*/5')
 async def bili_news_poller():
     try:
-        await news_poller(BiliSpider(), sv_bl)
+        await news_poller(bili_spider, sv_bl)
     except Exception as e:
         sv_bl.logger.info(f'PCR国服官网新闻获取失败: {type(e)}, {str(e)}')
 
@@ -45,7 +49,7 @@ async def bili_news_poller():
 @sv_jp.scheduled_job(minute='*/5')
 async def jp_news_poller():
     try:
-        await news_poller(JpSpider(), sv_jp)
+        await news_poller(jp_spider, sv_jp)
     except Exception as e:
         sv_bl.logger.info(f'PCR日服官网新闻获取失败: {type(e)}, {str(e)}')
 
