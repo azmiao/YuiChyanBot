@@ -430,7 +430,7 @@ async def getUnit(img2):
 
 
 async def get_pic(address: str):
-    async with httpx.AsyncClient() as session:
+    async with httpx.AsyncClient(verify=False) as session:
         resp = await session.get(address, timeout=6)
     return resp.read()
 

@@ -54,7 +54,7 @@ class BaseSpider(abc.ABC):
 
 
 class TwSpider(BaseSpider):
-    url = "https://www.princessconnect.so-net.tw/news"
+    url = "http://www.princessconnect.so-net.tw/news"
     src_name = "台服官网"
 
     @staticmethod
