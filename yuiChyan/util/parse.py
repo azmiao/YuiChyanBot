@@ -1,5 +1,6 @@
 import os
 import re
+import ssl
 from typing import List, Optional, Tuple
 
 import httpx
@@ -47,10 +48,13 @@ async def save_image(ev: Optional[CQEvent],
     # 开始下载图片
     try:
         if not os.path.isfile(image_path):
-            with httpx.Client(verify=False) as session:
+            headers = {'User-Agent': 'Mozilla/5.0'}
+            ctx = ssl.create_default_context()
+            ctx.set_ciphers('ALL')
+            with httpx.Client(verify=ctx, headers=headers) as session:
                 with session.stream('GET', image_url) as resp:
                     with open(image_path, 'wb') as f:
-                        f.write(await resp.read())
+                        f.write(resp.read())
     except Exception as e:
         raise FunctionException(ev, f'从{image_url}下载图片{image_name}出错:{str(e)}')
     return image_name
