@@ -1,8 +1,8 @@
 import os
 import re
 from typing import List, Optional, Tuple
-from urllib import request
 
+import httpx
 from aiocqhttp import Event as CQEvent
 
 from yuiChyan import FunctionException, get_bot
@@ -47,7 +47,10 @@ async def save_image(ev: Optional[CQEvent],
     # 开始下载图片
     try:
         if not os.path.isfile(image_path):
-            request.urlretrieve(url=image_url, filename=image_path)
+            with httpx.Client(verify=False) as session:
+                with session.stream('GET', image_url) as resp:
+                    with open(image_path, 'wb') as f:
+                        f.write(await resp.read())
     except Exception as e:
         raise FunctionException(ev, f'从{image_url}下载图片{image_name}出错:{str(e)}')
     return image_name
