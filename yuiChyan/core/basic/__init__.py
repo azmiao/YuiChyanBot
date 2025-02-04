@@ -99,6 +99,10 @@ async def make_choice(bot: YuiChyan, ev: CQEvent):
     if '还是' not in all_text:
         return
     split = all_text.split('还是')
+    # 列表中所有元素均一样
+    if len(set(split)) == 1:
+        await bot.send(ev, '> 您提供的选项看起来已经有答案了呢~')
+        return
     msg_list = []
     for choice in split:
         index = split.index(choice) + 1
