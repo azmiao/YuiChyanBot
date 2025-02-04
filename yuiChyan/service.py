@@ -419,7 +419,7 @@ class Service:
             msgs = (msgs,)
 
         # 只对启用服务的群进行广播
-        group_list = await self.bot.get_cached_group_list()
+        group_list = await self.get_enable_groups()
         for gid in group_list:
             if gid not in auth_db:
                 self.logger.info(f'不会向群 [{gid}] 广播{tag}：该群授权已过期')
