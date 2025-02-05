@@ -1,4 +1,5 @@
 import markdown
+from flask import redirect
 from quart import render_template, Markup
 
 import yuiChyan
@@ -7,6 +8,12 @@ from .util import sv
 
 # 帮助页面的参数
 help_config: dict = {}
+
+
+# 主页重定向至帮助页面
+@yuiChyan.yui_bot.server_app.route('/')
+async def home_to_help():
+    return redirect('/help')
 
 
 # 帮助页面
@@ -29,7 +36,7 @@ async def help_view():
         # 放入BOT别称
         help_config['bot_name'] = NICKNAME
     # 通过 Quart 的 render_template 方法渲染 Jinja2 模板
-    return await render_template('template.html', help_config=help_config)
+    return await render_template('help_page.html', help_config=help_config)
 
 
 # 帮助菜单
