@@ -27,10 +27,10 @@ class YuiChyan(NoneBot):
     # 获取bot的QQ
     def get_self_id(self) -> int:
         if self.cached_self_id is None:
-            keys_as_int = map(int, self._wsr_api_clients.keys())
-            if not keys_as_int:
+            qq_list = list(map(int, self._wsr_api_clients.keys()))
+            if not qq_list:
                 raise InterFunctionException('> 获取YuiChyan自身QQ号失败，可能是协议实现客户端未启动')
-            self.cached_self_id = list(keys_as_int)[0]
+            self.cached_self_id = qq_list[0]
         return self.cached_self_id
 
     # 获取bot所加的群列表
@@ -86,6 +86,7 @@ def create_instance() -> YuiChyan:
     # 配置 Quart App
     yui_bot.server_app.static_folder = os.path.join(help_res_dir, 'static')
     yui_bot.server_app.jinja_env.loader = FileSystemLoader(os.path.join(help_res_dir, 'template'))
+    yui_bot.server_app.secret_key = os.urandom(24)
     # App 启动前载入计时器
     yui_bot.server_app.before_serving(_start_scheduler)
 

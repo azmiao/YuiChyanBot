@@ -99,6 +99,16 @@ class Service:
     def get_loaded_services() -> Dict[str, 'Service']:
         return _loaded_services
 
+    # 转化成简单的字符串字典
+    def to_simple_dict(self, enable: bool = True) -> dict:
+        return {
+            'name': self.name,
+            'manage': self.manage.name,
+            'visible': self.visible,
+            'need_auth': self.need_auth,
+            'enable': enable
+        }
+
     # 获取sv实际的实例所在文件路径
     def get_caller_file_path(self):
         # 获取调用栈

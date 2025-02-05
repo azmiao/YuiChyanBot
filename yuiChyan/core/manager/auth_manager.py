@@ -49,6 +49,13 @@ async def auth_group_list(bot: YuiChyan, ev: CQEvent):
     await bot.send(ev, msg)
 
 
+# 超管查询BOT
+@sv.on_command('BOT账号', force_private=True)
+async def friend_list(bot: YuiChyan, ev: CQEvent):
+    self_id = bot.get_self_id()
+    await bot.send(ev, f'> {NICKNAME}账号为：{str(self_id)}')
+
+
 # 超管查询好友列表
 @sv.on_command('好友列表', force_private=True)
 async def friend_list(bot: YuiChyan, ev: CQEvent):

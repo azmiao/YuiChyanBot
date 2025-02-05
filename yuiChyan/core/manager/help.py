@@ -1,27 +1,26 @@
 import markdown
-from flask import redirect
-from quart import render_template, Markup
+from quart import render_template, Markup, redirect
 
 import yuiChyan
 from yuiChyan.config import PUBLIC_PROTOCOL, PUBLIC_DOMAIN, HOST, PORT, NICKNAME
 from .util import sv
 
 # 帮助页面的参数
-help_config: dict = {}
+config: dict = {}
 
 
 # 主页重定向至帮助页面
-@yuiChyan.yui_bot.server_app.route('/')
+@yuiChyan.yui_bot.server_app.route('/', methods=['GET'])
 async def home_to_help():
     return redirect('/help')
 
 
 # 帮助页面
-@yuiChyan.yui_bot.server_app.route('/help')
+@yuiChyan.yui_bot.server_app.route('/help', methods=['GET'])
 async def help_view():
-    global help_config
+    global config
     # 从插件列表里解析模板
-    if not help_config:
+    if not config:
         self_help_list = yuiChyan.help_list
         for help_ in self_help_list:
             help_['id'] = self_help_list.index(help_)
@@ -32,11 +31,11 @@ async def help_view():
                                                                            'markdown.extensions.tables'])
             help_['help'] = Markup(html_content)
         # 放入帮助列表
-        help_config['help_list'] = self_help_list
+        config['help_list'] = self_help_list
         # 放入BOT别称
-        help_config['bot_name'] = NICKNAME
+        config['bot_name'] = NICKNAME
     # 通过 Quart 的 render_template 方法渲染 Jinja2 模板
-    return await render_template('help_page.html', help_config=help_config)
+    return await render_template('help_page.html', config=config)
 
 
 # 帮助菜单

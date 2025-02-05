@@ -3,7 +3,7 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>{{ help_config.bot_name }}菜单</title>
+    <title>{{ config.bot_name }}菜单</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="../static/icon.svg" type="image/x-icon">
     <!-- 基础 CSS -->
@@ -33,7 +33,7 @@
     <div id="content">
         <div class="container text-center markdown-body">
             <!-- 标题 -->
-            <h1><strong>✦ {{ help_config.bot_name }} ✦</strong></h1>
+            <h1><strong>✦ {{ config.bot_name }} ✦</strong></h1>
             <!-- 搜索框 -->
             <form class="row justify-content-center" id="form_subscribe" method="get" onsubmit="return search();">
                 <div class="col-auto d-flex align-items-center">
@@ -50,7 +50,7 @@
                 <h2>命令文档</h2>
                 <div class="highlight invisible-highlight"></div>
                 <div class="accordion" id="instructions">
-                    {% for help_body in help_config.help_list %}
+                    {% for help_body in config.help_list %}
                     <div class="transparent-card">
                         <div class="card-header" id="heading-{{help_body.id}}">
                             <h5 class="mb-0">

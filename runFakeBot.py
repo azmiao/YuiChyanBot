@@ -9,7 +9,7 @@ from aiocqhttp.message import Message
 
 # 所有配置
 config = {
-    'bot_id': 3100271297,
+    'bot_id': 233333333,
     'sender_id': 2362020227,
     'role': 'normal',
     'group_name': '测试群',

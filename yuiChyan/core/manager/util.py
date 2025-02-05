@@ -4,11 +4,12 @@ from rocksdict import Rdict
 
 from yuiChyan import get_bot, FunctionException
 from yuiChyan.config import NICKNAME, REMIND_BEFORE_EXPIRED
+from yuiChyan.permission import SUPERUSER
 from yuiChyan.resources import auth_db_
 from yuiChyan.service import Service
 
 # BOT管理核心服务
-sv = Service('core_manager', visible=False, need_auth=False, help_cmd='核心管理帮助')
+sv = Service('core_manager', manage=SUPERUSER, visible=False, need_auth=False, help_cmd='核心管理帮助')
 
 
 # 获取数据库
@@ -30,6 +31,23 @@ async def get_auth_group_list(self_id):
         msg = await process_group_msg(self_id, group_id, group_name, expiration)
         msg_list.append(msg)
     return msg_list
+
+
+# 获取某个群的服务列表
+async def get_group_services(group_id: int, show_hidden: bool) -> (list[Service], list[Service]):
+    enable_list = []
+    disable_list = []
+    loaded_services = Service.get_loaded_services()
+    for service in loaded_services.values():
+        # 判断是否隐藏
+        if (not show_hidden) and (not service.visible):
+            continue
+        # 判断是否启用
+        if service.judge_enable(group_id):
+            enable_list.append(service)
+        else:
+            disable_list.append(service)
+    return enable_list, disable_list
 
 
 # 生成群授权信息

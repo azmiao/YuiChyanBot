@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>{{ config.bot_name }}管理</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../static/icon.svg" type="image/x-icon">
+    <!-- 基础 CSS -->
+    <link href="../static/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+    <link href="../static/css/github-markdown.css" rel="stylesheet" type="text/css">
+    <link href="../static/css/custom-style.css" rel="stylesheet" type="text/css">
+    <!-- 自定义样式 -->
+    <style>
+        {# 背景图样式 #}
+        .background-image {
+            background-image: url('../static/background_compressed.jpg');
+            background-size: cover;
+            filter: blur(30px);
+            opacity: 0.2;
+            height: 100vh;
+            width: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="background-image"></div>
+    <div id="content">
+        <div class="container text-center markdown-body">
+            <!-- 标题 -->
+            <h1><strong>✦ 服务功能开关 ✦</strong></h1>
+            <!-- 服务列表 -->
+            <div class="command-box">
+                <h2>群服务列表</h2>
+                <div class="highlight invisible-highlight"></div>
+                <div class="accordion" id="instructions">
+                    {% for group_body in config.data %}
+                    <div class="transparent-card">
+                        <div class="card-header" id="heading-{{group_body.group_id}}">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link" data-bs-toggle="collapse"
+                                    data-bs-target="#collapse-{{group_body.group_id}}" aria-expanded="true"
+                                    aria-controls="collapse-{{group_body.group_id}}">
+                                    {{ group_body.group_show }}
+                                </button>
+                            </h5>
+                        </div>
+                        <div id="collapse-{{ group_body.group_id }}" class="collapse" aria-labelledby="heading-{{ group_body.group_id }}">
+                            <div class="card-body">
+                                <table class="table" style="margin-top: 20px;">
+                                    <thead>
+                                        <tr>
+                                            <th>服务名称</th>
+                                            <th>是否可见</th>
+                                            <th>是否需要授权</th>
+                                            <th>管理权限</th>
+                                            <th>是否启用</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for service in group_body.service_list %}
+                                        <tr>
+                                            <td>{{ service.name }}</td>
+                                            <td>{{ "是" if service.visible else "否" }}</td>
+                                            <td>{{ "是" if service.need_auth else "否" }}</td>
+                                            <td>{{ service.manage }}</td>
+                                            <td>{{ "是" if service.enable else "否" }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 页面所需的JS -->
+    <script src="../static/js/jquery.min.js"></script>
+    <script src="../static/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

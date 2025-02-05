@@ -84,6 +84,13 @@ def normalize_str(string) -> str:
     return string
 
 
+# 自动截断字符串
+def truncate_string(s: str, max_length: int = 8) -> str:
+    if len(s) > max_length:
+        return s[:max_length] + '...'
+    return s
+
+
 # 频次限制器
 class FreqLimiter:
     def __init__(self, default_cd_seconds):
