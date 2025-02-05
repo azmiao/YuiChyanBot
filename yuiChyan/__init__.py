@@ -28,9 +28,9 @@ class YuiChyan(NoneBot):
     def get_self_id(self) -> int:
         if self.cached_self_id is None:
             keys_as_int = map(int, self._wsr_api_clients.keys())
+            if not keys_as_int:
+                raise InterFunctionException('> 获取YuiChyan自身QQ号失败，可能是协议实现客户端未启动')
             self.cached_self_id = list(keys_as_int)[0]
-        if not self.cached_self_id:
-            raise InterFunctionException('> 获取YuiChyan自身QQ号失败，可能是协议实现客户端未启动')
         return self.cached_self_id
 
     # 获取bot所加的群列表
