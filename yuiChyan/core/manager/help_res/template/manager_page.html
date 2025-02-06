@@ -59,7 +59,7 @@
                                             <th>是否可见</th>
                                             <th>是否需要授权</th>
                                             <th>管理所需权限</th>
-                                            <th>当前状态</th>
+                                            <th>是否启用</th>
                                             <th>【操作】</th>
                                         </tr>
                                     </thead>
@@ -67,10 +67,28 @@
                                         {% for service in group_body.service_list %}
                                         <tr>
                                             <td style="vertical-align: middle;">{{ service.name }}</td>
-                                            <td style="vertical-align: middle;">{{ "是" if service.visible else "否" }}</td>
-                                            <td style="vertical-align: middle;">{{ "是" if service.need_auth else "否" }}</td>
+                                            <td style="vertical-align: middle;">
+                                                {% if service.visible %}
+                                                    <span class="icon-circle check-circle"></span>
+                                                {% else %}
+                                                    <span class="icon-circle times-circle"></span>
+                                                {% endif %}
+                                            </td>
+                                            <td style="vertical-align: middle;">
+                                                {% if service.need_auth %}
+                                                    <span class="icon-circle check-circle"></span>
+                                                {% else %}
+                                                    <span class="icon-circle times-circle"></span>
+                                                {% endif %}
+                                            </td>
                                             <td style="vertical-align: middle;">{{ service.manage }}</td>
-                                            <td style="vertical-align: middle;">{{ "启用" if service.enabled else "禁用" }}</td>
+                                            <td style="vertical-align: middle;">
+                                                {% if service.enabled %}
+                                                    <span class="icon-circle check-circle"></span>
+                                                {% else %}
+                                                    <span class="icon-circle times-circle"></span>
+                                                {% endif %}
+                                            </td>
                                             <td style="vertical-align: middle;">
                                                 <form method="POST" action="/modify" style="display:inline;">
                                                     <input type="hidden" name="group_id" value="{{ group_body.group_id }}">

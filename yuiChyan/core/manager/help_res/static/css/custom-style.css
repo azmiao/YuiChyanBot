@@ -1,5 +1,7 @@
 {# 全局样式 #}
+@import url('https://static.zeoseven.com/zsft/161/main/result.css');
 body {
+    font-family: "Sarasa Gothic SC";
     background-color: #f2f2f2;
     margin: 0;
     text-align: center;
@@ -18,6 +20,7 @@ body {
 }
 {# 命令文档 和 关于 页面的样式#}
 .command-box, .about-box {
+    font-family: "Sarasa Gothic SC";
     border: 1px solid #ddd;
     border-radius: 12px;
     padding: 20px;
@@ -27,6 +30,7 @@ body {
 }
 {# 关于  页面内容的样式 #}
 .about-content {
+    font-family: "Sarasa Gothic SC";
     text-align: center;
     font-size: 18px;
     line-height: 1.6;
@@ -43,6 +47,7 @@ body {
 }
 {# H1/H2/H3标签的字体样式 #}
 h1, h2, h3 {
+    font-family: "Sarasa Gothic SC";
     color: #333;
     background: linear-gradient(to right, #87CEEB, #FF69B4, #A1D1F5, #FF82A5, #87CEEB);
     background-size: 200% 200%;
@@ -56,6 +61,7 @@ h1, h2, h3 {
 }
 {# 搜索框样式 #}
 #searchInput {
+    font-family: "Sarasa Gothic SC";
     flex: 1;
     padding: 12px 40px 12px 12px;
     margin: 10px 0;
@@ -66,6 +72,7 @@ h1, h2, h3 {
 }
 {# 搜索框内的提示字体样式 #}
 #searchInput::placeholder {
+    font-family: "Sarasa Gothic SC";
     color: #999;
     opacity: 1;
 }
@@ -137,6 +144,7 @@ input[type="text"]:focus {
 }
 {# 按钮常规样式 #}
 button:not(.reset-button) {
+    font-family: "Sarasa Gothic SC";
     height: 48px;
     padding: 0 20px;
     border: none;
@@ -167,6 +175,7 @@ button:hover:not(.reset-button) {
 }
 {# 每个子文档的折叠按钮样式 #}
 .accordion .card-header button {
+    font-family: "Sarasa Gothic SC";
     height: 48px;
     padding: 0 20px;
     border: none;
@@ -199,4 +208,45 @@ pre {
     padding: 10px;
     border-radius: 10px !important;
     overflow: auto;
+}
+{# 代码块字体 #}
+pre, code {
+    font-family: "Sarasa Gothic SC" !important;
+}
+{# 圆形图标 #}
+.icon-circle {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    position: relative;
+    color: white;
+    text-align: center;
+    font-size: 12px;
+    line-height: 20px;
+    font-weight: bold;
+}
+{# 是的图标 #}
+.check-circle {
+    background-color: #66cc66;
+}
+.check-circle:before {
+    font-family: "Sarasa Gothic SC";
+    content: "\2713";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+{# 否的图标 #}
+.times-circle {
+    background-color: #ff6666;
+}
+.times-circle:before {
+    font-family: "Sarasa Gothic SC";
+    content: "\2715";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
