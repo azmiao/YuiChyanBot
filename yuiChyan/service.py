@@ -75,8 +75,8 @@ class Service:
         self.help_bytes: Optional[bytes] = None
 
         service_config = _read_service_config(name)
-        self.include_group: List[int] = service_config.get('include_group', [])
-        self.exclude_group: List[int] = service_config.get('exclude_group', [])
+        self.include_group: List[str] = service_config.get('include_group', [])
+        self.exclude_group: List[str] = service_config.get('exclude_group', [])
         self.logger: Logger = new_logger(name, yuiChyan.config.DEBUG)
 
         # 载入缓存
@@ -100,13 +100,13 @@ class Service:
         return _loaded_services
 
     # 转化成简单的字符串字典
-    def to_simple_dict(self, enable: bool = True) -> dict:
+    def to_simple_dict(self, enabled: bool = True) -> dict:
         return {
             'name': self.name,
             'manage': self.manage.name,
             'visible': self.visible,
             'need_auth': self.need_auth,
-            'enable': enable
+            'enabled': enabled
         }
 
     # 获取sv实际的实例所在文件路径
@@ -140,29 +140,29 @@ class Service:
     # 对某个群开启服务
     def enable_service(self, group_id: int):
         if self.use_exclude:
-            self.exclude_group.remove(group_id)
+            self.exclude_group.remove(str(group_id))
         else:
-            self.include_group.append(group_id)
+            self.include_group.append(str(group_id))
         self.save_loaded_services()
         _save_service_config(self)
-        self.logger.info(f'服务 [{self.name}] 在群 [{group_id}] 启用成功！')
+        self.logger.info(f'服务 [{self.name}] 在群 [{str(group_id)}] 启用成功！')
 
     # 对某个群禁用服务
     def disable_service(self, group_id: int):
         if self.use_exclude:
-            self.exclude_group.append(group_id)
+            self.exclude_group.append(str(group_id))
         else:
-            self.include_group.remove(group_id)
+            self.include_group.remove(str(group_id))
         self.save_loaded_services()
         _save_service_config(self)
-        self.logger.info(f'服务 [{self.name}] 在群 [{group_id}] 禁用成功！')
+        self.logger.info(f'服务 [{self.name}] 在群 [{str(group_id)}] 禁用成功！')
 
     # 判断某个群是否启用本服务
     def judge_enable(self, group_id: int) -> bool:
         if self.use_exclude:
-            return group_id not in self.exclude_group
+            return str(group_id) not in self.exclude_group
         else:
-            return group_id in self.include_group
+            return str(group_id) in self.include_group
 
     # 获取所有启用本服务的群 | key: 群号 | value: BOT列表
     async def get_enable_groups(self) -> List[int]:
@@ -170,12 +170,12 @@ class Service:
             self_group_list = await self.bot.get_cached_group_list()
         except CQHttpError:
             self_group_list = []
-        self_group_list = list(int(x['group_id']) for x in self_group_list)
+        self_group_id_list: list[int] = list(int(x['group_id']) for x in self_group_list)
         if self.use_exclude:
-            self_group_list = [item for item in self_group_list if item not in self.exclude_group]
+            self_group_id_list = [item for item in self_group_id_list if str(item) not in self.exclude_group]
         else:
-            self_group_list = list(set(self_group_list) & set(self.include_group))
-        return self_group_list
+            self_group_id_list = list(set(self_group_id_list) & set([int(item) for item in self.include_group]))
+        return self_group_id_list
 
     def on_message(self, message_type: str = 'group') -> Callable:
         """

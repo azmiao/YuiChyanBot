@@ -1,5 +1,5 @@
 import uuid
-from typing import List, Dict
+from typing import List, Dict, Optional
 
 from quart import request, render_template, session, redirect, make_response
 
@@ -162,3 +162,21 @@ async def manager_page():
             'service_list': service_list
         })
     return await render_template('manager_page.html', config={'bot_name': NICKNAME, 'data': data})
+
+
+@yui_bot.server_app.route('/modify', methods=['POST'])
+async def manager_modify():
+    # 获取表单数据
+    modify_data = await request.form
+    group_id = modify_data.get('group_id')
+    service_name = modify_data.get('name')
+    enable_list, disable_list = await get_group_services(group_id, True)
+    # 检查服务在启用列表还是禁用列表，并切换状态
+    service: Optional[Service] = next((service for service in enable_list if service.name == service_name), None)
+    if service:
+        service.disable_service(group_id)
+        return redirect('/manager')
+    service: Optional[Service] = next((service for service in disable_list if service.name == service_name), None)
+    if service:
+        service.enable_service(group_id)
+        return redirect('/manager')

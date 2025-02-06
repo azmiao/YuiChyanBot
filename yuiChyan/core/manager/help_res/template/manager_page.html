@@ -59,7 +59,8 @@
                                             <th>是否可见</th>
                                             <th>是否需要授权</th>
                                             <th>管理权限</th>
-                                            <th>是否启用</th>
+                                            <th>状态</th>
+                                            <th>操作</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -69,7 +70,16 @@
                                             <td>{{ "是" if service.visible else "否" }}</td>
                                             <td>{{ "是" if service.need_auth else "否" }}</td>
                                             <td>{{ service.manage }}</td>
-                                            <td>{{ "是" if service.enable else "否" }}</td>
+                                            <td>{{ "启用" if service.enabled else "禁用" }}</td>
+                                            <td>
+                                                <form method="POST" action="/modify" style="display:inline;">
+                                                    <input type="hidden" name="group_id" value="{{ group_body.group_id }}">
+                                                    <input type="hidden" name="name" value="{{ service.name }}">
+                                                    <button type="submit" class="btn btn-link">
+                                                      {{ "禁用" if service.enabled else "启用" }}
+                                                    </button>
+                                                </form>
+                                            </td>
                                         </tr>
                                         {% endfor %}
                                     </tbody>
