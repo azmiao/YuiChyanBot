@@ -155,6 +155,8 @@ button:not(.reset-button) {
 button:hover:not(.reset-button) {
     box-shadow: 0 6px 15px rgba(255, 105, 180, 0.5);
     transform: scale(1.05);
+    color: white;
+    text-decoration: none;
 }
 {# 每个子文档的卡片样式 #}
 .transparent-card {

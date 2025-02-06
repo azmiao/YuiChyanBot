@@ -14,7 +14,7 @@
     <style>
         {# 背景图样式 #}
         .background-image {
-            background-image: url('../static/background_compressed.jpg');
+            background-image: url("../static/background_compressed.jpg");
             background-size: cover;
             filter: blur(30px);
             opacity: 0.2;
@@ -58,25 +58,25 @@
                                             <th>服务名称</th>
                                             <th>是否可见</th>
                                             <th>是否需要授权</th>
-                                            <th>管理权限</th>
-                                            <th>状态</th>
-                                            <th>操作</th>
+                                            <th>管理所需权限</th>
+                                            <th>当前状态</th>
+                                            <th>【操作】</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {% for service in group_body.service_list %}
                                         <tr>
-                                            <td>{{ service.name }}</td>
-                                            <td>{{ "是" if service.visible else "否" }}</td>
-                                            <td>{{ "是" if service.need_auth else "否" }}</td>
-                                            <td>{{ service.manage }}</td>
-                                            <td>{{ "启用" if service.enabled else "禁用" }}</td>
-                                            <td>
+                                            <td style="vertical-align: middle;">{{ service.name }}</td>
+                                            <td style="vertical-align: middle;">{{ "是" if service.visible else "否" }}</td>
+                                            <td style="vertical-align: middle;">{{ "是" if service.need_auth else "否" }}</td>
+                                            <td style="vertical-align: middle;">{{ service.manage }}</td>
+                                            <td style="vertical-align: middle;">{{ "启用" if service.enabled else "禁用" }}</td>
+                                            <td style="vertical-align: middle;">
                                                 <form method="POST" action="/modify" style="display:inline;">
                                                     <input type="hidden" name="group_id" value="{{ group_body.group_id }}">
                                                     <input type="hidden" name="name" value="{{ service.name }}">
                                                     <button type="submit" class="btn btn-link">
-                                                      {{ "禁用" if service.enabled else "启用" }}
+                                                      {{ "> 禁用 <" if service.enabled else "> 启用 <" }}
                                                     </button>
                                                 </form>
                                             </td>
