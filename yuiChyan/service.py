@@ -89,6 +89,9 @@ class Service:
             async def __get_help(bot, ev):
                 await bot.send(ev, await self.__get_sv_help())
 
+        # 重新保存至缓存 | 相当于刷新缓存
+        _save_service_config(self)
+
     # 获取bot
     @property
     def bot(self) -> YuiChyan:
@@ -98,6 +101,10 @@ class Service:
     @staticmethod
     def get_loaded_services() -> Dict[str, 'Service']:
         return _loaded_services
+
+    # 将自身服务保存至缓存
+    def save_loaded_services(self):
+        _loaded_services[self.name] = self
 
     # 转化成简单的字符串字典
     def to_simple_dict(self, enabled: bool = True) -> dict:
@@ -132,10 +139,6 @@ class Service:
         # 转base64发送
         image_base64 = await convert_image_to_base64(self.help_bytes)
         return f'[CQ:image,file=base64://{image_base64}]'
-
-    # 将自身服务保存至缓存
-    def save_loaded_services(self):
-        _loaded_services[self.name] = self
 
     # 对某个群开启服务
     def enable_service(self, group_id: int):
