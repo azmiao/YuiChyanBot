@@ -63,7 +63,7 @@ async def comic(bot, ev):
         return
     episode = episode.lstrip('0')
     if not episode:
-        raise FunctionException(ev, '命令错误，示例：官漫100')
+        raise FunctionException(ev, '命令错误，示例：PCR官漫100')
 
     with open(os.path.join(comic_path, 'index.json'), encoding='utf8') as f:
         index = json.load(f)

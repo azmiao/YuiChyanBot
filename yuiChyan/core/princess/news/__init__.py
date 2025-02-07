@@ -15,19 +15,19 @@ jp_spider = JpSpider()
 @sv_tw.on_match(('PCR台服新闻', 'pcr台服新闻'))
 async def send_tw_news(bot, ev):
     msg = await create_news(tw_spider)
-    await bot.send(ev, msg, at_sender=True)
+    await bot.send(ev, msg)
 
 
 @sv_bl.on_match(('PCR国服新闻', 'pcr国服新闻'))
 async def send_bili_news(bot, ev):
     msg = await create_news(bili_spider)
-    await bot.send(ev, msg, at_sender=True)
+    await bot.send(ev, msg)
 
 
 @sv_jp.on_match(('PCR日服新闻', 'pcr日服新闻'))
 async def send_jp_news(bot, ev):
     msg = await create_news(jp_spider)
-    await bot.send(ev, msg, at_sender=True)
+    await bot.send(ev, msg)
 
 
 @sv_tw.scheduled_job(minute='*/5')
