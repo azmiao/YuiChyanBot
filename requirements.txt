@@ -22,5 +22,5 @@ matplotlib==3.10.0
 plottable==0.1.5
 imgkit==1.2.3
 GitPython==3.1.44
-lxml==5.3.0
+lxml==5.3.1
 python-dateutil==2.9.0.post0
