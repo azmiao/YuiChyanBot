@@ -1,7 +1,6 @@
 import asyncio
 import json
 import random
-import re
 import time
 
 import websockets
@@ -82,21 +81,24 @@ async def connect_ws(ws_url, reconnect_interval, rate_limiter, headers):
                     case '/':
                         # 私聊
                         message_ = message_[1:]
+                        msg = Message(message_)
                         data['post_type'] = 'message'
                         data['message_type'] = 'private'
+                        data['detail_type'] = 'private'
                         data['sub_type'] = 'normal'
-                        data['message'] = message_
-                        data['raw_message'] = message_
+                        data['message'] = msg
+                        data['raw_message'] = str(msg)
                         print(f'收到私聊 {config["nickname"]}({config["sender_id"]}) 的消息: {message_} ({msg_id})')
                     case _:
                         # 群聊
-                        _match = re.match(r'^(@BOT)? ?([\S\s]*)$', message_)
-                        data['to_me'] = True if _match.group(1) else False
+                        message_ = message_.replace('@BOT', f'[CQ:at,qq={config["bot_id"]}]')
+                        msg = Message(message_)
                         data['post_type'] = 'message'
                         data['message_type'] = 'group'
+                        data['detail_type'] = 'group'
                         data['sub_type'] = 'normal'
-                        data['message'] = _match.group(2)
-                        data['raw_message'] = message_
+                        data['message'] = msg
+                        data['raw_message'] = str(msg)
                         data['group_id'] = config['group_id']
                         data['sender'] = {'card': config["nickname"]}
                         print(f'收到群 {config["group_name"]}({config["group_id"]}) 的消息: {message_} ({msg_id})')
