@@ -6,7 +6,7 @@ zhconv==1.4.3
 pygtrie==2.5.0
 pytz==2025.1
 APScheduler==3.11.0
-websockets==14.2
+websockets==15.0
 Jinja2==3.1.5
 quart==0.20.0
 rocksdict==0.3.25
