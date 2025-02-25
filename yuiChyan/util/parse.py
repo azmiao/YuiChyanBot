@@ -1,9 +1,12 @@
 import os
 import re
 import ssl
+from io import BytesIO
 from typing import List, Optional, Tuple
 
 import httpx
+from PIL import Image
+from PIL.ImageFile import ImageFile
 from aiocqhttp import Event as CQEvent
 
 from yuiChyan import FunctionException, get_bot
@@ -58,6 +61,25 @@ async def save_image(ev: Optional[CQEvent],
     except Exception as e:
         raise FunctionException(ev, f'从{image_url}下载图片{image_name}出错:{str(e)}')
     return image_name
+
+
+# 获取图片ImageFile
+async def get_image_pil(ev: Optional[CQEvent], image_file: str, image_name: str, image_url: Optional[str]) -> ImageFile:
+    # 如果没有image_url，说明是GO-CQ的客户端，重新取一下图片URL
+    image_url = image_url if image_url else await get_real_url(ev, image_file)
+
+    # 开始获取图片字节
+    try:
+        headers = {'User-Agent': 'Mozilla/5.0'}
+        ctx = ssl.create_default_context()
+        ctx.set_ciphers('ALL')
+        with httpx.Client(verify=ctx, headers=headers) as session:
+            with session.stream('GET', image_url) as resp:
+                f_data = resp.read()
+    except Exception as e:
+        raise FunctionException(ev, f'从{image_url}获取图片{image_name}出错:{str(e)}')
+    # 返回图片
+    return Image.open(BytesIO(f_data))
 
 
 # 根据CQ中的"xxx=xxxx,yyy=yyyy,..."提取出file和file_name还有url

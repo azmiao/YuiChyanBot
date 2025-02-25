@@ -4,7 +4,6 @@ from enum import IntEnum, unique
 from aiocqhttp import Event as CQEvent
 
 from .arena import sv
-from yuiChyan.util.parse import parse_single_image, get_real_url
 from .old_main import _QueryArenaImageAsync, _QueryArenaTextAsync, _update_dic_cron
 
 
@@ -39,12 +38,8 @@ async def parse_and_query(bot, ev: CQEvent, region: RegionEnum, str_raw: str):
         # 不是图片 | 解析阵容
         await _QueryArenaTextAsync(str_raw, int(region), bot, ev)
     else:
-        # 是图片 | 解析图片
-        image_file, _, image_url = await parse_single_image(ev, str_raw)
-        # 如果没有image_url，说明是GO-CQ的客户端，重新取一下图片URL
-        image_url = image_url if image_url else await get_real_url(ev, image_file)
-        # 查询
-        await _QueryArenaImageAsync(image_url, int(region), bot, ev)
+        # 是图片 | 解析图片并查询
+        await _QueryArenaImageAsync(str_raw, int(region), bot, ev)
 
 
 # 更新字典图标缓存

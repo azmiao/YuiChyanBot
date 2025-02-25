@@ -15,6 +15,7 @@ from PIL.Image import Resampling
 from aiocqhttp import MessageSegment
 
 from yuiChyan.util import pic2b64
+from yuiChyan.util.parse import parse_single_image, get_image_pil
 from . import arena
 from .arena import buffer_json_path, cur_path, sv
 from .record import update_dic, update_record
@@ -435,9 +436,9 @@ async def get_pic(address: str):
     return resp.read()
 
 
-async def _QueryArenaImageAsync(image_url: str, region: int, bot, ev):
-    # await bot.send(ev, "recognizing")
-    image = Image.open(BytesIO(await get_pic(image_url)))
+async def _QueryArenaImageAsync(str_raw: str, region: int, bot, ev):
+    image_file, image_file_name, image_url = await parse_single_image(ev, str_raw)
+    image = await get_image_pil(ev, image_file, image_file_name, image_url)
     boxDict, s = await getBox(image)
 
     if not boxDict:
