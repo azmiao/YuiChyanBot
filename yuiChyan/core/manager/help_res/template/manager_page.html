@@ -94,7 +94,7 @@
                                                     <input type="hidden" name="group_id" value="{{ group_body.group_id }}">
                                                     <input type="hidden" name="name" value="{{ service.name }}">
                                                     <button type="submit" class="btn btn-link">
-                                                      {{ "> 禁用 <" if service.enabled else "> 启用 <" }}
+                                                      {{ "禁用" if service.enabled else "启用" }}
                                                     </button>
                                                 </form>
                                             </td>
