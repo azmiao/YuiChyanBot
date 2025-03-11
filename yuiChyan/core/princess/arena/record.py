@@ -6,6 +6,7 @@ import numpy as np
 from PIL import Image
 
 from .arena import buffer_path
+from ..chara_manager import is_npc
 from ..util import unit_path
 
 
@@ -16,8 +17,9 @@ def update_dic():
         try:
             ret = re.match(r"^icon_unit_(\d{6}).png$", file)
             icon_id = int(ret.group(1))
-            if (1000 <= icon_id // 100 < 1300) or (1700 < icon_id // 100 < 1900):  # is_npc的判定是(1000,1900)
-                icon_list.append([file, icon_id])  # 但此处我们需要识别问号（pjjc用），因此设置为[1000, 1900)
+            # 保留1000的判断
+            if icon_id // 100 == 1000 or (not is_npc(icon_id // 100)):
+                icon_list.append([file, icon_id])
         except:
             continue
     msg = [f'共检测到{len(icon_list)}个pcr头像']
@@ -42,16 +44,12 @@ def update_record():
     buffer_region_cnt = [None, {}, {}, {}, {}]  # 全服=1 b服=2 台服=3 日服=4
     tot_file_cnt = len(os.listdir(buffer_path))
     for index, filename in enumerate(os.listdir(buffer_path)):  # 我为什么不用buffer.json 我是猪鼻
-        # if index % 100 == 0:
-        #     print(f'{index:5d}/{tot_file_cnt}')  # test
 
         if len(filename) != 26:
             continue
 
         try:
             region = int(filename[-6])
-            if region == 1:  # 按理说全服查询可能出现任何角色，应该归入4
-                region = 2  # 但本bot 绝大多数的全服查询实际均为国服，因此归入国服。少数的其它服查询在频率排序后会被滤过。
             if region not in [1, 2, 3, 4]:
                 continue
         except:
