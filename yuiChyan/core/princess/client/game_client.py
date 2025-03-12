@@ -128,7 +128,7 @@ class PcrClient:
             data = data['server_error']
             code = data_headers['result_code']
             logger.error(f'[PcrClient] 接口 {api_url} 调用异常：Code={code} | {data}')
-            if str(code) == '204':
+            if str(code) == '201':
                 raise PreemptException(data['message'], data['status'])
             else:
                 raise ApiException(data['message'], data['status'])
