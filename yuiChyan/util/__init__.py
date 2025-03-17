@@ -1,9 +1,11 @@
 import base64
+import html
 import os
 import time
 from collections import defaultdict
 from datetime import datetime, timedelta
 from io import BytesIO
+from urllib.parse import unquote
 
 import pytz
 import unicodedata
@@ -80,6 +82,7 @@ async def silence(ev: CQEvent, ban_time, skip_su=True):
 # 规范化unicode字符串 并 转为简体
 def normalize_str(string) -> str:
     string = unicodedata.normalize('NFKC', string)
+    string = html.unescape(string)
     string = zhconv.convert(string, 'zh-hans')
     return string
 
