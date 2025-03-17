@@ -2,6 +2,7 @@ import asyncio
 import json
 import mimetypes
 import os
+from asyncio import timeout
 
 import httpx
 import websockets
@@ -32,19 +33,27 @@ async def parse_and_save_image(ev, str_raw: str) -> str:
 
 
 # 接收WS数据
-async def receive_wss(ev: CQEvent, wss_url: str, timeout: int) -> str:
-    cycle_time = 0
-    async with websockets.connect(wss_url, additional_headers=header, max_size=2**20*10) as ws:
-        while True:
-            await asyncio.sleep(1)
-            cycle_time += 1
-            if cycle_time >= timeout:
-                raise FunctionException(ev, 'WS获取漫画蒙版超时')
-            recv = await ws.recv()
-            json_dump = json.loads(recv)
-            result = json_dump.get('result', {})
-            if result:
-                mask_url = result.get('translation_mask', '')
+async def receive_wss(ev: CQEvent, wss_url: str, _timeout: int) -> str:
+    async with websockets.connect(
+            wss_url,
+            additional_headers=header,
+            max_size=2 ** 20 * 10,
+            open_timeout=10
+    ) as ws:
+        try:
+            async with timeout(_timeout):
+                return await _receive_data(ws)
+        except asyncio.TimeoutError:
+            raise FunctionException(ev, 'WS获取漫画蒙版超时')
+
+
+# 解耦数据接收逻辑
+async def _receive_data(ws) -> str:
+    while True:
+        recv = await ws.recv()
+        json_dump = json.loads(recv)
+        if result := json_dump.get('result', {}):
+            if mask_url := result.get('translation_mask', ''):
                 return mask_url
 
 
@@ -85,7 +94,7 @@ async def manga_tran(ev: CQEvent, img_name: str) -> MessageSegment:
     # 异步WS获取蒙版URL
     logger.info(f'> 漫画翻译：当前漫画ID为 [{id_}]')
     wss_url = f'wss://api.cotrans.touhou.ai/task/{id_}/event/v1'
-    mask_url = await receive_wss(ev, wss_url, 180)
+    mask_url = await receive_wss(ev, wss_url, 60)
 
     # 同步保存蒙板
     logger.info(f'> 漫画翻译：蒙板URL为 [{mask_url}]')
