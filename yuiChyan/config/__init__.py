@@ -1,12 +1,12 @@
-import os
 from typing import Dict, Any, List, Optional
 
-import json5
+from ._create_default import *
 
-# 注意：文件仅供内置核心插件配置读取用，默认情况下无法加载外置插件配置
+# 生成默认配置
+check_all()
 
 # 基础配置
-with open(os.path.join(os.path.dirname(__file__), 'base_config.json5'), 'r', encoding='utf-8') as _config:
+with open(base_config, 'r', encoding='utf-8') as _config:
     _data = json5.load(_config)
 HOST: str = _data.get('HOST', '127.0.0.1')
 PORT: int = _data.get('PORT', 2333)
@@ -16,20 +16,10 @@ NICKNAME: str = _data.get('NICKNAME', '优衣酱')
 PUBLIC_PROTOCOL: str = _data.get('PUBLIC_PROTOCOL', 'http')
 PUBLIC_DOMAIN: Optional[str] = _data.get('PUBLIC_DOMAIN', None)
 PROXY: Optional[str] = _data.get('PROXY', None)
-MANAGER_PASSWORD: str = _data.get('MANAGER_PASSWORD', '@azmiao')
-
-# 核心插件
-with open(os.path.join(os.path.dirname(__file__), 'core_plugins.json5'), 'r', encoding='utf-8') as _config:
-    _data = json5.load(_config)
-CORE_PLUGINS: Dict[str, str] = _data
-
-# 额外插件
-with open(os.path.join(os.path.dirname(__file__), 'extra_plugins.json5'), 'r', encoding='utf-8') as _config:
-    _data = json5.load(_config)
-EXTRA_PLUGINS: Dict[str, str] = _data
+MANAGER_PASSWORD: str = _data.get('MANAGER_PASSWORD', '12345')
 
 # 授权管理配置
-with open(os.path.join(os.path.dirname(__file__), 'auth_config.json5'), 'r', encoding='utf-8') as _config:
+with open(auth_config, 'r', encoding='utf-8') as _config:
     _data = json5.load(_config)
 ENABLE_AUTH: bool = _data.get('ENABLE_AUTH', True)
 REMIND_BEFORE_EXPIRED: int = _data.get('REMIND_BEFORE_EXPIRED', 3)
@@ -37,7 +27,7 @@ GROUPS_IN_PAGE: int = _data.get('GROUPS_IN_PAGE', 5)
 GROUP_LEAVE_MSG: str = _data.get('GROUP_LEAVE_MSG', '管理员操作')
 
 # XQA配置
-with open(os.path.join(os.path.dirname(__file__), 'xqa_config.json5'), 'r', encoding='utf-8') as _config:
+with open(xqa_config, 'r', encoding='utf-8') as _config:
     _data = json5.load(_config)
 IS_SPILT_MSG: bool = _data.get('IS_SPILT_MSG', True)
 MSG_LENGTH: int = _data.get('MSG_LENGTH', 1000)
@@ -47,6 +37,16 @@ IS_JUDGE_LENGTH: bool = _data.get('IS_JUDGE_LENGTH', False)
 IS_DIRECT_SINGER: bool = _data.get('IS_DIRECT_SINGER', True)
 SPLIT_MSG: str = _data.get('SPLIT_MSG', ' | ')
 IS_BASE64: bool = _data.get('IS_BASE64', False)
+
+# 核心插件
+with open(core_plugins, 'r', encoding='utf-8') as _config:
+    _data = json5.load(_config)
+CORE_PLUGINS: Dict[str, str] = _data
+
+# 额外插件
+with open(extra_plugins, 'r', encoding='utf-8') as _config:
+    _data = json5.load(_config)
+EXTRA_PLUGINS: Dict[str, str] = _data
 
 # 其他默认配置
 COMMAND_START = {''}
