@@ -3,33 +3,14 @@ import io
 import os.path
 
 import imgkit
-import markdown
+import markdown2
 import matplotlib.pyplot as plt
 import pandas as pd
 from plottable import Table
 from quart import Markup, render_template
 
-from yuiChyan import md_css_path, font_path
+from yuiChyan import md_css_path
 from yuiChyan.resources import font_prop
-
-
-# 数据样例
-# raw_data = {
-#     'title': '啊这',
-#     'index_column': 'id',
-#     'show_columns': {
-#         'id': 'ID',
-#         'name': '名称',
-#         'text': '文本'
-#     },
-#     'data_list': [
-#         {
-#             'id': '1',
-#             'name': '测试',
-#             'text': '哈哈'
-#         }
-#     ]
-# }
 
 
 # 创建表格
@@ -47,7 +28,7 @@ async def create_table(_raw_data: dict) -> plt.Figure:
 
     # 动态计算图形的大小
     num_rows, num_cols = df.shape
-    default_width_per_col = 2  # 每列的默认宽度
+    default_width_per_col = 3  # 每列的默认宽度
     default_height_per_row = 0.5  # 每行的默认高度
     width = num_cols * default_width_per_col  # 根据列数调整宽度
     height = num_rows * default_height_per_row + 1.5  # 根据行数调整高度，加给标题等等
@@ -77,10 +58,25 @@ async def create_table(_raw_data: dict) -> plt.Figure:
         odd_row_color='#FFF0F0',
         even_row_color='#E0F6FF'
     )
-    # 添加左下角水印
-    fig.text(0.02, 0.02, 'Power By YuiChyanBot', fontproperties=font_prop, fontsize=12, color='gray', ha='left', va='bottom', alpha=0.5)
-    # 添加右下角水印
-    fig.text(0.98, 0.02, 'Author: AZMIAO', fontproperties=font_prop, fontsize=12, color='gray', ha='right', va='bottom', alpha=0.5)
+    # 添加左上角水印
+    fig.text(0.02, 0.98,
+             'Power By YuiChyanBot',
+             fontproperties=font_prop,
+             fontsize=12,
+             color='gray',
+             ha='left',
+             va='top',
+             alpha=0.5)
+
+    # 添加右上角水印
+    fig.text(0.98, 0.98,
+             'Author: AZMIAO',
+             fontproperties=font_prop,
+             fontsize=12,
+             color='gray',
+             ha='right',
+             va='top',
+             alpha=0.5)
     # 自动调整布局
     plt.tight_layout(pad=2.0)
     return fig
@@ -89,8 +85,7 @@ async def create_table(_raw_data: dict) -> plt.Figure:
 # 从Markdown生成图片
 async def generate_image_from_markdown(markdown_content: str) -> bytes:
     # 将 Markdown 文本转换为 HTML
-    html_content = markdown.markdown(markdown_content, extensions=['markdown.extensions.fenced_code',
-                                                                   'markdown.extensions.tables'])
+    html_content = markdown2.markdown(markdown_content, extras=['fenced-code-blocks', 'tables'])
     html_content = Markup(html_content)
     full_html = await render_template(
         'help_image.html',
