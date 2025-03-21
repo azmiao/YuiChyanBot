@@ -27,7 +27,7 @@ async def help_view():
             help_path = help_.get('path', '')
             with open(help_path, 'r', encoding='utf-8') as file:
                 markdown_content = file.read()
-            html_content = markdown2.markdown(markdown_content, extensions=['fenced-code-blocks', 'tables'])
+            html_content = markdown2.markdown(markdown_content, extras=['fenced-code-blocks', 'tables'])
             help_['help'] = Markup(html_content)
         # 放入帮助列表
         config['help_list'] = self_help_list
