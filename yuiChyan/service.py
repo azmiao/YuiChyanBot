@@ -193,6 +193,8 @@ class Service:
                 # 因为不走触发器，所以这里需要手动判断服务是否启用
                 if self.judge_enable(int(event.group_id)):
                     try:
+                        if config.DEBUG:
+                            self.logger.info(str(event.message))
                         return await func(self.bot, event)
                     except Exception as e:
                         self.logger.exception(e)
