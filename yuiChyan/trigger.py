@@ -122,11 +122,11 @@ class RegularTrigger(BaseTrigger):
         yuiChyan.logger.debug(f'成功添加 [正则匹配] 条件 [{x.pattern}]')
 
     def find_handler(self, event: CQEvent) -> Iterable['ServiceFunc']:
-        plain_text = str(event.message).strip()
-        normal_text = normalize_str(plain_text)
+        normal_text = normalize_str(str(event.message))
+        event.normal_text = normal_text
         for rex, sfs in self.regular_dict.items():
             for service_func in sfs:
-                match = rex.search(normal_text)
+                match = rex.search(event.normal_text)
                 if match:
                     event['match'] = match
                     yield service_func

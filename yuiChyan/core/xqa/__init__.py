@@ -10,7 +10,7 @@ sv = Service('core_xqa', help_cmd=('XQA帮助', 'xqa帮助', '问答帮助'))
 # 设置问答，支持正则表达式和回流
 @sv.on_message('group')
 async def set_question(bot: YuiChyan, ev: CQEvent):
-    results = re.match(r'^(全群|有人|我)问([\s\S]*)你答([\s\S]*)$', str(ev.message))
+    results = re.match(r'^(全群|有人|我)问([\s\S]*)你答([\s\S]*)$', ev.normal_text)
     if not results:
         return
 
@@ -106,7 +106,7 @@ async def search_question(bot: YuiChyan, ev: CQEvent):
 # 不要回答，管理员可以@人删除回答
 @sv.on_message('group')
 async def delete_question(bot: YuiChyan, ev: CQEvent):
-    no_que_match = re.match(r'^(\[CQ:at,qq=[0-9]+])? ?(全群)?不要回答([\s\S]*)$', str(ev.message))
+    no_que_match = re.match(r'^(\[CQ:at,qq=[0-9]+])? ?(全群)?不要回答([\s\S]*)$', ev.normal_text)
     if not no_que_match:
         return
 
@@ -159,7 +159,7 @@ async def delete_question(bot: YuiChyan, ev: CQEvent):
 # 回复问答
 @sv.on_message('group')
 async def xqa(bot: YuiChyan, ev: CQEvent):
-    group_id, user_id, message = str(ev.group_id), str(ev.user_id), str(ev.message)
+    group_id, user_id, message = str(ev.group_id), str(ev.user_id), ev.normal_text
     db = await get_database()
     group_dict = db.get(group_id, {'all': {}})
     # 仅调整问题中的图片

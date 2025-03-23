@@ -16,6 +16,7 @@ from yuiChyan.exception import *
 from yuiChyan.log import new_logger
 from yuiChyan.permission import ADMIN, check_permission, Permission
 from yuiChyan.resources import auth_db_ as auth_db, service_db_ as service_db
+from yuiChyan.util import normalize_str
 from yuiChyan.util.chart_generator import generate_image_from_markdown, convert_image_to_base64
 
 # 全局服务配置缓存
@@ -193,8 +194,9 @@ class Service:
                 # 因为不走触发器，所以这里需要手动判断服务是否启用
                 if self.judge_enable(int(event.group_id)):
                     try:
-                        if config.DEBUG:
-                            self.logger.info(str(event.message))
+                        # 处理url转码字符
+                        normal_text = normalize_str(str(event.message))
+                        event.normal_text = normal_text
                         return await func(self.bot, event)
                     except Exception as e:
                         self.logger.exception(e)

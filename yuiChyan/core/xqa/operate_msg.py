@@ -1,4 +1,3 @@
-from yuiChyan import YuiChyan
 from .util import *
 
 
