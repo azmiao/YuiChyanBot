@@ -1,4 +1,4 @@
-from aiocqhttp import Event, MessageSegment
+from aiocqhttp import Event
 
 from yuiChyan import YuiChyan
 from yuiChyan.service import Service
@@ -14,7 +14,7 @@ async def search_music(bot: YuiChyan, ev: Event):
     if not music_name:
         return
     msg = await search_api(ev.group_id, ev.user_id, music_name)
-    await bot.send(ev, msg)
+    await bot.send(ev, msg, at_sender=True)
 
 
 @sv.on_prefix('点歌')
@@ -30,8 +30,8 @@ async def select_music(bot: YuiChyan, ev: Event):
     # 确认缓存是否过期并返回音乐缓存列表
     song_list = await check_music_temp(ev.group_id, ev.user_id)
     if not song_list:
-        msg = '您还没有搜过歌或命令已超时，请先使用命令"搜歌 歌名"来搜索'
+        msg = '\n您还没有搜过歌或命令已超时，请先使用命令"搜歌 歌名"来搜索'
     else:
         song = song_list[music_id]
-        msg = MessageSegment.music(song['type'], song['id'])
-    await bot.send(ev, msg)
+        msg = f'\n> {song["name"]} - {song["artists"]}\nhttps://music.163.com/#/song?id={song["id"]}'
+    await bot.send(ev, msg, at_sender=True)

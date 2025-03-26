@@ -72,7 +72,7 @@ async def search_api(group_id: int, user_id: int, keyword: str, result_num: int 
     if not song_list:
         msg = '没有找到任何歌曲哦~'
     else:
-        msg = '查询到相关歌曲：'
+        msg = '> 查询到相关歌曲：'
         for idx, song in enumerate(song_list):
             msg += f'\n{idx}. {song["name"]} - {song["artists"]}'
         msg += f'\n> 请在30秒内发送形如"点歌 1"的命令来听歌吧，仅限搜歌人操作'
