@@ -110,7 +110,7 @@ async def construct_msg(is_enable: bool, success_list: List[str], failed_dict: D
 @yui_bot.server_app.before_request
 async def _():
     # 排除的请求
-    if request.path in ['/login', '/', '/help']:
+    if request.path in ['/login', '/', '/help', '/clan']:
         return
     # 排除静态文件
     if request.path.startswith('/static'):
