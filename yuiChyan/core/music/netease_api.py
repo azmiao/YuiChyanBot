@@ -42,7 +42,7 @@ class NetEase:
             headers=self.header,
             timeout=3
         )
-        return await resp.json()
+        return resp.json()
 
 
 # 查询接口
