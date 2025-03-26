@@ -73,7 +73,8 @@ _core_tmp = '''
     // 下面三个不需要可自行删除
     "air_con": "群空调",
     "daily_news": "今日早报",
-    "princess": "PCR公主连结基础插件"
+    "princess": "PCR公主连结基础插件",
+    "music": "群音乐助手"
 }
 '''
 
