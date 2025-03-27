@@ -233,22 +233,12 @@ pre, code {
     background-color: #66cc66;
 }
 .check-circle:before {
-    font-family: "Sarasa Gothic SC";
-    content: "\2713";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+  content: url('data:image/svg+xml,<svg viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>');
 }
 {# 否的图标 #}
 .times-circle {
     background-color: #ff6666;
 }
 .times-circle:before {
-    font-family: "Sarasa Gothic SC";
-    content: "\2715";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+  content: url('data:image/svg+xml,<svg viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg"><path d="M19 6.4L17.6 5 12 10.6 6.4 5 5 6.4l5.6 5.6L5 17.6 6.4 19l5.6-5.6 5.6 5.6 1.4-1.4-5.6-5.6z"/></svg>');
 }
