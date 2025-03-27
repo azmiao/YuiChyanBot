@@ -33,57 +33,77 @@
     <div id="content">
         <div class="container text-center markdown-body">
             <!-- 标题 -->
-            <h1><strong>✦ 公会 [{{ config.user_clan.clan_name }}] 会战情况 ✦</strong></h1>
-            <h3><strong>数据刷新时间：{{ config.refresh_time }} | 会长不在线时会每10分钟刷新一次</strong></h3>
+            <h1><strong>✦ {{ config.user_clan.clan_name }} 会战情况 ✦</strong></h1>
+            <h2><strong>> 当前排名 {{ config.period_rank }} <</strong></h2>
+            <h3><strong>数据更新时间 {{ config.refresh_time }}</strong></h3>
+            <h3>
+              <strong class="flex-center">
+                <span class="text">当前自动更新启用状态 : </span>
+                {% if config.schedule_enable %}
+                  <span class="icon-circle check-circle"></span>
+                {% else %}
+                  <span class="icon-circle times-circle"></span>
+                {% endif %}
+              </strong>
+            </h3>
+            <h3><strong>注：启用自动更新后每10分钟刷新一次</strong></h3>
             <!-- BOSS血量表格 -->
             <div class="command-box">
-                <h2>当前BOSS血量</h2>
-                <table class="table">
-                    <tr class="markdown-body">
-                        <th>BOSS</th>
-                        <th>周目数</th>
-                        <th>当前HP</th>
-                        <th>最大HP</th>
-                    </tr>
-                    <tbody>
-                        {% for boss in config.boss_info %}
-                        <tr class="markdown-body">
-                            <td>{{ boss.order_num }}王</td>
-                            <td>{{ boss.lap_num }}</td>
-                            <td>{{ "{:,.0f}".format(boss.current_hp) }}</td>
-                            <td>{{ "{:,.0f}".format(boss.max_hp) }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                <div class="card-body">
+                    <h2>当前BOSS血量</h2>
+                    <div class="highlight invisible-highlight"></div>
+                    <table class="table" style="margin-top: 20px;">
+                        <thead>
+                            <tr>
+                                <th>BOSS</th>
+                                <th>周目数</th>
+                                <th>当前HP</th>
+                                <th>最大HP</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for boss in config.boss_info %}
+                            <tr>
+                                <td style="vertical-align: middle;">{{ boss.order_num }}王</td>
+                                <td style="vertical-align: middle;">{{ boss.lap_num }}</td>
+                                <td style="vertical-align: middle;">{{ boss.current_hp }}</td>
+                                <td style="vertical-align: middle;">{{ boss.max_hp }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
             <!-- 公会出刀情况表格 -->
             <div class="command-box">
-                <h2>出刀统计 (统计区间: {{ config.older_battle_time }} 至 {{ config.refresh_time }})</h2>
-                <table class="table">
-                    <tr class="markdown-body">
-                        <th>游戏名</th>
-                        <th>群昵称</th>
-                        <th>等级</th>
-                        <th>公主骑士RANK</th>
-                        <th>最后登录时间</th>
-                        <th>完整刀数</th>
-                        <th>尾刀数</th>
-                    </tr>
-                    <tbody>
-                        {% for battle in config.battle_list %}
-                        <tr class="markdown-body">
-                            <td>{{ battle.user_name }}</td>
-                            <td>{{ battle.card }}</td>
-                            <td>{{ battle.team_level }}</td>
-                            <td>{{ battle.knight_rank }}</td>
-                            <td>{{ battle.last_login_str }}</td>
-                            <td>{{ battle.full_count_today }}</td>
-                            <td>{{ battle.tail_count_today }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                <div class="card-body">
+                    <h2>出刀统计 (统计区间: {{ config.older_battle_time }} 至 {{ config.refresh_time }})</h2>
+                    <div class="highlight invisible-highlight"></div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>游戏名</th>
+                                <th>群昵称</th>
+                                <th>等级</th>
+                                <th>公主骑士RANK</th>
+                                <th>完整刀数</th>
+                                <th>尾刀数</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for battle in config.battle_list %}
+                            <tr>
+                                <td style="vertical-align: middle;">{{ battle.user_name }}</td>
+                                <td style="vertical-align: middle;">{{ battle.card }}</td>
+                                <td style="vertical-align: middle;">{{ battle.team_level }}</td>
+                                <td style="vertical-align: middle;">{{ battle.knight_rank }}</td>
+                                <td style="vertical-align: middle;">{{ battle.full_count_today }}</td>
+                                <td style="vertical-align: middle;">{{ battle.tail_count_today }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
             <!-- 关于 -->
             <div class="about-box">

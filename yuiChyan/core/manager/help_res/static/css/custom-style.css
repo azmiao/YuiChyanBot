@@ -220,11 +220,13 @@ pre, code {
     height: 20px;
     border-radius: 50%;
     position: relative;
-    color: white;
+    color: white !important;
     text-align: center;
     font-size: 12px;
     line-height: 20px;
     font-weight: bold;
+    -webkit-text-fill-color: initial !important;
+    animation: none !important;
 }
 {# 是的图标 #}
 .check-circle {
