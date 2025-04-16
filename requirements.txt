@@ -14,7 +14,7 @@ markdown2==2.5.3
 pillow==11.2.1
 fuzzywuzzy==0.18.0
 python-Levenshtein==0.27.1
-beautifulsoup4==4.13.3
+beautifulsoup4==4.13.4
 numpy==2.2.4
 opencv-python==4.11.0.86
 pandas==2.2.3
