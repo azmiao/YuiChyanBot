@@ -23,18 +23,21 @@ async def set_question(bot: YuiChyan, ev: CQEvent):
     match que_type:
         case '全群':
             if get_user_permission(ev) < SUPERUSER:
-                raise LakePermissionException(ev, f'全群问只能维护组设置呢')
+                await bot.send(ev, f'全群问只能维护组设置呢')
+                return
             group_id = 'all'
         case '有人':
             if get_user_permission(ev) < ADMIN:
-                raise LakePermissionException(ev, f'有人问只能群管理设置呢')
+                await bot.send(ev, f'有人问只能群管理设置呢')
+                return
             user_id = 'all'
         case _:
             self_enable = await judge_enable_self(group_id)
             if not self_enable:
-                raise SubFuncDisabledException('本群管理员已禁用"个人问答"功能')
+                await bot.send(ev, f'本群管理员已禁用"个人问答"功能')
+                return
 
-    # 没有问题或没有回答
+        # 没有问题或没有回答
     if (not que_raw) or (not ans_raw):
         raise FunctionException(ev, f'发送“{que_type}问XXX你答XXX”我才记得住~')
     # 是否限制问答长度
