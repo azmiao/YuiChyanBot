@@ -81,10 +81,15 @@ async def show_question(bot: YuiChyan, ev: CQEvent):
 
 
 # 搜索某个成员的问题和回答，限群管理员
-@sv.on_rex(r'查问答 ?\[CQ:at,qq=([0-9]+)] ?(\S*)')
+@sv.on_message('group')
 async def search_question(bot: YuiChyan, ev: CQEvent):
+    query_msg = re.match(r'查问答 ?\[CQ:at,qq=([0-9]+)\S*] ?(\S*)', ev.normal_text)
+    if not query_msg:
+        return
+
     if get_user_permission(ev) < ADMIN:
-        raise LakePermissionException(ev, f'搜索某个成员的问答只能群管理操作呢。个人查询问答请使用“看看我问”+搜索内容')
+        await bot.send(ev, f'搜索某个成员的问答只能群管理操作呢。个人查询问答请使用“看看我问”+搜索内容')
+        return
 
     group_id = str(ev.group_id)
     # 匹配
@@ -92,7 +97,8 @@ async def search_question(bot: YuiChyan, ev: CQEvent):
 
     # 看看要查的用户是否在群里
     if not await judge_ismember(bot, group_id, user_id):
-        raise FunctionException(ev, f'该成员{user_id}不在该群中，请检查')
+        await bot.send(ev, f'该成员{user_id}不在该群中，请检查')
+        return
 
     # 消息头
     msg_head = f'QQ({user_id})的查询结果：\n查询"{search_str}"相关的结果如下：\n' if search_str else ''
@@ -105,7 +111,7 @@ async def search_question(bot: YuiChyan, ev: CQEvent):
 # 不要回答，管理员可以@人删除回答
 @sv.on_message('group')
 async def delete_question(bot: YuiChyan, ev: CQEvent):
-    no_que_match = re.match(r'^(\[CQ:at,qq=[0-9]+])? ?(全群)?不要回答([\s\S]*)$', ev.normal_text)
+    no_que_match = re.match(r'^(\[CQ:at,qq=[0-9]+\S*])? ?(全群)?不要回答([\s\S]*)$', ev.normal_text)
     if not no_que_match:
         return
 
