@@ -100,8 +100,10 @@ async def search_question(bot: YuiChyan, ev: CQEvent):
         await bot.send(ev, f'该成员{user_id}不在该群中，请检查')
         return
 
+    # 查询内容
+    search_str_new = f'"{search_str}"的' if search_str else ''
     # 消息头
-    msg_head = f'QQ({user_id})的查询结果：\n查询"{search_str}"相关的结果如下：\n' if search_str else ''
+    msg_head = f'QQ({user_id})个人问答的查询{search_str_new}结果：\n'
     # 查问答
     result_list = await show_que(group_id, user_id, search_str, msg_head)
     # 发送消息
