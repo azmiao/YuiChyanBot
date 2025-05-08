@@ -155,7 +155,10 @@ async def _process_message(bot: YuiChyan, event: CQEvent):
             # 校验@的人是否是自己 | 如果@别人就不处理
             message_: Message[MessageSegment] = event.message
             seg_first: MessageSegment = message_[0]
+            seg_last: MessageSegment = message_[-1]
             if seg_first.type == 'at' and str(seg_first.data['qq']) != str(event.self_id):
+                continue
+            if seg_last.type == 'at' and str(seg_last.data['qq']) != str(event.self_id):
                 continue
 
             # 如果有群ID

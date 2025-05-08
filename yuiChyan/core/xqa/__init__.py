@@ -81,18 +81,14 @@ async def show_question(bot: YuiChyan, ev: CQEvent):
 
 
 # 搜索某个成员的问题和回答，限群管理员
-@sv.on_prefix('查问答')
+@sv.on_rex(r'查问答 ?\[CQ:at,qq=([0-9]+)] ?(\S*)')
 async def search_question(bot: YuiChyan, ev: CQEvent):
     if get_user_permission(ev) < ADMIN:
         raise LakePermissionException(ev, f'搜索某个成员的问答只能群管理操作呢。个人查询问答请使用“看看我问”+搜索内容')
 
     group_id = str(ev.group_id)
     # 匹配
-    search_match = re.match(r'\[CQ:at,qq=([0-9]+)] ?(\S*)', str(ev.message))
-    try:
-        user_id, search_str = search_match.group(1), search_match.group(2)
-    except:
-        raise FunctionException(ev, f'请输入正确的格式！详情参考“问答帮助”')
+    user_id, search_str = ev['match'].group(1), ev['match'].group(2)
 
     # 看看要查的用户是否在群里
     if not await judge_ismember(bot, group_id, user_id):
