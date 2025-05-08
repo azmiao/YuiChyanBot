@@ -93,7 +93,7 @@ async def search_question(bot: YuiChyan, ev: CQEvent):
 
     group_id = str(ev.group_id)
     # 匹配
-    user_id, search_str = ev['match'].group(1), ev['match'].group(2)
+    user_id, search_str = query_msg.group(1), query_msg.group(2)
 
     # 看看要查的用户是否在群里
     if not await judge_ismember(bot, group_id, user_id):
