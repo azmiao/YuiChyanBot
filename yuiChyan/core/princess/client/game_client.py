@@ -27,6 +27,13 @@ class PreemptException(Exception):
         self.code = code
 
 
+# 维护中的异常
+class MaintenanceException(Exception):
+    def __init__(self, message, code):
+        super().__init__(message)
+        self.code = code
+
+
 class PcrClient:
     alphabet = '0123456789'
 
@@ -130,6 +137,8 @@ class PcrClient:
             logger.error(f'[PcrClient] 接口 {api_url} 调用异常：Code={code} | {data}')
             if str(code) == '201':
                 raise PreemptException(data['message'], data['status'])
+            elif str(code) == '101':
+                raise MaintenanceException(data['message'], data['status'])
             else:
                 raise ApiException(data['message'], data['status'])
         return data

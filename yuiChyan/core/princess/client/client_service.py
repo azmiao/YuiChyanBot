@@ -4,7 +4,7 @@ from typing import Optional
 import httpx
 
 from yuiChyan.http_request import rebuild_async_session
-from .game_client import ApiException, PreemptException
+from .game_client import ApiException, PreemptException, MaintenanceException
 from .utils import get_client, ClientType, get_lock, ParseType, parse_hex
 
 
@@ -26,6 +26,11 @@ async def query_api(clientType: ClientType, api_uri: str, body: dict = None, ret
             return res
         except PreemptException as e:
             # 被挤号了 | 不需要重试
+            query_client.shouldLogin = True
+            last_exception = e
+            break
+        except MaintenanceException as e:
+            # 维护中 | 不需要重试
             query_client.shouldLogin = True
             last_exception = e
             break
