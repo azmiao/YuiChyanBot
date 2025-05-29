@@ -9,7 +9,7 @@ APScheduler==3.11.0
 websockets==15.0.1
 Jinja2==3.1.6
 quart==0.20.0
-rocksdict==0.3.26
+rocksdict==0.3.27
 markdown2==2.5.3
 pillow==11.2.1
 fuzzywuzzy==0.18.0
