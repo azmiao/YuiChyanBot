@@ -122,7 +122,7 @@ async def query_gacha(bot: YuiChyan, ev: CQEvent):
 # 让 YuiChyan 戳戳你
 @sv.on_match(('戳一戳我', '戳戳我'), only_to_me=True)
 async def send_point(bot: YuiChyan, ev: CQEvent):
-    await bot.send(ev, f'[CQ:poke,qq={int(ev.user_id)}]')
+    await bot.group_poke(group_id=ev.group_id, user_id=ev.user_id)
 
 
 # YuiChyan 被戳提醒
