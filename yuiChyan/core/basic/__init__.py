@@ -5,7 +5,6 @@ from yuiChyan.config import NICKNAME
 from yuiChyan.permission import check_permission, ADMIN, SUPERUSER
 from yuiChyan.service import Service
 from yuiChyan.util import translate, DailyNumberLimiter, filter_message, FreqLimiter
-from .create_info import *
 from .group_gacha import *
 from .manga_trans import *
 from ...util.parse import get_real_url
@@ -54,42 +53,6 @@ async def manga_translate(bot: YuiChyan, ev: CQEvent):
     await bot.send(ev, '> 已收到图片，翻译非常慢，请耐心等待')
     msg = await manga_tran(ev, img_name)
     await bot.send(ev, msg)
-
-
-# 生成消息
-@sv.on_prefix('生成消息', only_to_me=True)
-async def create_msg(bot: YuiChyan, ev: CQEvent):
-    group_id = ev.group_id
-    all_text = str(ev.message)
-    try:
-        forward_msg_list = await get_create_msg(bot, all_text, group_id, False)
-    except:
-        raise CommandErrorException(ev, '> 生成消息命令错误，实例：\n生成消息 qq号:内容1|qq号:内容2\n注意：冒号使用英文冒号')
-    if not forward_msg_list:
-        raise CommandErrorException(ev, '> 生成消息命令错误，实例：\n生成消息 qq号:内容1|qq号:内容2\n注意：冒号使用英文冒号')
-    elif forward_msg_list == ['QQ号错误!本群里没有这个人哦']:
-        raise FunctionException(ev, f'> {forward_msg_list[0]}')
-    elif forward_msg_list == ['QQ号错误!被@的人不在本群里']:
-        raise FunctionException(ev, f'> {forward_msg_list[0]}')
-    else:
-        await bot.send_group_forward_msg(group_id=group_id, messages=forward_msg_list)
-
-
-# 生成陌生消息
-@sv.on_prefix('生成陌生消息', only_to_me=True)
-async def create_msg(bot: YuiChyan, ev: CQEvent):
-    group_id = ev.group_id
-    all_text = str(ev.message)
-    try:
-        forward_msg_list = await get_create_msg(bot, all_text, group_id, True)
-    except:
-        raise CommandErrorException(ev, '> 生成陌生消息命令错误，实例：\n生成陌生消息 qq号:内容1|qq号:内容2\n注意：冒号使用英文冒号')
-    if not forward_msg_list:
-        raise CommandErrorException(ev, '> 生成陌生消息命令错误，实例：\n生成陌生消息 qq号:内容1|qq号:内容2\n注意：冒号使用英文冒号')
-    elif forward_msg_list == ['QQ号错误!被@的人不在本群里']:
-        raise FunctionException(ev, f'> {forward_msg_list[0]}')
-    else:
-        await bot.send_group_forward_msg(group_id=group_id, messages=forward_msg_list)
 
 
 # 帮助选择器
