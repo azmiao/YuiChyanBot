@@ -96,16 +96,13 @@
                     <table class="table">
                         <thead>
                             <tr>
-                                <th>游戏名</th>
-                                <th>群昵称</th>
-                                <th>等级</th>
-                                <th>公主骑士RANK</th>
-                                <th>昨日整刀数</th>
-                                <th>昨日尾刀数</th>
-                                <th>今日整刀数</th>
-                                <th>今日尾刀数</th>
-                                <th>总计整刀数</th>
-                                <th>总计尾刀数</th>
+                                <th>&emsp;&emsp;&emsp;<br>游戏名<br>&emsp;&emsp;&emsp;</th>
+                                <th>&emsp;&emsp;&emsp;<br>群昵称<br>&emsp;&emsp;&emsp;</th>
+                                <th>&emsp;&emsp;<br>等级<br>&emsp;&emsp;</th>
+                                <th>&emsp;&emsp;&emsp;&emsp;<br>公主骑士<br>RANK</th>
+                                <th>&emsp;&emsp;&emsp;&emsp;<br>昨日刀数<br>&emsp;&emsp;&emsp;&emsp;</th>
+                                <th>&emsp;&emsp;&emsp;&emsp;<br>今日刀数<br>&emsp;&emsp;&emsp;&emsp;</th>
+                                <th>&emsp;&emsp;&emsp;&emsp;<br>总计刀数<br>&emsp;&emsp;&emsp;&emsp;</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -115,12 +112,9 @@
                                 <td style="vertical-align: middle;">{{ battle.card }}</td>
                                 <td style="vertical-align: middle;">{{ battle.team_level }}</td>
                                 <td style="vertical-align: middle;">{{ battle.knight_rank }}</td>
-                                <td style="vertical-align: middle;">{{ battle.full_count_yesterday }}</td>
-                                <td style="vertical-align: middle;">{{ battle.tail_count_yesterday }}</td>
-                                <td style="vertical-align: middle;">{{ battle.full_count_today }}</td>
-                                <td style="vertical-align: middle;">{{ battle.tail_count_today }}</td>
-                                <td style="vertical-align: middle;">{{ battle.full_count_all }}</td>
-                                <td style="vertical-align: middle;">{{ battle.tail_count_all }}</td>
+                                <td style="vertical-align: middle;">{{ battle.tail_count_yesterday }} 尾 {{ battle.full_count_yesterday }} 整</td>
+                                <td style="vertical-align: middle;">{{ battle.tail_count_today }} 尾 {{ battle.full_count_today }} 整</td>
+                                <td style="vertical-align: middle;">{{ battle.tail_count_all }} 尾 {{ battle.full_count_all }} 整</td>
                             </tr>
                             {% endfor %}
                         </tbody>
