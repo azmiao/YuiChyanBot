@@ -91,7 +91,7 @@
             <!-- 公会出刀情况表格 -->
             <div class="command-box">
                 <div class="card-body">
-                    <h2>出刀统计 (统计区间: {{ config.older_battle_time }} 至 {{ config.refresh_time }})</h2>
+                    <h2>出刀统计</h2>
                     <div class="highlight invisible-highlight"></div>
                     <table class="table">
                         <thead>
@@ -100,8 +100,12 @@
                                 <th>群昵称</th>
                                 <th>等级</th>
                                 <th>公主骑士RANK</th>
-                                <th>完整刀数</th>
-                                <th>尾刀数</th>
+                                <th>昨日整刀数</th>
+                                <th>昨日尾刀数</th>
+                                <th>今日整刀数</th>
+                                <th>今日尾刀数</th>
+                                <th>总计整刀数</th>
+                                <th>总计尾刀数</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -111,8 +115,12 @@
                                 <td style="vertical-align: middle;">{{ battle.card }}</td>
                                 <td style="vertical-align: middle;">{{ battle.team_level }}</td>
                                 <td style="vertical-align: middle;">{{ battle.knight_rank }}</td>
+                                <td style="vertical-align: middle;">{{ battle.full_count_yesterday }}</td>
+                                <td style="vertical-align: middle;">{{ battle.tail_count_yesterday }}</td>
                                 <td style="vertical-align: middle;">{{ battle.full_count_today }}</td>
                                 <td style="vertical-align: middle;">{{ battle.tail_count_today }}</td>
+                                <td style="vertical-align: middle;">{{ battle.full_count_all }}</td>
+                                <td style="vertical-align: middle;">{{ battle.tail_count_all }}</td>
                             </tr>
                             {% endfor %}
                         </tbody>
