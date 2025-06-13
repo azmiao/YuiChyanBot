@@ -1,4 +1,4 @@
-from aiocqhttp import Event
+from aiocqhttp import Event, MessageSegment
 
 from yuiChyan import YuiChyan
 from yuiChyan.service import Service
@@ -31,7 +31,16 @@ async def select_music(bot: YuiChyan, ev: Event):
     song_list = await check_music_temp(ev.group_id, ev.user_id)
     if not song_list:
         msg = '\n您还没有搜过歌或命令已超时，请先使用命令"搜歌 歌名"来搜索'
-    else:
-        song = song_list[music_id]
-        msg = f'\n> {song["name"]} - {song["artists"]}\nhttps://music.163.com/#/song?id={song["id"]}'
-    await bot.send(ev, msg, at_sender=True)
+        await bot.send(ev, msg, at_sender=True)
+        return
+
+    song = song_list[music_id]
+    msg_ = MessageSegment(
+        type_='music',
+        data={
+            'id': str(song['id']),
+            'type': song['type'],
+            'content': song['artists']
+        }
+    )
+    await bot.send(ev, msg_)
