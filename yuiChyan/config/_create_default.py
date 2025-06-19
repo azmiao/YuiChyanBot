@@ -70,9 +70,7 @@ _core_tmp = '''
     "basic": "基础功能",
     "manager": "核心管理",
     "xqa": "XQA你问我答",
-    // 下面三个不需要可自行删除
-    "air_con": "群空调",
-    "daily_news": "今日早报",
+    // 下面不需要可自行删除
     "princess": "PCR公主连结基础插件",
     "music": "群音乐助手"
 }
