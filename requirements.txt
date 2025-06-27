@@ -22,7 +22,7 @@ matplotlib==3.10.1
 plottable==0.1.5
 imgkit==1.2.3
 GitPython==3.1.44
-lxml==5.4.0
+lxml==6.0.0
 python-dateutil==2.9.0.post0
 msgpack==1.1.1
 pycryptodome==3.23.0
