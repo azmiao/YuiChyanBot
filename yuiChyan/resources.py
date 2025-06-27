@@ -25,6 +25,8 @@ auth_db_ = Rdict(os.path.join(base_db_path, 'auth.db'))
 service_db_ = Rdict(os.path.join(base_db_path, 'service.db'))
 # XQA数据库
 xqa_db_ = Rdict(os.path.join(base_db_path, 'xqa.db'))
+# 抽奖数据库
+group_gacha_db_ = Rdict(os.path.join(base_db_path, 'group_gacha.db'))
 
 # 全局本地字体
 font_path = os.path.join(current_dir, 'core', 'manager', 'help_res', 'static', 'fonts', 'HarmonyOS_SansSC_Regular.ttf')
