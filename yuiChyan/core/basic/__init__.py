@@ -140,12 +140,12 @@ async def poke_back(session: NoticeSession):
         f'嘎哦~ 嘎哦~',
         f'每天最多戳我十次哦~',
         f'嗯...{NICKNAME}..正在睡大觉呢',
-        f'看我的必杀技————花朵射击！',
         f'喵喵喵？',
         f'{NICKNAME}我啊，以前可是{NICKNAME}哦',
         f'你戳的对，{NICKNAME}我啊是由{NICKNAME}自主研发的{NICKNAME}',
         f'大家要早睡早起哦，指第一天早上睡，第二天早上起',
         f'俗话说的好，早期的虫儿被鸟吃',
+        f'不要戳我啦，还没睡醒呢',
         f'欸嘿嘿，{NICKNAME}打牌又赢了，荣！段幺九！',
         f'偷偷告诉你，{NICKNAME}其实不是机器人，我只是打字比较快而已'
     ]
@@ -232,28 +232,6 @@ async def what_to_say(bot: YuiChyan, ev: CQEvent):
         return
 
     await bot.send(ev, await filter_message(msg_result))
-
-
-@sv.on_prefix('获取b站封面')
-async def query_bili_cover(bot: YuiChyan, ev: CQEvent):
-    text = str(ev.message).strip()
-    if not text:
-        return
-
-    async with httpx.AsyncClient(verify=False) as session:
-        response = await session.get(
-            f'https://v3.alapi.cn/api/bilibili/cover?token=8OPxedOvkHqLqKQb&c={text}',
-            timeout=5,
-            headers={'content-type': 'application/json'},
-        )
-    data = response.json()
-
-    if data.get('code', 0) != 200:
-        await bot.send(ev, f'获取b站封面请求失败：{data.get("message", "")}')
-        return
-
-    cover_url = data.get('data', {}).get('cover', '')
-    await bot.send(ev, f'\n> 您查询的b站封面URL为：\n{cover_url}', at_sender=True)
 
 
 @sv.on_prefix('解析二维码')
