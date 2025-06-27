@@ -31,10 +31,7 @@
     // 核心插件文件夹和对应的名称 | key是plugins下的文件夹名，value是想给它取的名称，会在帮助页面显示
     "basic": "基础功能",
     "manager": "核心管理",
-    "air_con": "群空调",
-    "xqa": "XQA你问我答",
-    "daily_news": "今日早报",
-    "princess": "PCR公主连结基础插件"
+    "xqa": "XQA你问我答"
 }
 ```
 
