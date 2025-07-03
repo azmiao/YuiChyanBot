@@ -11,7 +11,7 @@ Jinja2==3.1.6
 quart==0.20.0
 rocksdict==0.3.27
 markdown2==2.5.3
-pillow==11.2.1
+pillow==11.3.0
 fuzzywuzzy==0.18.0
 python-Levenshtein==0.27.1
 beautifulsoup4==4.13.4
