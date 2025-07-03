@@ -5,9 +5,9 @@ from yuiChyan.config import NICKNAME
 from yuiChyan.permission import check_permission, ADMIN, SUPERUSER
 from yuiChyan.service import Service
 from yuiChyan.util import translate, DailyNumberLimiter, filter_message, FreqLimiter
+from yuiChyan.util.parse import get_real_url
 from .group_gacha import *
 from .manga_trans import *
-from ...util.parse import get_real_url
 
 sv = Service('base_func', manage=SUPERUSER, help_cmd='基础功能帮助')
 

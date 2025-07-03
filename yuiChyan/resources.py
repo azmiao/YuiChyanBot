@@ -1,10 +1,17 @@
 import os
+import sys
 
 from matplotlib import font_manager
 from rocksdict import Rdict
 
+# 是否是打包文件
+is_packaged: bool = not sys.argv[0].endswith('.py')
+
 # 基础文件路径
-current_dir = os.path.dirname(__file__)
+if is_packaged:
+    current_dir = sys.path[0]
+else:
+    current_dir = os.path.dirname(__file__)
 # 基础资源路径
 base_res_path = os.path.join(os.path.dirname(__file__), 'res')
 os.makedirs(base_res_path, exist_ok=True)

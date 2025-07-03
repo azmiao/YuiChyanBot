@@ -1,5 +1,6 @@
 import asyncio
 import importlib
+import os.path
 from typing import List, LiteralString, Dict
 
 import nonebot
@@ -123,10 +124,13 @@ def _load_core_plugins(config_logger):
 # 加载第三方插件
 def _load_external_plugins(config_logger):
     config_logger.info("=== 开始加载拓展插件 ===")
+    plugins_path = os.path.join(current_dir, 'plugins')
+    if not os.path.exists(plugins_path):
+        os.makedirs(plugins_path, exist_ok=True)
     for plugin_name in config.MODULES_ON:
-        load_plugins(str(os.path.join(os.path.dirname(__file__), 'plugins', plugin_name)),
+        load_plugins(str(os.path.join(plugins_path, plugin_name)),
                      f'yuiChyan.plugins.{plugin_name}')
-        help_path = os.path.join(os.path.dirname(__file__), 'plugins', plugin_name, 'HELP.md')
+        help_path = os.path.join(plugins_path, plugin_name, 'HELP.md')
         if os.path.exists(help_path):
             help_ = {
                 'name': config.EXTRA_PLUGINS[plugin_name],

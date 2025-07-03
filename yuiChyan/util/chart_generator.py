@@ -10,7 +10,7 @@ from plottable import Table
 from quart import Markup, render_template
 
 from yuiChyan import md_css_path
-from yuiChyan.resources import font_prop
+from yuiChyan.resources import font_prop, current_dir
 
 
 # 创建表格
@@ -93,7 +93,7 @@ async def generate_image_from_markdown(markdown_content: str) -> bytes:
         help_body=html_content
     )
 
-    wk_path = os.path.join(os.path.dirname(__file__), 'wkhtmltox', 'bin', 'wkhtmltoimage.exe')
+    wk_path = os.path.join(current_dir, 'util', 'wkhtmltox', 'bin', 'wkhtmltoimage.exe')
     config = imgkit.config(wkhtmltoimage=wk_path)
     # 渲染 HTML 到图片并返回字节数据
     options = {
