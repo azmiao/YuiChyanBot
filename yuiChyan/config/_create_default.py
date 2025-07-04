@@ -1,23 +1,18 @@
 import os
-import sys
 
 import json5
 
-# 是否是打包文件
-is_packaged: bool = not sys.argv[0].endswith('.py')
+from yuiChyan.resources import current_dir
 
-# 基础文件路径
-if is_packaged:
-    current_dir = os.path.join(sys.path[0], 'config')
-else:
-    current_dir = os.path.join(os.path.dirname(__file__), 'config')
-
+# 配置根路径
+config_path = os.path.join(current_dir, 'config')
+os.makedirs(current_dir, exist_ok=True)
 # 配置文件目录
-base_config = os.path.join(current_dir, 'base_config.json5')
-auth_config = os.path.join(current_dir, 'auth_config.json5')
-xqa_config = os.path.join(current_dir, 'xqa_config.json5')
-core_plugins = os.path.join(current_dir, 'core_plugins.json5')
-extra_plugins = os.path.join(current_dir, 'extra_plugins.json5')
+base_config = os.path.join(config_path, 'base_config.json5')
+auth_config = os.path.join(config_path, 'auth_config.json5')
+xqa_config = os.path.join(config_path, 'xqa_config.json5')
+core_plugins = os.path.join(config_path, 'core_plugins.json5')
+extra_plugins = os.path.join(config_path, 'extra_plugins.json5')
 
 
 _base_tmp = '''
@@ -101,8 +96,6 @@ def check_all():
 
 # 确保生成默认配置
 def _check_default_config(config_path: str, data: dict):
-    if not os.path.exists(current_dir):
-        os.makedirs(current_dir, exist_ok=True)
     if not os.path.isfile(config_path):
         with open(config_path, 'w', encoding='utf-8') as _config:
             json5.dump(data, _config)

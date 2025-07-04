@@ -32,6 +32,7 @@ jobs:
           show-memory: yes
           show-progress: yes
           include-package-data: package_name:HELP.*
+          include-data-dir: ./yuiChyan/util/textfilter/sensitive_words.txt=yuiChyan/util/textfilter/sensitive_words.txt,./yuiChyan/core/manager/help_res=yuiChyan/core/manager/help_res
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4

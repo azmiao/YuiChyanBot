@@ -14,7 +14,6 @@ from aiocqhttp import Event as CQEvent, Message, Union
 from aiocqhttp.exceptions import ActionFailed
 
 import yuiChyan
-from yuiChyan.resources import current_dir
 from .textfilter import *
 from .translator_lite.apis import Youdao
 
@@ -40,7 +39,7 @@ _youdao = Youdao()
 
 # 初始化敏感词
 _search = StringSearch()
-_sen_word_file = os.path.join(current_dir, 'util', 'textfilter', 'sensitive_words.txt')
+_sen_word_file = os.path.join(os.path.dirname(__file__), 'textfilter', 'sensitive_words.txt')
 with open(_sen_word_file, 'r', encoding='utf-8') as f:
     _sen_word = f.read()
 _search.SetKeywords(_sen_word.split('\n'))
