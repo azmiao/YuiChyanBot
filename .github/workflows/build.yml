@@ -29,7 +29,6 @@ jobs:
           nuitka-version: main
           script-name: runYuiChyan.py
           mode: app
-          mingw64: yes
           show-memory: yes
           show-progress: yes
           include-package-data: package_name:HELP.*
