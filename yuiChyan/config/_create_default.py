@@ -8,9 +8,9 @@ is_packaged: bool = not sys.argv[0].endswith('.py')
 
 # 基础文件路径
 if is_packaged:
-    current_dir = sys.path[0]
+    current_dir = os.path.join(sys.path[0], 'config')
 else:
-    current_dir = os.path.dirname(__file__)
+    current_dir = os.path.join(os.path.dirname(__file__), 'config')
 
 # 配置文件目录
 base_config = os.path.join(current_dir, 'base_config.json5')
