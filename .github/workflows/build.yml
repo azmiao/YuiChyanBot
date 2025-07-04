@@ -28,13 +28,11 @@ jobs:
         with:
           nuitka-version: main
           script-name: runYuiChyan.py
-          standalone: true
-          onefile: true
+          mode: app
           mingw64: yes
           show-memory: yes
           show-progress: yes
           include-package-data: package_name:HELP.*
-          include-data-dir: /core/manager/help_res
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
