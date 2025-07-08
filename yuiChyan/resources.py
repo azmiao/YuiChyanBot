@@ -13,7 +13,7 @@ if is_packaged:
 else:
     current_dir = os.path.dirname(__file__)
 # 基础资源路径
-base_res_path = os.path.join(os.path.dirname(__file__), 'res')
+base_res_path = os.path.join(current_dir, 'res')
 os.makedirs(base_res_path, exist_ok=True)
 # 本项目使用高性能并发数据库 rocksdict 底层为 rocksdb | YuiChyanBot 结束时会自动触发 db.close()
 base_db_path = os.path.join(base_res_path, 'db')

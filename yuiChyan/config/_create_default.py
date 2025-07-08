@@ -6,7 +6,7 @@ from yuiChyan.resources import current_dir
 
 # 配置根路径
 config_path = os.path.join(current_dir, 'config')
-os.makedirs(current_dir, exist_ok=True)
+os.makedirs(config_path, exist_ok=True)
 # 配置文件目录
 base_config = os.path.join(config_path, 'base_config.json5')
 auth_config = os.path.join(config_path, 'auth_config.json5')
