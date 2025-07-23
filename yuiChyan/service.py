@@ -390,6 +390,7 @@ class Service:
         定时任务的参数配置。
         """
         def deco(func: Callable[[], Any]) -> Callable:
+            job_name = func.__name__ if not custom_id else custom_id
             @functools.wraps(func)
             @exception_handler
             async def wrapper():
@@ -399,10 +400,9 @@ class Service:
                     group_self_list = await self.get_enable_groups()
                     # 排除授权过期的群
                     auth_group = [gid for gid in group_self_list if gid in auth_db]
-                    job_name = func.__name__ if not custom_id else custom_id
                     if not auth_group:
                         self.logger.info(f'> 定时任务 {job_name} 已在所有群禁用或授权过期，将跳过执行')
-                        return
+                        return None
                     if not silence:
                         self.logger.info(f'> 定时任务 {job_name} 开始运行...')
                     ret = await func()
@@ -414,10 +414,11 @@ class Service:
             nonebot.scheduler.add_job(
                 wrapper,
                 CronTrigger(**kwargs),
-                id=f'{self.name}_{func.__name__}_job' if not custom_id else custom_id,
+                id=f'{self.name}_{job_name}_job',
                 misfire_grace_time=300,
                 replace_existing=True
             )
+            self.logger.debug(f'定时任务ID[{self.name}_{job_name}_job]已成功添加')
 
             return wrapper
 
