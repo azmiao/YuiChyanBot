@@ -377,11 +377,13 @@ class Service:
 
         return deco
 
-    def scheduled_job(self, silence: bool = False, **kwargs) -> Callable:
+    def scheduled_job(self, silence: bool = False, custom_id: str = None, **kwargs) -> Callable:
         """
         > 服务触发 - 定时任务
 
         silence: 是否沉默执行，不打印日志
+
+        custom_id: 自定义JOB的ID，不传默认按服务名+方法名命名
 
         注意：参数只能是CronTrigger的参数
 
@@ -411,7 +413,7 @@ class Service:
             nonebot.scheduler.add_job(
                 wrapper,
                 CronTrigger(**kwargs),
-                id=f'{self.name}_{func.__name__}_job',
+                id=f'{self.name}_{func.__name__}_job' if not custom_id else custom_id,
                 misfire_grace_time=300,
                 replace_existing=True
             )
