@@ -43,4 +43,8 @@
 2. 启动BOT：`python runYuiChyan.py`
 3. 第一次启动会在config下生成配置，并仅启用核心插件，请修改各种配置后关闭BOT重启启动即可使用
 
+## 插件
+
+目前仅有自用插件：https://github.com/stars/azmiao/lists/yuichyanbot-plugins
+
 ## 其他说明后续慢慢更新
