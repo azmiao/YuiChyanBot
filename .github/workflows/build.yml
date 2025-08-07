@@ -41,9 +41,15 @@ jobs:
             ./yuiChyan/util/wkhtmltox/include/wkhtmltox=./yuiChyan/util/wkhtmltox/include/wkhtmltox
             ./yuiChyan/util/wkhtmltox/bin=./yuiChyan/util/wkhtmltox/bin
 
+      - name: Create output folder
+        run: mkdir -p dist/YuiChyanBot
+
+      - name: Move executable to subfolder
+        run: mv build/*.exe dist/YuiChyanBot/
+
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: executable
-          path: build/*.exe
+          name: YuiChyanBot
+          path: dist/YuiChyanBot/*
           if-no-files-found: error
