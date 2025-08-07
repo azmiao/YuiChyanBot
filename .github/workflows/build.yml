@@ -51,5 +51,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: YuiChyanBot
-          path: dist/YuiChyanBot/*
+          path: dist/YuiChyanBot
           if-no-files-found: error

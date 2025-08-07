@@ -56,7 +56,7 @@ logger = new_logger('YuiChyan', config.DEBUG)
 # 插件帮助文档列表
 help_list: List[Dict[str, LiteralString | str | bytes | int]] = []
 # Quart资源路径
-help_res_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'core', 'manager', 'help_res'))
+help_res_dir = os.path.abspath(os.path.join(code_dir, 'core', 'manager', 'help_res'))
 
 
 # 获取当前BOT实例
@@ -109,9 +109,9 @@ def create_instance() -> YuiChyan:
 def _load_core_plugins(config_logger):
     config_logger.info("=== 开始加载核心插件 ===")
     for core_plugin in config.CORE_MODULE:
-        load_plugins(str(os.path.join(os.path.dirname(__file__), 'core', core_plugin)),
+        load_plugins(str(os.path.join(code_dir, 'core', core_plugin)),
                      f'yuiChyan.core.{core_plugin}')
-        help_path = os.path.join(os.path.dirname(__file__), 'core', core_plugin, 'HELP.md')
+        help_path = os.path.join(code_dir, 'core', core_plugin, 'HELP.md')
         if os.path.exists(help_path):
             help_ = {
                 'name': config.CORE_PLUGINS[core_plugin],

@@ -12,6 +12,9 @@ if is_packaged:
     current_dir = sys.path[0]
 else:
     current_dir = os.path.dirname(__file__)
+# 代码路径
+code_dir = os.path.dirname(__file__)
+
 # 基础资源路径
 base_res_path = os.path.join(current_dir, 'res')
 os.makedirs(base_res_path, exist_ok=True)
@@ -36,13 +39,13 @@ xqa_db_ = Rdict(os.path.join(base_db_path, 'xqa.db'))
 group_gacha_db_ = Rdict(os.path.join(base_db_path, 'group_gacha.db'))
 
 # 全局本地字体
-font_path = os.path.join(os.path.dirname(__file__), 'core', 'manager', 'help_res', 'static', 'fonts', 'HarmonyOS_SansSC_Regular.ttf')
+font_path = os.path.join(code_dir, 'core', 'manager', 'help_res', 'static', 'fonts', 'HarmonyOS_SansSC_Regular.ttf')
 font_prop = font_manager.FontProperties(fname=font_path)
 
 # 全局CSS
-base_css_path = os.path.join(os.path.dirname(__file__), 'core', 'manager', 'help_res', 'static', 'css', 'bootstrap.min.css')
-md_css_path = os.path.join(os.path.dirname(__file__), 'core', 'manager', 'help_res', 'static', 'css', 'github-markdown.css')
+base_css_path = os.path.join(code_dir, 'core', 'manager', 'help_res', 'static', 'css', 'bootstrap.min.css')
+md_css_path = os.path.join(code_dir, 'core', 'manager', 'help_res', 'static', 'css', 'github-markdown.css')
 
 # 全局JS
-base_js_path = os.path.join(os.path.dirname(__file__), 'core', 'manager', 'help_res', 'static', 'js', 'bootstrap.bundle.min.js')
-jq_js_path = os.path.join(os.path.dirname(__file__), 'core', 'manager', 'help_res', 'static', 'js', 'jquery.min.js')
+base_js_path = os.path.join(code_dir, 'core', 'manager', 'help_res', 'static', 'js', 'bootstrap.bundle.min.js')
+jq_js_path = os.path.join(code_dir, 'core', 'manager', 'help_res', 'static', 'js', 'jquery.min.js')
