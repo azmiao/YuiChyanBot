@@ -56,7 +56,7 @@ logger = new_logger('YuiChyan', config.DEBUG)
 # 插件帮助文档列表
 help_list: List[Dict[str, LiteralString | str | bytes | int]] = []
 # Quart资源路径
-help_res_dir = os.path.abspath(os.path.join(current_dir, 'core', 'manager', 'help_res'))
+help_res_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'core', 'manager', 'help_res'))
 
 
 # 获取当前BOT实例
