@@ -12,6 +12,9 @@ from yuiChyan.resources import xqa_db_, xqa_img_path, base_db_path
 from yuiChyan.util import filter_message
 from yuiChyan.util.parse import extract_file, save_image
 
+# 暂不支持的CQ码
+ban_cq_type = ['record', 'video', 'rps', 'dice', 'shake', 'poke', 'share', 'contact', 'location', 'music', 'gift', 'forward', 'xml', 'json', 'cardimage', 'tts']
+
 
 # 获取数据库
 async def get_database() -> Rdict:
@@ -100,6 +103,20 @@ async def get_search(que_list: list, search_str: str) -> list:
         if re.search(rf'\S*{search_str_}\S*', question):
             search_list.append(question)
     return search_list
+
+
+# 问答过滤
+async def question_filter(que_raw: str, ans_raw: str) -> str:
+    # 检查是否泛匹配
+    if re.match(fr'{que_raw}', '一个检测泛匹配的文本 Aa_'):
+        return '不可设置泛匹配问题哦'
+    # 检查不支持的CQ码
+    msg = que_raw + '###' + ans_raw
+    cq_list = re.findall(r'(\[CQ:(\S+?),(\S+?)])', msg)
+    for cq_code in cq_list:
+        if cq_code[1] in ban_cq_type:
+            return f'设置的问答中有暂不支持的CQ码，类型：{cq_code[1]}'
+    return ''
 
 
 # 匹配替换字符
@@ -201,13 +218,13 @@ async def match_ans(info: dict, message: str, ans: str) -> str:
     return ans
 
 
-# 删啊删
+# 删图片
 def delete_img(list_raw: list):
     for str_raw in list_raw:
         # 这里理论上是已经规范好了的图片 | file参数就直接是路径或者base64
-        cq_list = re.findall(r'(\[CQ:(\S+?),(\S+?)])', str_raw)
+        cq_list = re.findall(r'(\[CQ:image,(\S+?)])', str_raw)
         for cq_code in cq_list:
-            cq_split = str(cq_code[2]).split(',')
+            cq_split = str(cq_code[1]).split(',')
             image_file_raw = next(filter(lambda x: x.startswith('file='), cq_split), '')
             image_file = image_file_raw.replace('file=', '').replace('file:///', '')
             if 'base64' in image_file:

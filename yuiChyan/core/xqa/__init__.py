@@ -46,9 +46,10 @@ async def set_question(bot: YuiChyan, ev: CQEvent):
         await bot.send(ev, f'回答的长度超过最大字符限制，限制{MSG_LENGTH}字符，包括符号和图片转码后的长度，您设置的回答字符长度为[{len(ans_raw)}]')
         return
 
-    # 检查是否泛匹配
-    if re.match(fr'{que_raw}', '检测文本'):
-        await bot.send(ev, f'不可设置泛匹配问题哦')
+    # 检查内容
+    filter_result = await question_filter(que_raw, ans_raw)
+    if filter_result:
+        await bot.send(ev, filter_result)
         return
 
     # 设置问答
