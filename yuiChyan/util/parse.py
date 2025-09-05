@@ -35,6 +35,10 @@ async def parse_all_image(ev: CQEvent, str_raw: str) -> List[Tuple[str, str, str
 
 # 获取真实URL
 async def get_real_url(ev: Optional[CQEvent], image_file: str) -> str:
+    # 支持自定义URL
+    if image_file.startswith('http'):
+        raise image_file
+    # 默认情况查接口获取
     try:
         img_data = await get_bot().get_image(file=image_file)
     except Exception as e:
