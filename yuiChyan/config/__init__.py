@@ -10,6 +10,7 @@ with open(base_config, 'r', encoding='utf-8') as _config:
     _data = json5.load(_config)
 HOST: str = _data.get('HOST', '127.0.0.1')
 PORT: int = _data.get('PORT', 2333)
+ACCESS_TOKEN: int = _data.get('ACCESS_TOKEN', '')
 DEBUG: bool = _data.get('DEBUG', False)
 SUPERUSERS: List[int] = _data.get('SUPERUSERS', [])
 NICKNAME: str = _data.get('NICKNAME', '优衣酱')

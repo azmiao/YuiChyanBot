@@ -14,6 +14,7 @@ config = {
     'group_name': '测试群',
     'group_id': 66666666,
     'ws_url': 'ws://127.0.0.1:2333/ws/',
+    'access_token': 'test',
     'reconnect_interval': 3,
     'nickname': 'AZMIAO',
     'sex': 'male',
@@ -221,7 +222,8 @@ async def main():
         {
             'X-Self-ID': config['bot_id'],
             'X-Client-Role': 'Universal',
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + config['access_token']
         }
     )
 

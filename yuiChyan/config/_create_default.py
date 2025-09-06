@@ -20,6 +20,8 @@ _base_tmp = '''
     // 监听IP和端口
     "HOST": "0.0.0.0",
     "PORT": 2333,
+    // 签验Token
+    "ACCESS_TOKEN": "",
     // 调试模式
     "DEBUG": false,
     // 超级管理员QQ号列表
