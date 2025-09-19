@@ -180,8 +180,8 @@ async def adjust_img(str_raw: str, is_ans: bool, save: bool) -> str:
             if not is_base64:
                 # 对图片单独保存图片，并修改图片路径为真实路径
                 image_file = await doing_img(image_file, image_file_name, image_url, save)
-            # 检测下图片是否存在，存在才替换
-            if os.path.isfile(image_file):
+            # 检测下是否需要保存图片或者图片是否存在，要下载或者已存在才替换
+            if save or os.path.isfile(image_file):
                 flit_msg = flit_msg.replace(flit_cq, f'[CQ:image,file={image_file}]')
             else:
                 flit_msg = flit_msg.replace(flit_cq, f'[CQ:image,{cq_code[2]}]')
