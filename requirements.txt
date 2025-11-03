@@ -13,7 +13,7 @@ rocksdict==0.3.27
 markdown2==2.5.4
 pillow==12.0.0
 fuzzywuzzy==0.18.0
-python-Levenshtein==0.27.1
+python-Levenshtein==0.27.3
 beautifulsoup4==4.14.2
 numpy==2.2.4
 opencv-python==4.12.0.88
