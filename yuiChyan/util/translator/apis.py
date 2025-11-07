@@ -156,7 +156,7 @@ class Youdao(Tse):
             self.session: AsyncClient = get_session_or_create('Youdao', True)
             host_html = await self.session.get(self.host_url, headers=self.host_headers, timeout=timeout)
             self.sign_key = await self.get_sign_key(host_html.text, self.session, timeout)
-            self.language_map = await self.get_language_map(self.session, self.host_headers, timeout)
+            self.language_map = await self.get_language_map(self.language_url, self.session, self.host_headers, timeout)
 
         from_language, to_language = self.check_language(from_language, to_language, self.language_map, output_zh=self.output_zh)
 
