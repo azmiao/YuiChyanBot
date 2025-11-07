@@ -99,3 +99,13 @@ async def quit_group(bot: YuiChyan, ev: CQEvent):
     await bot.send(ev, msg)
     # 这时候重新刷新一下群缓存
     await get_bot().get_cached_group_list(False)
+
+
+@sv.on_prefix('申请头衔', only_to_me=True)
+async def group_special_title(bot: YuiChyan, ev: CQEvent):
+    special_title = str(ev.message).strip()
+    try:
+        await bot.set_group_special_title(group_id=ev.group_id, user_id=ev.user_id, special_title=special_title)
+        sv.logger.error(f'头衔[{special_title}]设置成功')
+    except Exception as e:
+        sv.logger.error(f'头衔[{special_title}]设置失败：{str(e)}')
