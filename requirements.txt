@@ -26,3 +26,4 @@ lxml==6.0.2
 python-dateutil==2.9.0.post0
 msgpack==1.1.2
 pycryptodome==3.23.0
+feedparser==6.0.12

@@ -1,48 +1,15 @@
-import base64
-import html
-import os
 import time
 from collections import defaultdict
 from datetime import datetime, timedelta
-from io import BytesIO
 
 import pytz
-import unicodedata
-import zhconv
-from PIL import Image
-from aiocqhttp import Event as CQEvent, Message, Union
+from aiocqhttp import Event as CQEvent
 from aiocqhttp.exceptions import ActionFailed
 
 import yuiChyan
-from .textfilter import *
-from .translator_lite.apis import Youdao
-
-# 默认支持的语言
-trans_dict = {
-    'en': '英语',
-    'zh': '中文',
-    'ar': '阿拉伯语',
-    'ru': '俄语',
-    'fr': '法语',
-    'de': '德语',
-    'es': '西班牙语',
-    'pt': '葡萄牙语',
-    'it': '意大利语',
-    'ja': '日语',
-    'ko': '韩语',
-    'nl': '荷兰语',
-    'vi': '越南语',
-    'id': '印尼语'
-}
-# 翻译器
-_youdao = Youdao()
-
-# 初始化敏感词
-_search = StringSearch()
-_sen_word_file = os.path.join(os.path.dirname(__file__), 'textfilter', 'sensitive_words.txt')
-with open(_sen_word_file, 'r', encoding='utf-8') as f:
-    _sen_word = f.read()
-_search.SetKeywords(_sen_word.split('\n'))
+from .common_code_utils import *
+from .image_utils import *
+from .translator import *
 
 
 # 撤回消息
@@ -76,21 +43,6 @@ async def silence(ev: CQEvent, ban_time, skip_su=True):
             yuiChyan.logger.error(f'禁言失败 {e}')
     except Exception as e:
         yuiChyan.logger.exception(e)
-
-
-# 规范化unicode字符串 并 转为简体
-def normalize_str(string) -> str:
-    string = unicodedata.normalize('NFKC', string)
-    string = html.unescape(string)
-    string = zhconv.convert(string, 'zh-hans')
-    return string
-
-
-# 自动截断字符串
-def truncate_string(s: str, max_length: int = 8) -> str:
-    if len(s) > max_length:
-        return s[:max_length] + '...'
-    return s
 
 
 # 频次限制器
@@ -134,32 +86,3 @@ class DailyNumberLimiter:
 
     def reset(self, key):
         self.count[key] = 0
-
-
-# 敏感词替换
-async def filter_message(message: Union[Message, str]) -> Union[Message, str]:
-    if isinstance(message, str):
-        return _search.Replace(message)
-    elif isinstance(message, Message):
-        for seg in message:
-            if seg.type == 'text':
-                seg.data['text'] = _search.Replace(seg.data.get('text', ''))
-        return message
-    else:
-        raise TypeError
-
-
-# 翻译 | 目前只有有道引擎
-async def translate(text: str, from_: str = 'auto', to_: str = 'zh') -> str:
-    error_msg = ' - 目前支持的语言有：\n' + '\n'.join([f'{key}: {value}' for key, value in trans_dict.items()])
-    assert from_ in trans_dict, f'源语言 [{from_}] 不存在\n{error_msg}'
-    assert to_ in trans_dict, f'目标语言 [{to_}] 不存在\n{error_msg}'
-    return await _youdao.youdao_api(text, from_, to_)
-
-
-# 图片转base64
-def pic2b64(pic: Image) -> str:
-    buf = BytesIO()
-    pic.save(buf, format='PNG')
-    base64_str = base64.b64encode(buf.getvalue()).decode()
-    return 'base64://' + base64_str

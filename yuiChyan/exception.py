@@ -71,3 +71,8 @@ class SubFuncDisabledException(BotException):
     def __init__(self, message: Optional[str] = None):
         self.message = message if message else '子功能被禁用'
         super().__init__(None, message)
+
+
+# 翻译错误
+class TranslatorError(Exception):
+    pass
