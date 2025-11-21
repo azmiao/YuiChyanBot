@@ -1,3 +1,2 @@
-CALL conda activate yuiChyan
-python runFakeBot.py
+uv run runFakeBot.py
 pause

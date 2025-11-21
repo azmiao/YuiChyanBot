@@ -1,3 +1,4 @@
+# 常见需要排除的
 __pycache__/
 .idea/
 *.pyc
@@ -8,3 +9,10 @@ __pycache__/
 *.npy
 yuiChyan/res/
 yuiChyan/plugins/
+
+# 虚拟环境
+.venv
+# embeddable python
+python
+# 归档
+stash

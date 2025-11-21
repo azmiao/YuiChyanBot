@@ -1,3 +1,2 @@
-CALL conda activate yuiChyan
-python runYuiChyan.py
+uv run runYuiChyan.py
 pause
