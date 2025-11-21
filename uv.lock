@@ -1247,7 +1247,7 @@ requires-dist = [
     { name = "imgkit", specifier = ">=1.2.3" },
     { name = "jinja2", specifier = ">=3.1.6" },
     { name = "json5", specifier = ">=0.12.1" },
-    { name = "lxml", specifier = ">=6.0.2" },
+    { name = "lxml", specifier = ">=6.0.1" },
     { name = "markdown2", specifier = ">=2.5.4" },
     { name = "matplotlib", specifier = ">=3.10.7" },
     { name = "msgpack", specifier = ">=1.1.2" },
