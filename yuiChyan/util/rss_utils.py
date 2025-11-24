@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-from typing import Optional, Dict, List
+from typing import Dict, List
 
 import feedparser
 import httpx
@@ -49,7 +49,7 @@ class Feed:
 
 
 class RSSParser:
-    def __init__(self, source: str, proxy: Optional[dict] = None, timeout: int = 10):
+    def __init__(self, source: str, proxy: str | None = None, timeout: int = 10):
         """
         初始化解析器
         :param source: RSS 的 URL 或本地文件路径
