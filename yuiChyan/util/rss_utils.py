@@ -1,16 +1,19 @@
+from datetime import datetime, timezone
 from typing import Optional, Dict, List
 
 import feedparser
 import httpx
 
+from yuiChyan.util.date_utils import parse_datetime
+
 
 class FeedEntry:
     """单条 RSS 订阅项"""
-    def __init__(self, title: str, link: str, published: str, author: str,
-                 summary: str, tags: List[str]):
+    def __init__(self, title: str, link: str, update_time_str: str, author: str, summary: str, tags: List[str]):
         self.title = title
         self.link = link
-        self.published = published
+        self.update_time_str = update_time_str
+        self.update_time: datetime | None = parse_datetime(update_time_str)
         self.author = author
         self.summary = summary
         self.tags = tags
@@ -18,12 +21,22 @@ class FeedEntry:
     def __repr__(self):
         return f"<FeedEntry title='{self.title}'>"
 
+    def __lt__(self, other):
+        """按更新时间进行比较（早于返回 True）"""
+        if not isinstance(other, FeedEntry):
+            return NotImplemented
+        # 如果没有时间，则按 datetime.min
+        self_time = self.update_time or datetime.min.replace(tzinfo=timezone.utc)
+        other_time = other.update_time or datetime.min.replace(tzinfo=timezone.utc)
+        return self_time < other_time
 
 class Feed:
     """RSS 整体信息"""
-    def __init__(self, title: str, link: str, description: str, entries: List[FeedEntry]):
+    def __init__(self, title: str, link: str, update_time_str: str, description: str, entries: List[FeedEntry]):
         self.title = title
         self.link = link
+        self.update_time_str = update_time_str
+        self.update_time = parse_datetime(update_time_str)
         self.description = description
         self.entries = entries
 
@@ -66,6 +79,7 @@ class RSSParser:
         result = {
             "title": feed.feed.get("title", ""),
             "link": feed.feed.get("link", ""),
+            "update_time_str": feed.feed.get("published", feed.feed.get("updated", "")),
             "description": feed.feed.get("description", ""),
             "entries": []
         }
@@ -74,7 +88,7 @@ class RSSParser:
             result["entries"].append({
                 "title": entry.get("title", ""),
                 "link": entry.get("link", ""),
-                "published": entry.get("published", ""),
+                "update_time_str": entry.get("published", entry.get("updated", "")),
                 "author": entry.get("author", ""),
                 "summary": entry.get("summary", ""),
                 "tags": [tag["term"] for tag in entry.get("tags", [])]
@@ -91,7 +105,7 @@ class RSSParser:
             entries.append(FeedEntry(
                 title=entry.get("title", ""),
                 link=entry.get("link", ""),
-                published=entry.get("published", ""),
+                update_time_str=entry.get("published", entry.get("updated", "")),
                 author=entry.get("author", ""),
                 summary=entry.get("summary", ""),
                 tags=[tag["term"] for tag in entry.get("tags", [])] if "tags" in entry else []
@@ -100,6 +114,7 @@ class RSSParser:
         return Feed(
             title=parsed.feed.get("title", ""),
             link=parsed.feed.get("link", ""),
+            update_time_str=parsed.feed.get("published", parsed.feed.get("updated", "")),
             description=parsed.feed.get("description", ""),
             entries=entries
         )
