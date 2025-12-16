@@ -2,8 +2,9 @@ from datetime import datetime, timezone
 from typing import Dict, List
 
 import feedparser
-import httpx
+from httpx import AsyncClient
 
+from yuiChyan.http_request import get_session_or_create
 from yuiChyan.util.date_utils import parse_datetime
 
 
@@ -49,21 +50,24 @@ class Feed:
 
 
 class RSSParser:
-    def __init__(self, source: str, proxy: str | None = None, timeout: int = 10):
+    def __init__(self, source: str, proxy: str | None = None, timeout: int = 10, headers: dict | None = None):
         """
         初始化解析器
         :param source: RSS 的 URL 或本地文件路径
         :param proxy: 代理设置
         :param timeout: 请求超时时间（秒）
+        :param headers: 请求头
         """
         self.source = source
         self.proxy = proxy
         self.timeout = timeout
+        self.headers = headers
 
-    def _fetch_content(self) -> str:
+    async def _fetch_content(self) -> str:
         """获取 RSS 内容（支持本地文件和网络请求）"""
         if self.source.startswith("http://") or self.source.startswith("https://"):
-            resp = httpx.get(self.source, proxy=self.proxy, timeout=self.timeout)
+            async_session: AsyncClient = get_session_or_create('RSSParser', True, self.proxy)
+            resp = await async_session.get(self.source, timeout=self.timeout, headers=self.headers)
             resp.raise_for_status()
             return resp.text
         else:
@@ -71,9 +75,9 @@ class RSSParser:
             with open(self.source, "r", encoding="utf-8") as f:
                 return f.read()
 
-    def parse_dict(self) -> Dict:
+    async def parse_dict(self) -> Dict:
         """解析 RSS 内容"""
-        raw_content = self._fetch_content()
+        raw_content = await self._fetch_content()
         feed = feedparser.parse(raw_content)
 
         result = {
@@ -95,7 +99,7 @@ class RSSParser:
             })
         return result
 
-    def parse_feed(self) -> Feed:
+    async def parse_feed(self) -> Feed:
         """解析 RSS，返回 Feed 对象"""
         raw_content = self._fetch_content()
         parsed = feedparser.parse(raw_content)
