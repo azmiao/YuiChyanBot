@@ -101,7 +101,7 @@ class RSSParser:
 
     async def parse_feed(self) -> Feed:
         """解析 RSS，返回 Feed 对象"""
-        raw_content = self._fetch_content()
+        raw_content = await self._fetch_content()
         parsed = feedparser.parse(raw_content)
 
         entries = []
