@@ -78,7 +78,7 @@ class RSSParser:
             resp = await async_session.get(self.source, timeout=self.timeout, headers=self.headers)
         except Exception:
             # 出现异常就重建会话再试一次
-            await rebuild_async_session('RSSParser')
+            async_session = await rebuild_async_session('RSSParser')
             resp = await async_session.get(self.source, timeout=self.timeout, headers=self.headers)
         resp.raise_for_status()
         return resp.text
