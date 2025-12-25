@@ -2,9 +2,9 @@ from datetime import datetime, timezone
 from typing import Dict, List
 
 import feedparser
-from httpx import AsyncClient
+from httpx import AsyncClient, HTTPStatusError
 
-from yuiChyan.http_request import get_session_or_create
+from yuiChyan.http_request import get_session_or_create, rebuild_async_session
 from yuiChyan.util.date_utils import parse_datetime
 
 
@@ -66,14 +66,22 @@ class RSSParser:
     async def _fetch_content(self) -> str:
         """获取 RSS 内容（支持本地文件和网络请求）"""
         if self.source.startswith("http://") or self.source.startswith("https://"):
-            async_session: AsyncClient = get_session_or_create('RSSParser', True, self.proxy)
-            resp = await async_session.get(self.source, timeout=self.timeout, headers=self.headers)
-            resp.raise_for_status()
-            return resp.text
+            return await self._request_url()
         else:
             # 读取本地文件
             with open(self.source, "r", encoding="utf-8") as f:
                 return f.read()
+
+    async def _request_url(self):
+        async_session: AsyncClient = get_session_or_create('RSSParser', True, self.proxy)
+        try:
+            resp = await async_session.get(self.source, timeout=self.timeout, headers=self.headers)
+        except Exception:
+            # 出现异常就重建会话再试一次
+            await rebuild_async_session('RSSParser')
+            resp = await async_session.get(self.source, timeout=self.timeout, headers=self.headers)
+        resp.raise_for_status()
+        return resp.text
 
     async def parse_dict(self) -> Dict:
         """解析 RSS 内容"""
