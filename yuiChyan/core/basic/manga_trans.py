@@ -75,10 +75,10 @@ async def manga_tran(ev: CQEvent, img_name: str) -> MessageSegment:
     data = {
         'mime': (None, mime_type, None),
         'target_language': (None, 'CHS', None),
-        'detector': (None, 'default', None),
+        'detector': (None, 'ctd', None),
         'direction': (None, 'default', None),
         'translator': (None, 'offline', None),
-        'size': (None, 'L', None)
+        'size': (None, 'X', None)
     }
     with open(img_path, 'rb') as f:
         data['file'] = (img_name, f.read(), mime_type)
