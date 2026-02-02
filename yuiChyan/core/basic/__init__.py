@@ -51,8 +51,13 @@ async def manga_translate(bot: YuiChyan, ev: CQEvent):
     # 保存图片
     img_name = await parse_and_save_image(ev, img_text)
     await bot.send(ev, '> 已收到图片，翻译非常慢，请耐心等待')
-    msg = await manga_tran(ev, img_name)
-    await bot.send(ev, msg)
+    try:
+        msg = await manga_tran(ev, img_name)
+        await bot.send(ev, msg, at_sender=True)
+    except httpx.TransportError as e:
+        raise FunctionException(ev, f'> 漫画翻译出现接口请求异常：{str(e)}')
+    except Exception as e:
+        raise FunctionException(ev, f'> 漫画翻译出现意外异常：{str(e)}')
 
 
 # 帮助选择器

@@ -40,7 +40,7 @@ def exception_handler(func) -> Callable:
                     service_instance.logger.error(e.message)
                 else:
                     bot_logger.error(e.message)
-            return
+            return None
 
     return wrapper
 

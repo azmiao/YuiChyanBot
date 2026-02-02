@@ -72,7 +72,7 @@ async def manga_tran(ev: CQEvent, img_name: str) -> MessageSegment:
     mask_path = os.path.join(manga_path, f'MASK_{img_name}.png')
     mime_type, _ = mimetypes.guess_type(img_name)
     upload_url = 'https://api.cotrans.touhou.ai/task/upload/v1'
-    data = {
+    data: dict[str, tuple[str | None, str | bytes | None, str | None]] = {
         'mime': (None, mime_type, None),
         'target_language': (None, 'CHS', None),
         'detector': (None, 'ctd', None),
@@ -83,7 +83,7 @@ async def manga_tran(ev: CQEvent, img_name: str) -> MessageSegment:
     with open(img_path, 'rb') as f:
         data['file'] = (img_name, f.read(), mime_type)
     # 异步上传图片
-    async with httpx.AsyncClient(verify=False, timeout=httpx.Timeout(10, read=15)) as async_session:
+    async with httpx.AsyncClient(verify=False, timeout=httpx.Timeout(10, read=20)) as async_session:
         upload_resp = await async_session.put(upload_url, files=data, headers=header)
     # 等待翻译完成
     try:
@@ -94,7 +94,7 @@ async def manga_tran(ev: CQEvent, img_name: str) -> MessageSegment:
     # 异步WS获取蒙版URL
     logger.info(f'> 漫画翻译：当前漫画ID为 [{id_}]')
     wss_url = f'wss://api.cotrans.touhou.ai/task/{id_}/event/v1'
-    mask_url = await receive_wss(ev, wss_url, 60)
+    mask_url = await receive_wss(ev, wss_url, 120)
 
     # 同步保存蒙板
     logger.info(f'> 漫画翻译：蒙板URL为 [{mask_url}]')
