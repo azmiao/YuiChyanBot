@@ -1,11 +1,16 @@
+from asyncio import Lock
 from datetime import datetime, timezone
 from typing import Dict, List
 
 import feedparser
-from httpx import AsyncClient, HTTPStatusError
+import httpx
+from httpx import AsyncClient
 
 from yuiChyan.http_request import get_session_or_create, rebuild_async_session
 from yuiChyan.util.date_utils import parse_datetime
+
+# 全局RSS请求锁
+rss_lock = Lock()
 
 
 class FeedEntry:
@@ -50,6 +55,7 @@ class Feed:
 
 
 class RSSParser:
+
     def __init__(self, source: str, proxy: str | None = None, timeout: int = 10, headers: dict | None = None):
         """
         初始化解析器
@@ -72,16 +78,31 @@ class RSSParser:
             with open(self.source, "r", encoding="utf-8") as f:
                 return f.read()
 
-    async def _request_url(self):
+    async def _request_url(self, retry_times: int = 1):
+        last_exception: Exception | None = None
         async_session: AsyncClient = get_session_or_create('RSSParser', True, self.proxy)
-        try:
-            resp = await async_session.get(self.source, timeout=self.timeout, headers=self.headers)
-        except Exception:
-            # 出现异常就重建会话再试一次
-            async_session = await rebuild_async_session('RSSParser')
-            resp = await async_session.get(self.source, timeout=self.timeout, headers=self.headers)
-        resp.raise_for_status()
-        return resp.text
+
+        for attempt in range(retry_times + 1):
+
+            try:
+                async with rss_lock:
+                    resp = await async_session.get(self.source, timeout=self.timeout, headers=self.headers)
+                return resp.text
+            except httpx.TransportError as e:
+                # 出现异常就重建会话再试一次
+                last_exception = e
+                async_session = await rebuild_async_session('RSSParser')
+            except Exception as e:
+                # 其他未知异常
+                last_exception = e
+                break
+
+            # 超过重试次数了
+            if attempt == retry_times:
+                break
+
+        # 最后抛出异常
+        raise last_exception
 
     async def parse_dict(self) -> Dict:
         """解析 RSS 内容"""
