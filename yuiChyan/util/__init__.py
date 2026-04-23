@@ -1,8 +1,8 @@
 import time
 from collections import defaultdict
 from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 
-import pytz
 from aiocqhttp import Event as CQEvent
 from aiocqhttp.exceptions import ActionFailed
 
@@ -64,7 +64,7 @@ class FreqLimiter:
 
 # 每日限制器
 class DailyNumberLimiter:
-    tz = pytz.timezone('Asia/Shanghai')
+    tz = ZoneInfo('Asia/Shanghai')
 
     def __init__(self, max_num):
         self.today = -1

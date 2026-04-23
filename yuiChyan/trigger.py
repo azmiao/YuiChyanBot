@@ -1,5 +1,6 @@
 import copy
 import re
+from abc import ABC, abstractmethod
 from typing import List, Iterable
 from typing import TYPE_CHECKING
 
@@ -15,11 +16,13 @@ if TYPE_CHECKING:
 
 
 # 基本触发器
-class BaseTrigger:
+class BaseTrigger(ABC):
 
-    def add(self, x: str, sf: 'ServiceFunc'):
+    @abstractmethod
+    def add(self, x, sf: 'ServiceFunc'):
         pass
 
+    @abstractmethod
     def find_handler(self, ev: CQEvent) -> List['ServiceFunc']:
         pass
 
