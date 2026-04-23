@@ -75,6 +75,12 @@ async def _start_scheduler():
         logger.info('> YuiChyanBot 核心计时器启动成功！')
 
 
+# 关闭 YuiChyanBot 资源
+async def _close_resources():
+    close_all_db()
+    logger.info('> YuiChyanBot 数据库资源已释放')
+
+
 # 创建 YuiChyanBot 实例
 def create_instance() -> YuiChyan:
     global yui_bot
@@ -91,6 +97,8 @@ def create_instance() -> YuiChyan:
     yui_bot.server_app.secret_key = os.urandom(24)
     # App 启动前载入计时器
     yui_bot.server_app.before_serving(_start_scheduler)
+    # App 关闭时释放数据库资源
+    yui_bot.server_app.after_serving(_close_resources)
 
     # 加载插件
     _load_core_plugins(config_logger)

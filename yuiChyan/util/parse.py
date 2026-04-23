@@ -58,10 +58,10 @@ async def save_image(ev: Optional[CQEvent],
             headers = {'User-Agent': 'Mozilla/5.0'}
             ctx = ssl.create_default_context()
             ctx.set_ciphers('ALL')
-            with httpx.Client(verify=ctx, headers=headers) as session:
-                with session.stream('GET', image_url) as resp:
+            async with httpx.AsyncClient(verify=ctx, headers=headers) as session:
+                async with session.stream('GET', image_url) as resp:
                     with open(image_path, 'wb') as f:
-                        f.write(resp.read())
+                        f.write(await resp.aread())
     except Exception as e:
         raise FunctionException(ev, f'从{image_url}下载图片{image_name}出错:{str(e)}')
     return image_name
@@ -77,9 +77,9 @@ async def get_image_pil(ev: Optional[CQEvent], image_file: str, image_name: str,
         headers = {'User-Agent': 'Mozilla/5.0'}
         ctx = ssl.create_default_context()
         ctx.set_ciphers('ALL')
-        with httpx.Client(verify=ctx, headers=headers) as session:
-            with session.stream('GET', image_url) as resp:
-                f_data = resp.read()
+        async with httpx.AsyncClient(verify=ctx, headers=headers) as session:
+            async with session.stream('GET', image_url) as resp:
+                f_data = await resp.aread()
     except Exception as e:
         raise FunctionException(ev, f'从{image_url}获取图片{image_name}出错:{str(e)}')
     # 返回图片

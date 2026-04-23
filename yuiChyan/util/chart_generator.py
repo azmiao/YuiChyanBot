@@ -1,3 +1,4 @@
+import asyncio
 import base64
 import io
 import os.path
@@ -13,8 +14,8 @@ from yuiChyan import md_css_path
 from yuiChyan.resources import font_prop, current_dir
 
 
-# 创建表格
-async def create_table(_raw_data: dict) -> plt.Figure:
+# 创建表格（同步内部实现）
+def _create_table_sync(_raw_data: dict) -> plt.Figure:
     _index = _raw_data.get('index_column', '')
     show_columns = _raw_data.get('show_columns', {})
     data_list = _raw_data.get('data_list', [])
@@ -82,6 +83,11 @@ async def create_table(_raw_data: dict) -> plt.Figure:
     return fig
 
 
+# 创建表格
+async def create_table(_raw_data: dict) -> plt.Figure:
+    return await asyncio.to_thread(_create_table_sync, _raw_data)
+
+
 # 从Markdown生成图片
 async def generate_image_from_markdown(markdown_content: str) -> bytes:
     # 将 Markdown 文本转换为 HTML
@@ -105,20 +111,30 @@ async def generate_image_from_markdown(markdown_content: str) -> bytes:
     return img_bytes
 
 
-# 保存 fig 为 PNG 文件
-async def save_fig_as_image(fig: plt.Figure, file_path: str):
+# 保存 fig 为 PNG 文件（同步内部实现）
+def _save_fig_as_image_sync(fig: plt.Figure, file_path: str):
     fig.savefig(file_path, format='png', bbox_inches='tight')
     plt.close(fig)
 
 
-# 将 fig 转换为 base64 字符串
-async def fig_to_base64(fig: plt.Figure) -> str:
+# 保存 fig 为 PNG 文件
+async def save_fig_as_image(fig: plt.Figure, file_path: str):
+    await asyncio.to_thread(_save_fig_as_image_sync, fig, file_path)
+
+
+# 将 fig 转换为 base64 字符串（同步内部实现）
+def _fig_to_base64_sync(fig: plt.Figure) -> str:
     buf = io.BytesIO()
     fig.savefig(buf, format='png', bbox_inches='tight')
     buf.seek(0)
     img_base64 = base64.b64encode(buf.read()).decode('utf-8')
     plt.close(fig)
     return img_base64
+
+
+# 将 fig 转换为 base64 字符串
+async def fig_to_base64(fig: plt.Figure) -> str:
+    return await asyncio.to_thread(_fig_to_base64_sync, fig)
 
 
 # 导出图片到文件

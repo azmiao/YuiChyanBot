@@ -49,3 +49,12 @@ md_css_path = os.path.join(code_dir, 'core', 'manager', 'help_res', 'static', 'c
 # 全局JS
 base_js_path = os.path.join(code_dir, 'core', 'manager', 'help_res', 'static', 'js', 'bootstrap.bundle.min.js')
 jq_js_path = os.path.join(code_dir, 'core', 'manager', 'help_res', 'static', 'js', 'jquery.min.js')
+
+
+# 关闭所有数据库实例
+def close_all_db():
+    for db in (auth_db_, service_db_, xqa_db_, group_gacha_db_):
+        try:
+            db.close()
+        except Exception:
+            pass
