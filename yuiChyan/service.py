@@ -284,8 +284,8 @@ class Service:
             suffixes = (suffixes,)
 
         def deco(func) -> Callable:
-            @exception_handler
             @functools.wraps(func)
+            @exception_handler
             async def wrapper(bot, event: CQEvent):
                 # 校验是否是群消息
                 if event.detail_type != 'group':
@@ -466,7 +466,7 @@ def _read_service_config(service_name: str):
 def _save_service_config(service: Service):
     service_db[service.name] = {
         'name': service.name,
-        'manage': service.manage,
+        'manage': service.manage.level,
         'use_exclude': service.use_exclude,
         'visible': service.visible,
         'need_auth': service.need_auth,

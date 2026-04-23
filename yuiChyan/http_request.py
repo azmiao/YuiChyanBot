@@ -66,7 +66,7 @@ def rebuild_session(name: str) -> Client:
         raise SessionNotFoundException(f'找不到 Client [{name}]')
     session_cache = _session_map.get(name, SessionCache.create_empty())
     session_cache.session.close()
-    _async_session_map.pop(name)
+    _session_map.pop(name)
     return create_session(name, True, session_cache.proxy, session_cache.timeout)
 
 
