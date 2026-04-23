@@ -77,8 +77,15 @@ async def _start_scheduler():
 
 # 关闭 YuiChyanBot 资源
 async def _close_resources():
+    await close_browser()
     close_all_db()
-    logger.info('> YuiChyanBot 数据库资源已释放')
+    logger.info('> YuiChyanBot 资源已释放')
+
+
+# 启动 Playwright 浏览器
+async def _start_browser():
+    await start_browser()
+    logger.info('> YuiChyanBot Playwright 浏览器启动成功！')
 
 
 # 创建 YuiChyanBot 实例
@@ -95,9 +102,10 @@ def create_instance() -> YuiChyan:
     yui_bot.server_app.static_folder = os.path.join(help_res_dir, 'static')
     yui_bot.server_app.jinja_env.loader = FileSystemLoader(os.path.join(help_res_dir, 'template'))
     yui_bot.server_app.secret_key = os.urandom(24)
-    # App 启动前载入计时器
+    # App 启动前载入计时器和浏览器
     yui_bot.server_app.before_serving(_start_scheduler)
-    # App 关闭时释放数据库资源
+    yui_bot.server_app.before_serving(_start_browser)
+    # App 关闭时释放资源
     yui_bot.server_app.after_serving(_close_resources)
 
     # 加载插件

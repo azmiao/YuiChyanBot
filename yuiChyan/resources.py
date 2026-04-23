@@ -1,7 +1,9 @@
 import os
 import sys
+from typing import Optional
 
 from matplotlib import font_manager
+from playwright.async_api import async_playwright, Browser, Playwright
 from rocksdict import Rdict
 
 # 是否是打包文件
@@ -58,3 +60,33 @@ def close_all_db():
             db.close()
         except Exception:
             pass
+
+
+# Playwright 浏览器实例
+_playwright: Optional[Playwright] = None
+_browser: Optional[Browser] = None
+
+
+# 启动 Playwright 浏览器
+async def start_browser():
+    global _playwright, _browser
+    _playwright = await async_playwright().start()
+    _browser = await _playwright.chromium.launch(headless=True)
+
+
+# 获取全局浏览器实例
+def get_browser() -> Browser:
+    if _browser is None:
+        raise RuntimeError('Playwright 浏览器实例未启动')
+    return _browser
+
+
+# 关闭 Playwright 浏览器
+async def close_browser():
+    global _playwright, _browser
+    if _browser:
+        await _browser.close()
+        _browser = None
+    if _playwright:
+        await _playwright.stop()
+        _playwright = None

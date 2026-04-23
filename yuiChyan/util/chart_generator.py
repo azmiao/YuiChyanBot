@@ -3,7 +3,6 @@ import base64
 import io
 import os.path
 
-import imgkit
 import markdown2
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -11,7 +10,7 @@ from plottable import Table
 from quart import Markup, render_template
 
 from yuiChyan import md_css_path
-from yuiChyan.resources import font_prop, current_dir
+from yuiChyan.resources import font_prop, get_browser
 
 
 # 创建表格（同步内部实现）
@@ -93,21 +92,23 @@ async def generate_image_from_markdown(markdown_content: str) -> bytes:
     # 将 Markdown 文本转换为 HTML
     html_content = markdown2.markdown(markdown_content, extras=['fenced-code-blocks', 'tables'])
     html_content = Markup(html_content)
+    # 读取 CSS 内容内联到模板中
+    with open(md_css_path, 'r', encoding='utf-8') as css_file:
+        md_css_content = css_file.read()
     full_html = await render_template(
         'help_image.html',
-        md_css_path=format_path(md_css_path),
+        md_css_content=md_css_content,
         help_body=html_content
     )
 
-    wk_path = os.path.join(current_dir, 'util', 'wkhtmltox', 'bin', 'wkhtmltoimage.exe')
-    config = imgkit.config(wkhtmltoimage=wk_path)
-    # 渲染 HTML 到图片并返回字节数据
-    options = {
-        'enable-local-file-access': None,
-        'format': 'png',
-        'quiet': ''
-    }
-    img_bytes = imgkit.from_string(full_html, False, config=config, options=options)
+    # 使用 Playwright 渲染 HTML 到图片
+    browser = get_browser()
+    page = await browser.new_page()
+    try:
+        await page.set_content(full_html, wait_until='networkidle')
+        img_bytes = await page.screenshot(full_page=True, type='png')
+    finally:
+        await page.close()
     return img_bytes
 
 
@@ -147,10 +148,3 @@ async def save_image_to_file(img_bytes: bytes, file_path: str):
 async def convert_image_to_base64(img_bytes: bytes) -> str:
     image_base64 = base64.b64encode(img_bytes).decode('utf-8')
     return image_base64
-
-
-# 格式化路径
-def format_path(raw_path: str) -> str:
-    abs_path = os.path.abspath(raw_path)
-    replace = abs_path.replace('\\', '/')
-    return f'file:///{replace}'
