@@ -14,7 +14,7 @@
 
 - 系统: 仅限 64位 Win10+ 系统
 - python: 推荐直接最新版本，最低建议`3.13.1`
-- 协议实现: 任选其一：LLOneBot >= 5.0.0 或 NapCat >= 4.5.0 或 其他协议实现客户端
+- 协议实现: LLOneBot
 
 ## 框架局限性
 
@@ -39,9 +39,40 @@
 
 ## 如何使用
 
-1. 拉代码，安装依赖`pip install -r requirements.txt`
-2. 启动BOT：`python runYuiChyan.py`
-3. 第一次启动会在config下生成配置，并仅启用核心插件，请修改各种配置后关闭BOT重启启动即可使用
+### 1. 安装 uv
+
+本项目使用 [uv](https://docs.astral.sh/uv/) 管理 Python 环境和依赖，请先安装 uv：
+
+```bash
+# Windows (PowerShell)
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
+
+安装完成后，重新打开终端，运行 `uv --version` 确认安装成功。
+
+### 2. 安装依赖
+
+双击运行项目根目录下的 `更新依赖.bat`，脚本会自动完成以下操作：
+
+- 通过 `uv sync` 同步 Python 依赖（含自动创建虚拟环境和安装 Python 解释器）
+- 通过 `playwright install chromium` 安装 Playwright 所需的 Chromium 浏览器
+
+或者也可以手动在项目根目录执行：
+
+```bash
+uv sync
+uv run playwright install chromium
+```
+
+### 3. 启动 BOT
+
+双击 `启动YuiChyan.bat` 或者手动执行：
+
+```bash
+uv run runYuiChyan.py
+```
+
+首次启动会在 config 目录下生成配置文件，并仅启用核心插件，请修改各项配置后重启 BOT 即可使用。
 
 ## 插件
 
