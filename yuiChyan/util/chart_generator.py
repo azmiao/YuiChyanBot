@@ -2,6 +2,7 @@ import asyncio
 import base64
 import io
 import os.path
+import warnings
 
 import markdown2
 import matplotlib
@@ -13,6 +14,9 @@ from quart import Markup, render_template
 
 from yuiChyan import md_css_path
 from yuiChyan.resources import font_prop, get_browser
+
+# 抑制字体缺失字形的警告
+warnings.filterwarnings('ignore', message='Glyph.*missing from font', category=UserWarning)
 
 
 # 创建表格（同步内部实现）
