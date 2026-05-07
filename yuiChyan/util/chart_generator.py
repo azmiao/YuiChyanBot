@@ -4,6 +4,8 @@ import io
 import os.path
 
 import markdown2
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import pandas as pd
 from plottable import Table
