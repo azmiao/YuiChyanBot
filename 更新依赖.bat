@@ -28,6 +28,8 @@ echo [1/2] Python 依赖同步完成
 echo.
 
 echo [2/2] 正在安装 Playwright Chromium 浏览器...
+:: 配置代理
+:: set HTTPS_PROXY=http://127.0.0.1:1081
 echo.
 uv run playwright install chromium
 if %errorlevel% neq 0 (
