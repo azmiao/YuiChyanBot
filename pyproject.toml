@@ -9,7 +9,7 @@ license = {text = "AGPL-3.0"}
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "json5>=0.14.0",
+    "json5>=0.15.0",
     "nonebot>=1.9.1",
     "httpx>=0.28.1",
     "aiocqhttp>=1.4.4",
