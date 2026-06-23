@@ -34,7 +34,7 @@ dependencies = [
     "GitPython>=3.1.45",
     "lxml>=6.1.1",
     "python-dateutil>=2.9.0.post0",
-    "msgpack>=1.2.0",
+    "msgpack>=1.2.1",
     "pycryptodome>=3.23.0",
     "feedparser>=6.0.12",
 ]
