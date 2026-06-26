@@ -105,10 +105,19 @@ async def get_search(que_list: list, search_str: str) -> list:
     return search_list
 
 
+# 校验是否是合法的正则
+def is_valid_regex(pattern: str) -> bool:
+    try:
+        re.compile(pattern)
+        return True
+    except re.error:
+        return False
+
+
 # 问答过滤
 async def question_filter(que_raw: str, ans_raw: str) -> str:
     # 检查是否泛匹配
-    if re.match(fr'{que_raw}', '一个检测泛匹配的文本 Aa_'):
+    if is_valid_regex(que_raw) and re.match(fr'{que_raw}', '一个检测泛匹配的文本 Aa_\n#'):
         return '不可设置泛匹配问题哦'
     # 检查不支持的CQ码
     msg = que_raw + '###' + ans_raw
