@@ -1,6 +1,7 @@
-name: Build YuiChyanBot App
+name: Build YuiChyanBot Portable Zip
 env:
   TZ: Asia/Shanghai
+  PORTABLE_PYTHON_VERSION: 3.13.5
 
 on:
   workflow_dispatch:
@@ -18,38 +19,52 @@ jobs:
           python-version: '3.13'
           architecture: 'x64'
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-      - name: Build with Nuitka
-        uses: Nuitka/Nuitka-Action@main
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v4
         with:
-          nuitka-version: main
-          script-name: runYuiChyan.py
-          mode: app
-          show-memory: yes
-          show-progress: yes
-          include-package-data: |
-            yuiChyan.core.basic:HELP.md
-            yuiChyan.core.manager:HELP.md
-            yuiChyan.core.xqa:HELP.md
-            yuiChyan.util.textfilter:sensitive_words.txt
-          include-data-dir: |
-            ./yuiChyan/core/manager/help_res=./yuiChyan/core/manager/help_res
-            ./yuiChyan/util/wkhtmltox/include/wkhtmltox=./yuiChyan/util/wkhtmltox/include/wkhtmltox
-            ./yuiChyan/util/wkhtmltox/bin=./yuiChyan/util/wkhtmltox/bin
+          enable-cache: true
 
-      - name: Create output folder
-        run: mkdir -p dist/YuiChyanBot
+      - name: Export locked requirements
+        run: uv export --frozen --format requirements-txt --no-dev --no-hashes -o portable-requirements.txt
 
-      - name: Move executable to subfolder
-        run: mv build/*.exe dist/YuiChyanBot/
+      - name: Download offline wheels
+        run: python -m pip download --dest portable-build/wheels -r portable-requirements.txt
+
+      - name: Download portable Python
+        shell: pwsh
+        run: |
+          nuget install python -Version $env:PORTABLE_PYTHON_VERSION -ExcludeVersion -OutputDirectory portable-build/nuget
+
+      - name: Assemble portable package
+        shell: pwsh
+        run: |
+          $packageRoot = Join-Path $PWD 'dist/YuiChyanBot'
+          $pythonRoot = Join-Path $packageRoot 'python'
+          $wheelsRoot = Join-Path $packageRoot 'wheels'
+          New-Item -ItemType Directory -Path $pythonRoot -Force | Out-Null
+          New-Item -ItemType Directory -Path $wheelsRoot -Force | Out-Null
+          Copy-Item -Path 'portable-build/nuget/python/tools/*' -Destination $pythonRoot -Recurse -Force
+          Copy-Item -Path 'portable-build/wheels/*' -Destination $wheelsRoot -Force
+          Copy-Item -LiteralPath 'yuiChyan' -Destination (Join-Path $packageRoot 'yuiChyan') -Recurse -Force
+          Copy-Item -LiteralPath 'runYuiChyan.py' -Destination $packageRoot -Force
+          Copy-Item -LiteralPath '启动YuiChyan.bat' -Destination $packageRoot -Force
+          Copy-Item -LiteralPath 'portable-requirements.txt' -Destination (Join-Path $packageRoot 'requirements-portable.txt') -Force
+          Copy-Item -LiteralPath 'LICENSE' -Destination $packageRoot -Force
+          Copy-Item -LiteralPath 'README.md' -Destination $packageRoot -Force
+          Set-Content -LiteralPath (Join-Path $packageRoot 'portable-build-id.txt') -Value '${{ github.sha }}' -Encoding ascii
+
+      - name: Create zip artifact
+        shell: pwsh
+        run: |
+          $zipPath = Join-Path $PWD 'dist/YuiChyanBot-portable-windows.zip'
+          if (Test-Path -LiteralPath $zipPath) {
+            Remove-Item -LiteralPath $zipPath -Force
+          }
+          Compress-Archive -Path 'dist/YuiChyanBot/*' -DestinationPath $zipPath -Force
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: YuiChyanBot
-          path: dist/YuiChyanBot
+          name: YuiChyanBot-portable-windows
+          path: dist/YuiChyanBot-portable-windows.zip
           if-no-files-found: error

@@ -12,6 +12,7 @@ yuiChyan/plugins/
 
 # 虚拟环境
 .venv
+.venv-portable
 # embeddable python
 python
 # 归档

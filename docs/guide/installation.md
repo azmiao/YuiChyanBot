@@ -1,5 +1,29 @@
 # 安装部署
 
+## 方式一：使用绿色压缩包（推荐）
+
+### 1. 下载压缩包
+
+前往 GitHub Actions 构建产物或后续发布页，下载 `YuiChyanBot-portable-windows.zip`。
+
+### 2. 解压并启动
+
+将压缩包解压到任意目录后，双击 `启动YuiChyan.bat`。
+
+程序会自动完成以下操作：
+
+- 使用压缩包内置的便携 Python 创建本地运行环境
+- 使用压缩包内置的离线依赖安装 Python 包
+- 首次联网安装 Playwright Chromium 浏览器
+
+首次启动会稍慢一些，初始化完成后再次启动会更快。
+
+### 3. 修改配置
+
+首次启动会在 `yuiChyan/config/` 目录下自动生成或补全配置文件，请关闭 BOT，修改配置后再重新启动。
+
+## 方式二：从源码部署
+
 ## 阶段一：安装 uv
 
 本项目使用 [uv](https://docs.astral.sh/uv/) 管理 Python 环境和依赖。
@@ -16,7 +40,7 @@ powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | ie
 uv --version
 ```
 
-## 阶段二：部署 YuiChyanBot
+## 阶段一：部署 YuiChyanBot
 
 ### 1. 克隆仓库
 
@@ -57,7 +81,7 @@ uv run runYuiChyan.py
 
 请关闭 BOT，修改配置文件后再重新启动。配置文件详解请参考 [配置文件详解](configuration.md)。
 
-## 阶段三：安装 LLOneBot
+## 阶段二：安装 LLOneBot
 
 ### 1. 安装 NTQQ
 
@@ -80,7 +104,7 @@ uv run runYuiChyan.py
    - 端口号 `2333` 需与 `base_config.json5` 中的 `PORT` 一致
 3. 如果 `base_config.json5` 中配置了 `ACCESS_TOKEN`，需要在 LLOneBot 中同步配置相同的 Token
 
-## 阶段四：验证连接
+## 阶段三：验证连接
 
 1. 确保 NTQQ（LLOneBot）已启动并登录
 2. 启动 YuiChyanBot（双击 `启动YuiChyan.bat`）
