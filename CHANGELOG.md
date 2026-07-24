@@ -1,5 +1,155 @@
 # 更新日志
 
+## 1.0.1 (2026-07-24)
+
+### ✨ 新功能
+
+- 尝新增自动发布版本流程CI任务和ChangeLog生成 azmiao
+- 使用Playwright替换wkhtmltoimage实现HTML转图片，删除wkhtmltox目录 azmiao
+- RSS功能增加代理 azmiao
+- 新增时间解析工具类，RSS工具新增自带时间参数 azmiao
+- 更换uv环境配置 azmiao
+- 测试增加模板 azmiao
+- 新增设置头衔功能 azmiao
+- 新增RSS解析工具类 azmiao
+
+### 🐛 Bug 修复
+
+- 尝试修复依赖打包问题 azmiao
+- 修复关闭Win窗口后Python仍然被PlayWright长时间占用的BUG azmiao
+- 敏感词去除CQ azmiao
+- 优化删问答时删除图片逻辑的稳定性 azmiao
+- 修复XQA泛匹配校验异常 azmiao
+- 抑制字体缺失字形的警告 azmiao
+- 尝试修复matplotlib绘图错误 azmiao
+- 修复rebuild_session pop错误map、on_suffix装饰器顺序、Permission序列化问题 azmiao
+- 修复类型声明错误 azmiao
+- 补充更新client操作 azmiao
+- 修复一处异步错误 azmiao
+- 去除www的敏感词 azmiao
+- 更新依赖检测为每日 azmiao
+- 同步更新uv.lock azmiao
+- 更新pyproject azmiao
+- 修改默认配置 azmiao
+- 修复一处传参错误 azmiao
+- 整理工具类，尝试优化翻译工具 azmiao
+
+### 🚀 性能优化
+
+- 更新依赖脚本支持选项配置是否使用代理 azmiao
+- 更新依赖脚本增加代理配置 azmiao
+- 异步化httpx调用、matplotlib操作to_thread、RocksDB生命周期管理 azmiao
+- 优化漫画翻译逻辑 azmiao
+- RSS工具优化请求逻辑 azmiao
+- 尝试优化漫画翻译参数 azmiao
+- RSS工具新增自动重试 azmiao
+- RSS功能优化，更换异步会话请求，新增可自定义传入的Headers参数 azmiao
+
+### 🎨 代码重构
+
+- pytz替换为zoneinfo、BaseTrigger改用ABC抽象基类 azmiao
+
+### 📚 文档
+
+- 更新AI帮我写的文档，嘿嘿 azmiao
+
+### 🧩 依赖变更
+
+- *(deps)* bump quart from 0.20.0 to 0.21.0 @dependabot[bot]
+- *(deps)* bump pandas from 3.0.4 to 3.0.5 @dependabot[bot]
+- *(deps)* bump opencv-python from 4.13.0.92 to 5.0.0.93 @dependabot[bot]
+- *(deps)* bump websockets from 16.1 to 16.1.1 @dependabot[bot]
+- *(deps)* bump matplotlib from 3.11.0 to 3.11.1 @dependabot[bot]
+- *(deps)* bump websockets from 16.0 to 16.1 @dependabot[bot]
+- *(deps)* bump pillow from 12.2.0 to 12.3.0 @dependabot[bot]
+- *(deps)* bump playwright from 1.60.0 to 1.61.0 @dependabot[bot]
+- *(deps)* bump pandas from 3.0.3 to 3.0.4 @dependabot[bot]
+- *(deps)* bump json5 from 0.14.0 to 0.15.0 @dependabot[bot]
+- *(deps)* bump msgpack from 1.2.0 to 1.2.1 @dependabot[bot]
+- *(deps)* bump matplotlib from 3.10.9 to 3.11.0 @dependabot[bot]
+- *(deps)* bump msgpack from 1.1.2 to 1.2.0 @dependabot[bot]
+- *(deps)* bump beautifulsoup4 from 4.14.3 to 4.15.0 @dependabot[bot]
+- *(deps)* bump lxml from 6.1.0 to 6.1.1 @dependabot[bot]
+- *(deps)* bump playwright from 1.59.0 to 1.60.0 @dependabot[bot]
+- *(deps)* bump pandas from 3.0.2 to 3.0.3 @dependabot[bot]
+- *(deps)* bump playwright from 1.58.0 to 1.59.0 @dependabot[bot]
+- *(deps)* bump matplotlib from 3.10.8 to 3.10.9 @dependabot[bot]
+- *(deps)* bump lxml from 6.0.4 to 6.1.0 @dependabot[bot]
+- *(deps)* bump lxml from 6.0.3 to 6.0.4 @dependabot[bot]
+- *(deps)* bump lxml from 6.0.2 to 6.0.3 @dependabot[bot]
+- *(deps)* bump pillow from 12.1.1 to 12.2.0 @dependabot[bot]
+- *(deps)* bump pandas from 3.0.1 to 3.0.2 @dependabot[bot]
+- *(deps)* bump json5 from 0.13.0 to 0.14.0 @dependabot[bot]
+- *(deps)* bump pytz from 2025.2 to 2026.1.post1 @dependabot[bot]
+- *(deps)* bump markdown2 from 2.5.4 to 2.5.5 @dependabot[bot]
+- *(deps)* bump pandas from 3.0.0 to 3.0.1 @dependabot[bot]
+- *(deps)* bump pillow from 12.1.0 to 12.1.1 @dependabot[bot]
+- *(deps)* bump opencv-python from 4.13.0.90 to 4.13.0.92 @dependabot[bot]
+- *(deps)* bump pandas from 2.3.3 to 3.0.0 @dependabot[bot]
+- 更新Numpy至2.4.1 azmiao
+- *(deps)* bump opencv-python from 4.12.0.88 to 4.13.0.90 @dependabot[bot]
+- *(deps)* bump websockets from 15.0.1 to 16.0 @dependabot[bot]
+- *(deps)* bump pillow from 12.0.0 to 12.1.0 @dependabot[bot]
+- *(deps)* bump gitpython from 3.1.45 to 3.1.46 @dependabot[bot]
+- *(deps)* bump json5 from 0.12.1 to 0.13.0 @dependabot[bot]
+- *(deps)* bump apscheduler from 3.11.1 to 3.11.2 @dependabot[bot]
+- *(deps)* bump matplotlib from 3.10.7 to 3.10.8 @dependabot[bot]
+- *(deps)* bump rocksdict from 0.3.28 to 0.3.29 @dependabot[bot]
+- *(deps)* bump beautifulsoup4 from 4.14.2 to 4.14.3 @dependabot[bot]
+
+### ⚙️ 持续集成
+
+- 去除打包的二次压缩 azmiao
+- 测试更新依赖检测 azmiao
+- 测试更新依赖检测 azmiao
+- 测试更新依赖检测 azmiao
+- 更新Dependabot azmiao
+
+### 🧹 日常维护
+
+- 更换打包CI配置，修改启动脚本 azmiao
+- 更新依赖安装脚本，更新依赖需求配置 azmiao
+- 更新gitignore azmiao
+- 去除部分敏感词 azmiao
+
+### 其他变更
+
+- v1.0.1 azmiao
+- 添加Python镜像站 azmiao
+- Add GNU AGPL v3 License @azmiao
+- fix azmiao
+- Bump numpy from 2.2.4 to 2.3.5 @dependabot[bot]
+- Bump rocksdict from 0.3.27 to 0.3.28 @dependabot[bot]
+- Bump python-levenshtein from 0.27.1 to 0.27.3 @dependabot[bot]
+- Bump apscheduler from 3.11.0 to 3.11.1 @dependabot[bot]
+- Bump pillow from 11.3.0 to 12.0.0 @dependabot[bot]
+- 固定numpy版本为2.2.4 azmiao
+- Bump matplotlib from 3.10.6 to 3.10.7 @dependabot[bot]
+- Bump msgpack from 1.1.1 to 1.1.2 @dependabot[bot]
+- Bump numpy from 2.2.4 to 2.3.3 @dependabot[bot]
+- Bump matplotlib from 3.10.1 to 3.10.6 @dependabot[bot]
+- Bump beautifulsoup4 from 4.13.5 to 4.14.2 @dependabot[bot]
+- Bump pandas from 2.3.2 to 2.3.3 @dependabot[bot]
+- Bump beautifulsoup4 from 4.13.5 to 4.14.0 @dependabot[bot]
+- Bump lxml from 6.0.1 to 6.0.2 @dependabot[bot]
+- 修复保存问题 azmiao
+- 添加Token验证 azmiao
+- 先不支持自定义URL吧 azmiao
+- 尝试优化复读图片 azmiao
+- 调整显性CQ类型排除，优化删除不需要图片的逻辑 azmiao
+- 尝试修复自定义URL问答的问题 azmiao
+- Bump beautifulsoup4 from 4.13.4 to 4.13.5 @dependabot[bot]
+- Bump lxml from 6.0.0 to 6.0.1 @dependabot[bot]
+- Bump pandas from 2.3.1 to 2.3.2 @dependabot[bot]
+- Bump json5 from 0.12.0 to 0.12.1 @dependabot[bot]
+- 调整一下代码逻辑 azmiao
+- 尝试修复打包版本静态资源路径问题 azmiao
+- 尝试修改打包参数 azmiao
+- 尝试修复部分资源路径问题 azmiao
+- Bump markdown2 from 2.5.3 to 2.5.4 @dependabot[bot]
+- Bump gitpython from 3.1.44 to 3.1.45 @dependabot[bot]
+- 更新插件列表 azmiao
+
 ## 1.0.0 (2025-07-24)
 
 ### 其他变更
