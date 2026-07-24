@@ -1,0 +1,215 @@
+name: Release YuiChyanBot
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+      - "!v*-*"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  TZ: Asia/Shanghai
+  PORTABLE_PYTHON_VERSION: 3.13.5
+
+jobs:
+  metadata:
+    name: Validate release metadata
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.validate.outputs.tag }}
+      version: ${{ steps.validate.outputs.version }}
+    steps:
+      - name: Checkout full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate tag and project version
+        id: validate
+        shell: bash
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          tag="$RELEASE_TAG"
+          if [[ ! "$tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "仅支持 vX.Y.Z 格式的正式版本标签，当前标签：$tag" >&2
+            exit 1
+          fi
+
+          version="${tag#v}"
+          project_version="$(python -c "import tomllib; print(tomllib.load(open('pyproject.toml', 'rb'))['project']['version'])")"
+          if [[ "$version" != "$project_version" ]]; then
+            echo "标签版本 $version 与项目版本 $project_version 不一致" >&2
+            exit 1
+          fi
+
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+  build:
+    name: Build portable package
+    needs: metadata
+    runs-on: windows-latest
+    steps:
+      - name: Checkout tagged source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.metadata.outputs.tag }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          architecture: 'x64'
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+
+      - name: Export locked requirements
+        run: uv export --frozen --format requirements-txt --no-dev --no-hashes -o portable-requirements.txt
+
+      - name: Build offline wheels
+        run: python -m pip wheel --wheel-dir portable-build/wheels -r portable-requirements.txt
+
+      - name: Verify wheelhouse
+        shell: pwsh
+        run: |
+          $sourceArchives = Get-ChildItem -LiteralPath 'portable-build/wheels' -File | Where-Object {
+            $_.Name -match '\.(tar\.gz|tar\.bz2|tgz|zip)$'
+          }
+          if ($sourceArchives) {
+            $names = $sourceArchives.Name -join ', '
+            throw "离线依赖目录包含源码包：$names"
+          }
+
+      - name: Download portable Python
+        shell: pwsh
+        run: |
+          nuget install python -Version $env:PORTABLE_PYTHON_VERSION -ExcludeVersion -OutputDirectory portable-build/nuget
+
+      - name: Assemble portable package
+        shell: pwsh
+        run: |
+          $packageRoot = Join-Path $PWD 'dist/YuiChyanBot'
+          $pythonRoot = Join-Path $packageRoot 'python'
+          $wheelsRoot = Join-Path $packageRoot 'wheels'
+          New-Item -ItemType Directory -Path $pythonRoot -Force | Out-Null
+          New-Item -ItemType Directory -Path $wheelsRoot -Force | Out-Null
+          Copy-Item -Path 'portable-build/nuget/python/tools/*' -Destination $pythonRoot -Recurse -Force
+          Copy-Item -Path 'portable-build/wheels/*.whl' -Destination $wheelsRoot -Force
+          Copy-Item -LiteralPath 'yuiChyan' -Destination (Join-Path $packageRoot 'yuiChyan') -Recurse -Force
+          Copy-Item -LiteralPath 'runYuiChyan.py' -Destination $packageRoot -Force
+          Copy-Item -LiteralPath '启动YuiChyan.bat' -Destination $packageRoot -Force
+          Copy-Item -LiteralPath 'portable-requirements.txt' -Destination (Join-Path $packageRoot 'requirements-portable.txt') -Force
+          Copy-Item -LiteralPath 'LICENSE' -Destination $packageRoot -Force
+          Copy-Item -LiteralPath 'README.md' -Destination $packageRoot -Force
+          Set-Content -LiteralPath (Join-Path $packageRoot 'portable-build-id.txt') -Value '${{ github.sha }}' -Encoding ascii
+
+      - name: Upload portable artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: YuiChyanBot-Portable
+          path: dist/YuiChyanBot
+          if-no-files-found: error
+          retention-days: 7
+
+  changelog:
+    name: Generate changelog
+    needs: metadata
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout default branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Generate release notes and full changelog
+        shell: bash
+        env:
+          RELEASE_TAG: ${{ needs.metadata.outputs.tag }}
+        run: |
+          set -euo pipefail
+          git show "$RELEASE_TAG:scripts/generate_changelog.py" > "$RUNNER_TEMP/generate_changelog.py"
+          python "$RUNNER_TEMP/generate_changelog.py" --tag "$RELEASE_TAG" > release-notes.md
+          python "$RUNNER_TEMP/generate_changelog.py" --all --output CHANGELOG.md
+          test -s release-notes.md
+          test -s CHANGELOG.md
+
+      - name: Upload release metadata
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-metadata
+          path: release-notes.md
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Commit changelog
+        shell: bash
+        env:
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add CHANGELOG.md
+          if git diff --cached --quiet; then
+            echo "CHANGELOG.md 无变化，跳过提交"
+            exit 0
+          fi
+          git commit -m "chore: 更新 CHANGELOG"
+          git push origin "HEAD:$DEFAULT_BRANCH"
+
+  release:
+    name: Publish GitHub Release
+    needs: [metadata, build, changelog]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download portable artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: YuiChyanBot-Portable
+          path: assets/portable
+
+      - name: Download release metadata
+        uses: actions/download-artifact@v4
+        with:
+          name: release-metadata
+          path: assets/metadata
+
+      - name: Package portable ZIP
+        shell: bash
+        env:
+          RELEASE_TAG: ${{ needs.metadata.outputs.tag }}
+        run: |
+          set -euo pipefail
+          test -d assets/portable
+          test -s assets/metadata/release-notes.md
+          zip_path="assets/YuiChyanBot-Portable-${RELEASE_TAG}.zip"
+          (cd assets/portable && zip -r "../YuiChyanBot-Portable-${RELEASE_TAG}.zip" .)
+          test -s "$zip_path"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: ${{ needs.metadata.outputs.tag }}
+          name: ${{ needs.metadata.outputs.tag }}
+          body_path: assets/metadata/release-notes.md
+          files: assets/YuiChyanBot-Portable-${{ needs.metadata.outputs.tag }}.zip
+          draft: false
+          prerelease: false
+          fail_on_unmatched_files: true
