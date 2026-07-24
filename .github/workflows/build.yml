@@ -53,18 +53,9 @@ jobs:
           Copy-Item -LiteralPath 'README.md' -Destination $packageRoot -Force
           Set-Content -LiteralPath (Join-Path $packageRoot 'portable-build-id.txt') -Value '${{ github.sha }}' -Encoding ascii
 
-      - name: Create zip artifact
-        shell: pwsh
-        run: |
-          $zipPath = Join-Path $PWD 'dist/YuiChyanBot-portable-windows.zip'
-          if (Test-Path -LiteralPath $zipPath) {
-            Remove-Item -LiteralPath $zipPath -Force
-          }
-          Compress-Archive -Path 'dist/YuiChyanBot/*' -DestinationPath $zipPath -Force
-
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: YuiChyanBot-portable-windows
-          path: dist/YuiChyanBot-portable-windows.zip
+          name: YuiChyanBot-Portable
+          path: dist/YuiChyanBot
           if-no-files-found: error
