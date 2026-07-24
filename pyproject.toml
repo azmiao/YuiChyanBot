@@ -1,6 +1,6 @@
 [project]
 name = "YuiChyan"
-version = "1.0.0"
+version = "1.0.1"
 description = "一个自用的QQ机器人框架"
 authors = [
     {name = "AZMIAO"},
