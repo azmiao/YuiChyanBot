@@ -60,7 +60,7 @@ if not exist "%VENV_PYTHON%" (
 
 echo [2/3] 正在离线安装 Python 依赖...
 echo.
-"%VENV_PYTHON%" -m pip install --no-index --find-links="%WHEELS_DIR%" -r "%REQUIREMENTS_FILE%"
+"%VENV_PYTHON%" -m pip install --no-index --only-binary=:all: --find-links="%WHEELS_DIR%" -r "%REQUIREMENTS_FILE%"
 if errorlevel 1 (
     echo.
     echo [错误] 离线依赖安装失败

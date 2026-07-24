@@ -27,8 +27,19 @@ jobs:
       - name: Export locked requirements
         run: uv export --frozen --format requirements-txt --no-dev --no-hashes -o portable-requirements.txt
 
-      - name: Download offline wheels
-        run: python -m pip download --dest portable-build/wheels -r portable-requirements.txt
+      - name: Build offline wheels
+        run: python -m pip wheel --wheel-dir portable-build/wheels -r portable-requirements.txt
+
+      - name: Verify wheelhouse
+        shell: pwsh
+        run: |
+          $sourceArchives = Get-ChildItem -LiteralPath 'portable-build/wheels' -File | Where-Object {
+            $_.Name -match '\.(tar\.gz|tar\.bz2|tgz|zip)$'
+          }
+          if ($sourceArchives) {
+            $names = $sourceArchives.Name -join ', '
+            throw "离线依赖目录包含源码包：$names"
+          }
 
       - name: Download portable Python
         shell: pwsh
@@ -44,7 +55,7 @@ jobs:
           New-Item -ItemType Directory -Path $pythonRoot -Force | Out-Null
           New-Item -ItemType Directory -Path $wheelsRoot -Force | Out-Null
           Copy-Item -Path 'portable-build/nuget/python/tools/*' -Destination $pythonRoot -Recurse -Force
-          Copy-Item -Path 'portable-build/wheels/*' -Destination $wheelsRoot -Force
+          Copy-Item -Path 'portable-build/wheels/*.whl' -Destination $wheelsRoot -Force
           Copy-Item -LiteralPath 'yuiChyan' -Destination (Join-Path $packageRoot 'yuiChyan') -Recurse -Force
           Copy-Item -LiteralPath 'runYuiChyan.py' -Destination $packageRoot -Force
           Copy-Item -LiteralPath '启动YuiChyan.bat' -Destination $packageRoot -Force
