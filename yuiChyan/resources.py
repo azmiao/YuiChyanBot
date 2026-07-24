@@ -1,5 +1,7 @@
+import asyncio
 import os
 import sys
+from pathlib import Path
 from typing import Optional
 
 from matplotlib import font_manager
@@ -29,7 +31,6 @@ os.makedirs(base_img_path, exist_ok=True)
 # XQA资源路径
 xqa_img_path = os.path.join(base_img_path, 'xqa')
 os.makedirs(xqa_img_path, exist_ok=True)
-
 
 # 授权管理数据库
 auth_db_ = Rdict(os.path.join(base_db_path, 'auth.db'))
@@ -65,13 +66,87 @@ def close_all_db():
 # Playwright 浏览器实例
 _playwright: Optional[Playwright] = None
 _browser: Optional[Browser] = None
+_browser_lock = asyncio.Lock()
+_browser_close_timeout = 1.5
+
+
+async def _wait_and_ignore(awaitable):
+    try:
+        await asyncio.wait_for(awaitable, timeout=_browser_close_timeout)
+    except Exception:
+        pass
+
+
+async def _start_playwright():
+    import subprocess
+
+    if os.name != 'nt':
+        return await async_playwright().start()
+
+    original_create_subprocess_exec = asyncio.create_subprocess_exec
+
+    async def detached_create_subprocess_exec(*args, **kwargs):
+        startupinfo = kwargs.get('startupinfo') or subprocess.STARTUPINFO()
+        startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+        startupinfo.wShowWindow = subprocess.SW_HIDE
+        kwargs['startupinfo'] = startupinfo
+        creationflags = kwargs.get('creationflags', 0)
+        creationflags |= subprocess.DETACHED_PROCESS
+        creationflags |= subprocess.CREATE_NEW_PROCESS_GROUP
+        creationflags |= subprocess.CREATE_NO_WINDOW
+        kwargs['creationflags'] = creationflags
+        return await original_create_subprocess_exec(*args, **kwargs)
+
+    asyncio.create_subprocess_exec = detached_create_subprocess_exec
+    try:
+        return await async_playwright().start()
+    finally:
+        asyncio.create_subprocess_exec = original_create_subprocess_exec
+
+
+def _get_windows_chromium_path() -> Optional[str]:
+    if os.name != 'nt':
+        return None
+    local_app_data = os.environ.get('LOCALAPPDATA')
+    if not local_app_data:
+        return None
+    chromium_root = Path(local_app_data) / 'ms-playwright'
+    candidates = sorted(chromium_root.glob('chromium-*'), reverse=True)
+    for candidate in candidates:
+        chrome_path = candidate / 'chrome-win64' / 'chrome.exe'
+        if chrome_path.exists():
+            return str(chrome_path)
+    return None
 
 
 # 启动 Playwright 浏览器
 async def start_browser():
     global _playwright, _browser
-    _playwright = await async_playwright().start()
-    _browser = await _playwright.chromium.launch(headless=True)
+    async with _browser_lock:
+        if _playwright and _browser:
+            return
+        if _playwright is None:
+            _playwright = await _start_playwright()
+        if _browser is None:
+            launch_kwargs = {
+                'headless': True,  # 无头模式，无UI渲染
+                'args': [
+                    "--disable-gpu",  # 禁用GPU加速
+                    "--disable-dev-shm-usage",  # 避免/dev/shm分区不足
+                    "--disable-extensions",  # 禁用扩展
+                    "--disable-background-networking",  # 禁用后台网络活动
+                    "--no-sandbox",  # 非沙箱模式(部分环境需要)
+                    "--mute-audio",  # 静音
+                    "--blink-settings=imagesEnabled=false"  # 禁用图片加载
+                ],
+                'chromium_sandbox': False
+            }
+            chromium_path = _get_windows_chromium_path()
+            if chromium_path:
+                launch_kwargs['executable_path'] = chromium_path
+            _browser = await _playwright.chromium.launch(
+                **launch_kwargs
+            )
 
 
 # 获取全局浏览器实例
@@ -84,9 +159,12 @@ def get_browser() -> Browser:
 # 关闭 Playwright 浏览器
 async def close_browser():
     global _playwright, _browser
-    if _browser:
-        await _browser.close()
+    async with _browser_lock:
+        browser = _browser
+        playwright = _playwright
         _browser = None
-    if _playwright:
-        await _playwright.stop()
         _playwright = None
+        if browser:
+            await _wait_and_ignore(browser.close())
+        if playwright:
+            await _wait_and_ignore(playwright.stop())
