@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import re
 import subprocess
 import sys
@@ -20,6 +21,7 @@ GITHUB_NOREPLY_PATTERN = re.compile(
     r"^(?:\d+\+)?(?P<username>[^@]+)@users\.noreply\.github\.com$",
     re.IGNORECASE,
 )
+DEFAULT_NICKNAME_MAP_PATH = Path(".vscode/git-nickname-username.json")
 
 CATEGORY_BY_TYPE = {
     "feat": "✨ 新功能",
@@ -93,7 +95,23 @@ def read_commit_records(tag: str, previous_tag: str | None) -> list[str]:
     return [record.strip() for record in output.split("\x1e") if record.strip()]
 
 
-def format_author(name: str, email: str) -> str:
+def load_nickname_map(path: Path = DEFAULT_NICKNAME_MAP_PATH) -> dict[str, str]:
+    if not path.exists():
+        return {}
+    data = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(data, dict):
+        raise ValueError(f"Git 昵称映射配置必须是 JSON 对象：{path}")
+    return {
+        name: username
+        for name, username in data.items()
+        if not name.startswith("$") and isinstance(username, str)
+    }
+
+
+def format_author(name: str, email: str, nickname_map: dict[str, str]) -> str:
+    mapped_username = nickname_map.get(name.strip())
+    if mapped_username:
+        return f"@{mapped_username}"
     match = GITHUB_NOREPLY_PATTERN.fullmatch(email.strip())
     return f"@{match.group('username')}" if match else name.strip()
 
@@ -116,7 +134,7 @@ def parse_commit_record(record: str) -> Commit:
     return Commit(subject, author_name, author_email, category)
 
 
-def render_version(tag: str, tags: list[str]) -> str:
+def render_version(tag: str, tags: list[str], nickname_map: dict[str, str]) -> str:
     if parse_version_tag(tag) is None:
         raise ValueError(f"不是正式版本标签：{tag}")
     if tag not in tags:
@@ -137,16 +155,16 @@ def render_version(tag: str, tags: list[str]) -> str:
             continue
         lines.extend(("", f"### {category}", ""))
         lines.extend(
-            f"- {commit.subject} {format_author(commit.author_name, commit.author_email)}"
+            f"- {commit.subject} {format_author(commit.author_name, commit.author_email, nickname_map)}"
             for commit in category_commits
         )
     return "\n".join(lines) + "\n"
 
 
-def render_changelog(tags: list[str]) -> str:
+def render_changelog(tags: list[str], nickname_map: dict[str, str]) -> str:
     if not tags:
         raise ValueError("仓库中没有正式版本标签")
-    sections = [render_version(tag, tags).rstrip() for tag in tags]
+    sections = [render_version(tag, tags, nickname_map).rstrip() for tag in tags]
     return "# 更新日志\n\n" + "\n\n".join(sections) + "\n"
 
 
@@ -163,7 +181,12 @@ def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
     try:
         tags = get_release_tags()
-        content = render_changelog(tags) if args.all else render_version(args.tag, tags)
+        nickname_map = load_nickname_map()
+        content = (
+            render_changelog(tags, nickname_map)
+            if args.all
+            else render_version(args.tag, tags, nickname_map)
+        )
         if args.output:
             args.output.write_text(content, encoding="utf-8", newline="\n")
         else:

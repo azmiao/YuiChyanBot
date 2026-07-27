@@ -4,54 +4,54 @@
 
 ### ✨ 新功能
 
-- 尝新增自动发布版本流程CI任务和ChangeLog生成 azmiao
-- 使用Playwright替换wkhtmltoimage实现HTML转图片，删除wkhtmltox目录 azmiao
-- RSS功能增加代理 azmiao
-- 新增时间解析工具类，RSS工具新增自带时间参数 azmiao
-- 更换uv环境配置 azmiao
-- 测试增加模板 azmiao
-- 新增设置头衔功能 azmiao
-- 新增RSS解析工具类 azmiao
+- 尝新增自动发布版本流程CI任务和ChangeLog生成 @azmiao
+- 使用Playwright替换wkhtmltoimage实现HTML转图片，删除wkhtmltox目录 @azmiao
+- RSS功能增加代理 @azmiao
+- 新增时间解析工具类，RSS工具新增自带时间参数 @azmiao
+- 更换uv环境配置 @azmiao
+- 测试增加模板 @azmiao
+- 新增设置头衔功能 @azmiao
+- 新增RSS解析工具类 @azmiao
 
 ### 🐛 Bug 修复
 
-- 尝试修复依赖打包问题 azmiao
-- 修复关闭Win窗口后Python仍然被PlayWright长时间占用的BUG azmiao
-- 敏感词去除CQ azmiao
-- 优化删问答时删除图片逻辑的稳定性 azmiao
-- 修复XQA泛匹配校验异常 azmiao
-- 抑制字体缺失字形的警告 azmiao
-- 尝试修复matplotlib绘图错误 azmiao
-- 修复rebuild_session pop错误map、on_suffix装饰器顺序、Permission序列化问题 azmiao
-- 修复类型声明错误 azmiao
-- 补充更新client操作 azmiao
-- 修复一处异步错误 azmiao
-- 去除www的敏感词 azmiao
-- 更新依赖检测为每日 azmiao
-- 同步更新uv.lock azmiao
-- 更新pyproject azmiao
-- 修改默认配置 azmiao
-- 修复一处传参错误 azmiao
-- 整理工具类，尝试优化翻译工具 azmiao
+- 尝试修复依赖打包问题 @azmiao
+- 修复关闭Win窗口后Python仍然被PlayWright长时间占用的BUG @azmiao
+- 敏感词去除CQ @azmiao
+- 优化删问答时删除图片逻辑的稳定性 @azmiao
+- 修复XQA泛匹配校验异常 @azmiao
+- 抑制字体缺失字形的警告 @azmiao
+- 尝试修复matplotlib绘图错误 @azmiao
+- 修复rebuild_session pop错误map、on_suffix装饰器顺序、Permission序列化问题 @azmiao
+- 修复类型声明错误 @azmiao
+- 补充更新client操作 @azmiao
+- 修复一处异步错误 @azmiao
+- 去除www的敏感词 @azmiao
+- 更新依赖检测为每日 @azmiao
+- 同步更新uv.lock @azmiao
+- 更新pyproject @azmiao
+- 修改默认配置 @azmiao
+- 修复一处传参错误 @azmiao
+- 整理工具类，尝试优化翻译工具 @azmiao
 
 ### 🚀 性能优化
 
-- 更新依赖脚本支持选项配置是否使用代理 azmiao
-- 更新依赖脚本增加代理配置 azmiao
-- 异步化httpx调用、matplotlib操作to_thread、RocksDB生命周期管理 azmiao
-- 优化漫画翻译逻辑 azmiao
-- RSS工具优化请求逻辑 azmiao
-- 尝试优化漫画翻译参数 azmiao
-- RSS工具新增自动重试 azmiao
-- RSS功能优化，更换异步会话请求，新增可自定义传入的Headers参数 azmiao
+- 更新依赖脚本支持选项配置是否使用代理 @azmiao
+- 更新依赖脚本增加代理配置 @azmiao
+- 异步化httpx调用、matplotlib操作to_thread、RocksDB生命周期管理 @azmiao
+- 优化漫画翻译逻辑 @azmiao
+- RSS工具优化请求逻辑 @azmiao
+- 尝试优化漫画翻译参数 @azmiao
+- RSS工具新增自动重试 @azmiao
+- RSS功能优化，更换异步会话请求，新增可自定义传入的Headers参数 @azmiao
 
 ### 🎨 代码重构
 
-- pytz替换为zoneinfo、BaseTrigger改用ABC抽象基类 azmiao
+- pytz替换为zoneinfo、BaseTrigger改用ABC抽象基类 @azmiao
 
 ### 📚 文档
 
-- 更新AI帮我写的文档，嘿嘿 azmiao
+- 更新AI帮我写的文档，嘿嘿 @azmiao
 
 ### 🧩 依赖变更
 
@@ -86,7 +86,7 @@
 - *(deps)* bump pillow from 12.1.0 to 12.1.1 @dependabot[bot]
 - *(deps)* bump opencv-python from 4.13.0.90 to 4.13.0.92 @dependabot[bot]
 - *(deps)* bump pandas from 2.3.3 to 3.0.0 @dependabot[bot]
-- 更新Numpy至2.4.1 azmiao
+- 更新Numpy至2.4.1 @azmiao
 - *(deps)* bump opencv-python from 4.12.0.88 to 4.13.0.90 @dependabot[bot]
 - *(deps)* bump websockets from 15.0.1 to 16.0 @dependabot[bot]
 - *(deps)* bump pillow from 12.0.0 to 12.1.0 @dependabot[bot]
@@ -99,31 +99,31 @@
 
 ### ⚙️ 持续集成
 
-- 去除打包的二次压缩 azmiao
-- 测试更新依赖检测 azmiao
-- 测试更新依赖检测 azmiao
-- 测试更新依赖检测 azmiao
-- 更新Dependabot azmiao
+- 去除打包的二次压缩 @azmiao
+- 测试更新依赖检测 @azmiao
+- 测试更新依赖检测 @azmiao
+- 测试更新依赖检测 @azmiao
+- 更新Dependabot @azmiao
 
 ### 🧹 日常维护
 
-- 更换打包CI配置，修改启动脚本 azmiao
-- 更新依赖安装脚本，更新依赖需求配置 azmiao
-- 更新gitignore azmiao
-- 去除部分敏感词 azmiao
+- 更换打包CI配置，修改启动脚本 @azmiao
+- 更新依赖安装脚本，更新依赖需求配置 @azmiao
+- 更新gitignore @azmiao
+- 去除部分敏感词 @azmiao
 
 ### 其他变更
 
-- v1.0.1 azmiao
-- 添加Python镜像站 azmiao
+- v1.0.1 @azmiao
+- 添加Python镜像站 @azmiao
 - Add GNU AGPL v3 License @azmiao
-- fix azmiao
+- fix @azmiao
 - Bump numpy from 2.2.4 to 2.3.5 @dependabot[bot]
 - Bump rocksdict from 0.3.27 to 0.3.28 @dependabot[bot]
 - Bump python-levenshtein from 0.27.1 to 0.27.3 @dependabot[bot]
 - Bump apscheduler from 3.11.0 to 3.11.1 @dependabot[bot]
 - Bump pillow from 11.3.0 to 12.0.0 @dependabot[bot]
-- 固定numpy版本为2.2.4 azmiao
+- 固定numpy版本为2.2.4 @azmiao
 - Bump matplotlib from 3.10.6 to 3.10.7 @dependabot[bot]
 - Bump msgpack from 1.1.1 to 1.1.2 @dependabot[bot]
 - Bump numpy from 2.2.4 to 2.3.3 @dependabot[bot]
@@ -132,75 +132,75 @@
 - Bump pandas from 2.3.2 to 2.3.3 @dependabot[bot]
 - Bump beautifulsoup4 from 4.13.5 to 4.14.0 @dependabot[bot]
 - Bump lxml from 6.0.1 to 6.0.2 @dependabot[bot]
-- 修复保存问题 azmiao
-- 添加Token验证 azmiao
-- 先不支持自定义URL吧 azmiao
-- 尝试优化复读图片 azmiao
-- 调整显性CQ类型排除，优化删除不需要图片的逻辑 azmiao
-- 尝试修复自定义URL问答的问题 azmiao
+- 修复保存问题 @azmiao
+- 添加Token验证 @azmiao
+- 先不支持自定义URL吧 @azmiao
+- 尝试优化复读图片 @azmiao
+- 调整显性CQ类型排除，优化删除不需要图片的逻辑 @azmiao
+- 尝试修复自定义URL问答的问题 @azmiao
 - Bump beautifulsoup4 from 4.13.4 to 4.13.5 @dependabot[bot]
 - Bump lxml from 6.0.0 to 6.0.1 @dependabot[bot]
 - Bump pandas from 2.3.1 to 2.3.2 @dependabot[bot]
 - Bump json5 from 0.12.0 to 0.12.1 @dependabot[bot]
-- 调整一下代码逻辑 azmiao
-- 尝试修复打包版本静态资源路径问题 azmiao
-- 尝试修改打包参数 azmiao
-- 尝试修复部分资源路径问题 azmiao
+- 调整一下代码逻辑 @azmiao
+- 尝试修复打包版本静态资源路径问题 @azmiao
+- 尝试修改打包参数 @azmiao
+- 尝试修复部分资源路径问题 @azmiao
 - Bump markdown2 from 2.5.3 to 2.5.4 @dependabot[bot]
 - Bump gitpython from 3.1.44 to 3.1.45 @dependabot[bot]
-- 更新插件列表 azmiao
+- 更新插件列表 @azmiao
 
 ## 1.0.0 (2025-07-24)
 
 ### 其他变更
 
-- 更新文档，正式开源 azmiao
-- 优化DEBUG打印 azmiao
-- 更新日志打印 azmiao
-- 定时任务新增自定义ID azmiao
-- 修复两处的路径错误 azmiao
-- 尝试修正错误的Action-Yaml语法 azmiao
-- 尝试更新打包的参数配置 azmiao
+- 更新文档，正式开源 @azmiao
+- 优化DEBUG打印 @azmiao
+- 更新日志打印 @azmiao
+- 定时任务新增自定义ID @azmiao
+- 修复两处的路径错误 @azmiao
+- 尝试修正错误的Action-Yaml语法 @azmiao
+- 尝试更新打包的参数配置 @azmiao
 - Bump pandas from 2.3.0 to 2.3.1 @dependabot[bot]
 - Bump opencv-python from 4.11.0.86 to 4.12.0.88 @dependabot[bot]
-- 尝试修改打包资源的路径 azmiao
-- 修复配置路径问题 azmiao
-- 去除mingw64配置 azmiao
-- 修复模式问题 azmiao
-- 更新配置和路径 azmiao
+- 尝试修改打包资源的路径 @azmiao
+- 修复配置路径问题 @azmiao
+- 去除mingw64配置 @azmiao
+- 修复模式问题 @azmiao
+- 更新配置和路径 @azmiao
 - Bump pillow from 11.2.1 to 11.3.0 @dependabot[bot]
-- 移动编译yml至action文件夹 azmiao
-- 更新yml azmiao
-- 去除失效功能，更新文档 azmiao
-- 同步YuiChyan公主连结基础插件解耦 azmiao
-- 同步YuiChyan音乐助手插件解耦 azmiao
+- 移动编译yml至action文件夹 @azmiao
+- 更新yml @azmiao
+- 去除失效功能，更新文档 @azmiao
+- 同步YuiChyan公主连结基础插件解耦 @azmiao
+- 同步YuiChyan音乐助手插件解耦 @azmiao
 - Bump lxml from 5.4.0 to 6.0.0 @dependabot[bot]
-- 更新配置，新增初版打包参数 azmiao
-- 去除已经解耦的每日新闻组件 azmiao
-- 去除已经解耦的空调组件 azmiao
+- 更新配置，新增初版打包参数 @azmiao
+- 去除已经解耦的每日新闻组件 @azmiao
+- 去除已经解耦的空调组件 @azmiao
 - Bump msgpack from 1.1.0 to 1.1.1 @dependabot[bot]
-- 更新文档 azmiao
-- 新增logo图 azmiao
-- 尝试恢复点歌功能 azmiao
-- 修改展示模板 azmiao
-- 新增新版出刀数统计逻辑 azmiao
-- 同步更新支持月份显示 azmiao
-- 尝试修复戳一戳 azmiao
-- 删除合并转发消息功能，已无用 azmiao
+- 更新文档 @azmiao
+- 新增logo图 @azmiao
+- 尝试恢复点歌功能 @azmiao
+- 修改展示模板 @azmiao
+- 新增新版出刀数统计逻辑 @azmiao
+- 同步更新支持月份显示 @azmiao
+- 尝试修复戳一戳 @azmiao
+- 删除合并转发消息功能，已无用 @azmiao
 - Bump pandas from 2.2.3 to 2.3.0 @dependabot[bot]
-- 去除字体相关，防止加载问题 azmiao
+- 去除字体相关，防止加载问题 @azmiao
 - Bump rocksdict from 0.3.26 to 0.3.27 @dependabot[bot]
 - Bump pycryptodome from 3.22.0 to 3.23.0 @dependabot[bot]
-- 优化维护中的查询检测 azmiao
-- 修复BUG azmiao
-- 优化描述 azmiao
-- 修复问题 azmiao
-- 优化@取值 azmiao
-- 还是先去掉吧 azmiao
-- 回退判断，尝试通过正则表达式解决 azmiao
-- 修改只处理前缀@，防止正常命令被过滤 azmiao
-- 优化帮助文档 azmiao
-- 修复设置问答权限反馈问题 azmiao
+- 优化维护中的查询检测 @azmiao
+- 修复BUG @azmiao
+- 优化描述 @azmiao
+- 修复问题 @azmiao
+- 优化@取值 @azmiao
+- 还是先去掉吧 @azmiao
+- 回退判断，尝试通过正则表达式解决 @azmiao
+- 修改只处理前缀@，防止正常命令被过滤 @azmiao
+- 优化帮助文档 @azmiao
+- 修复设置问答权限反馈问题 @azmiao
 - Bump rocksdict from 0.3.25 to 0.3.26 @dependabot[bot]
 - Bump lxml from 5.3.2 to 5.4.0 @dependabot[bot]
 - Bump beautifulsoup4 from 4.13.3 to 4.13.4 @dependabot[bot]
@@ -209,214 +209,214 @@
 - Bump json5 from 0.11.0 to 0.12.0 @dependabot[bot]
 - Bump json5 from 0.10.0 to 0.11.0 @dependabot[bot]
 - Bump pillow from 11.1.0 to 11.2.0 @dependabot[bot]
-- 更新周目 azmiao
-- 状态图标改为SVG azmiao
-- 优化页面 azmiao
-- 优化页面 azmiao
-- 更新支持会战的页面展示 azmiao
-- 调整展示效果 azmiao
-- 修复换行 azmiao
-- 修复await azmiao
-- 新增核心功能：音乐助手 azmiao
+- 更新周目 @azmiao
+- 状态图标改为SVG @azmiao
+- 优化页面 @azmiao
+- 优化页面 @azmiao
+- 更新支持会战的页面展示 @azmiao
+- 调整展示效果 @azmiao
+- 修复换行 @azmiao
+- 修复await @azmiao
+- 新增核心功能：音乐助手 @azmiao
 - Bump pytz from 2025.1 to 2025.2 @dependabot[bot]
-- 优化字符问题 azmiao
-- 更新DEBUG功能 azmiao
-- 修复markdown2的参数 azmiao
-- 修复换行符问题 azmiao
-- 优化图片处理和markdown处理 azmiao
-- 更新默认配置 azmiao
-- 优化漫画翻译WS连接 azmiao
-- 修复正则解析前html实体的转译 azmiao
+- 优化字符问题 @azmiao
+- 更新DEBUG功能 @azmiao
+- 修复markdown2的参数 @azmiao
+- 修复换行符问题 @azmiao
+- 优化图片处理和markdown处理 @azmiao
+- 更新默认配置 @azmiao
+- 优化漫画翻译WS连接 @azmiao
+- 修复正则解析前html实体的转译 @azmiao
 - Bump pycryptodome from 3.21.0 to 3.22.0 @dependabot[bot]
 - Bump numpy from 2.2.3 to 2.2.4 @dependabot[bot]
-- 修复挤号的错误 azmiao
-- 新增内置的统一封装的客户端 azmiao
-- 尝试修复部分角色头像无法识别的问题 azmiao
+- 修复挤号的错误 @azmiao
+- 新增内置的统一封装的客户端 @azmiao
+- 尝试修复部分角色头像无法识别的问题 @azmiao
 - Bump websockets from 15.0 to 15.0.1 @dependabot[bot]
 - Bump jinja2 from 3.1.5 to 3.1.6 @dependabot[bot]
 - Bump python-levenshtein from 0.26.1 to 0.27.1 @dependabot[bot]
-- 更新按钮 azmiao
+- 更新按钮 @azmiao
 - Bump matplotlib from 3.10.0 to 3.10.1 @dependabot[bot]
-- 对竞技场查询图片解析更换内置解析器 azmiao
-- 优化非@触发的服务如果@别人就阻断业务逻辑 azmiao
+- 对竞技场查询图片解析更换内置解析器 @azmiao
+- 优化非@触发的服务如果@别人就阻断业务逻辑 @azmiao
 - Bump websockets from 14.2 to 15.0 @dependabot[bot]
 - Bump numpy from 2.2.2 to 2.2.3 @dependabot[bot]
 - Bump lxml from 5.3.0 to 5.3.1 @dependabot[bot]
-- 优化代码 azmiao
-- 修复排除列表加载缓存问题 azmiao
-- 优化样式 azmiao
-- 优化样式 azmiao
-- 新增页面功能开关实现 azmiao
-- 帮助页面新增服务管理入口 azmiao
-- 新增服务管理页面基本框架 azmiao
-- 优化帮助页面结构 azmiao
-- 优化主页重定向至帮助 azmiao
+- 优化代码 @azmiao
+- 修复排除列表加载缓存问题 @azmiao
+- 优化样式 @azmiao
+- 优化样式 @azmiao
+- 新增页面功能开关实现 @azmiao
+- 帮助页面新增服务管理入口 @azmiao
+- 新增服务管理页面基本框架 @azmiao
+- 优化帮助页面结构 @azmiao
+- 优化主页重定向至帮助 @azmiao
 - Bump beautifulsoup4 from 4.13.1 to 4.13.3 @dependabot[bot]
-- 选择工具增加检测 azmiao
-- 修复服务广播的群号获取问题 azmiao
+- 选择工具增加检测 @azmiao
+- 修复服务广播的群号获取问题 @azmiao
 - Bump beautifulsoup4 from 4.13.0 to 4.13.1 @dependabot[bot]
 - Bump beautifulsoup4 from 4.12.3 to 4.13.0 @dependabot[bot]
-- 尝试解决SSL证书问题 azmiao
-- 更换下载图片方式 azmiao
-- 尝试修复设置问答不下载的问题 azmiao
-- 尝试替换缓存逻辑 azmiao
-- 尝试修复一些请求问题 azmiao
+- 尝试解决SSL证书问题 @azmiao
+- 更换下载图片方式 @azmiao
+- 尝试修复设置问答不下载的问题 @azmiao
+- 尝试替换缓存逻辑 @azmiao
+- 尝试修复一些请求问题 @azmiao
 - Bump pytz from 2024.2 to 2025.1 @dependabot[bot]
-- 手动补齐依赖更新 azmiao
+- 手动补齐依赖更新 @azmiao
 - Bump pillow from 11.0.0 to 11.1.0 @dependabot[bot]
 - Bump opencv-python from 4.10.0.84 to 4.11.0.86 @dependabot[bot]
 - Bump gitpython from 3.1.43 to 3.1.44 @dependabot[bot]
 - Bump pytz from 2024.1 to 2024.2 @dependabot[bot]
 - Bump numpy from 2.2.0 to 2.2.2 @dependabot[bot]
 - Update dependabot.yml @azmiao
-- 调整依赖配置 azmiao
+- 调整依赖配置 @azmiao
 - Create dependabot.yml @azmiao
-- 帮助图片也去除字体 azmiao
-- 页面去除字体 azmiao
-- 为获取bot所加的群列表增加异步锁 azmiao
-- 修复戳一戳的接口调用问题 azmiao
-- 【重要】修复文件路径错误 azmiao
-- 优化代码 azmiao
-- 默认文件名改为PNG azmiao
-- 新增BOT的ID和群列表的缓存机制 azmiao
-- 更换回原始路由 azmiao
-- 修复BUG azmiao
-- 修复广播错误 azmiao
-- 更新帮助页面 azmiao
-- 规范化代码 azmiao
-- 代码优化 azmiao
-- 修复重建会话未关闭完全的问题 azmiao
-- 更新优化http请求工具 azmiao
-- 修复key值问题 azmiao
-- 更新修复 azmiao
-- 新增B站封面提取功能和二维码识别功能，并优化代码 azmiao
-- 停止git跟踪部分配置 azmiao
-- 优化配置存储逻辑 azmiao
-- 同步调整 azmiao
-- 尝试优化漫画翻译功能 azmiao
-- 修复广播问题 azmiao
-- 修复广播问题 azmiao
-- 更新gitignore azmiao
-- 新增今日早报功能 azmiao
-- 修复异步 azmiao
-- 修复ssl问题 azmiao
-- 新增基础功能：是啥翻译 azmiao
-- XQA删除图片方式改为同步执行 azmiao
-- XQA删除图片方式改为同步执行 azmiao
-- 修复base64转换问题 azmiao
-- 更新gitignore azmiao
-- 更新gitignore azmiao
-- 更新gitignore azmiao
-- 优化漫画翻译保存图片 azmiao
-- 优化全局的httpx请求超时参数 azmiao
-- 尝试优化httpx请求参数 azmiao
-- 尝试优化代理 azmiao
-- 尝试优化漫画翻译功能 azmiao
-- 修改PCR漫画为默认禁用 azmiao
-- 定时器优化 azmiao
-- 修复图片的正则问题 azmiao
-- 修改竞技场识别精细度 azmiao
-- 修复匹配 azmiao
-- 修复图片URL获取 azmiao
-- 修复DB问题 azmiao
-- 优化PCR功能 azmiao
-- 优化代码 azmiao
-- 优化代码 azmiao
-- 优化代码 azmiao
-- 尝试修改台服新闻推送服务 azmiao
-- 尝试修改台服新闻推送服务URL azmiao
-- 尝试修改新闻推送服务 azmiao
-- 尝试修改唯一删除图片逻辑 azmiao
-- PCR台服和国服去除https azmiao
-- 竞技场查询去除代理 azmiao
-- 尝试修复更新PCR头像问题 azmiao
-- 更新头像新增代理 azmiao
-- 修复授权列表展示数量问题 azmiao
-- 初版：更新依赖支持 azmiao
-- 初版：更换finish实现 azmiao
-- 初版：更新依赖版本 azmiao
-- 初版：更新依赖文件 azmiao
-- 初版：新增今天吃啥助手 azmiao
-- 初版：新增塔罗牌，优化 azmiao
-- 初版：新增人生重来配置 azmiao
-- 初版：新增群空调 azmiao
-- 初版：XQA更新特殊拦截 azmiao
-- 更新正则规则和查询逻辑 azmiao
-- 初版：帮助图片新增水印 azmiao
-- 初版：绘制表格新增水印 azmiao
-- 优化帮助图片 azmiao
-- 初版：优化帮助页面 azmiao
-- 初版：新增早安晚安插件 azmiao
-- 初版：更新绘图工具 azmiao
-- 初版：优化帮助文档生成方法 azmiao
-- 初版：优化更新，暂时去除hoshino适配器，适配实现有点麻烦 azmiao
-- 初版：更新内置配置加载方式，便于分支管理时的自定义 azmiao
-- 初版：去除一些不必要的配置 azmiao
-- 初版：更换PcrClient代理配置方式 azmiao
-- 初版：修改默认不注册帮助，需手动注册 azmiao
-- 初版：更新帮助功能至内置服务中 azmiao
-- 初版：新增掷骰子功能 azmiao
-- 初版：调整模块业务分配 azmiao
-- 初版：优化权限逻辑 azmiao
-- 初版：优化和修复授权BUG azmiao
-- 初版：修复异步httpx数据流请求问题 azmiao
-- 初版：更新帮助实现方法 azmiao
-- 初版：更新优化自动帮助菜单图片生成功能 azmiao
-- 更新本地markdown帮助文档命令 azmiao
-- 初版：更新导出表格工具支持 azmiao
-- 初版：更新优化 azmiao
-- 初版：更新下表格生成器 azmiao
-- 初版：更新基础绘制表格工具 azmiao
-- 初版：翻译功能更换异步 azmiao
-- 初版：修复PCR新闻BUG azmiao
-- 初版：更换回httpx请求 azmiao
-- 初版：BUG修复 azmiao
-- 初版：小问题修复 azmiao
-- 初版：更新更换HTTP请求工具 azmiao
-- 初版：更新第二版PCR功能 azmiao
-- 初版：更新第二版PCR功能，未完成 azmiao
-- 初版：更新PCR功能 azmiao
-- 初版：更新PCR添加角色名称功能和查询角色功能 azmiao
-- 初版：更新PCR基础功能 azmiao
-- 初版：第一版优化PCR功能，未完成 azmiao
-- 初版：增加PCR功能，未完成 azmiao
-- 初版：增加漫画翻译功能 azmiao
-- 初版：增加漫画翻译功能，未完成 azmiao
-- 初版：优化代码 azmiao
-- 初版：新增部分基础功能 azmiao
-- 初版：更新优化异常拦截和新增翻译功能 azmiao
-- 初版：更新一版翻译功能和敏感词优化 azmiao
-- 初版：页面修改全部字体的高亮效果 azmiao
-- 初版：页面浮动符号点击穿透 azmiao
-- 初版：更新不通同平台的页面展示 azmiao
-- 初版：调整按钮渐变动效 azmiao
-- 初版：新增页面点击效果和搜索重置功能已经背景 azmiao
-- 初版：新优化页面字体和按钮颜色变化 azmiao
-- 初版：新增帮助页面图标和字体 azmiao
-- 初版：新增群服务管理功能 azmiao
-- 初版：适应权限调整 azmiao
-- 初版：权限和拦截器调整 azmiao
-- 初版：简单调整下核心功能的帮助 azmiao
-- 初版：帮助页面调整和精简 azmiao
-- 初版：优化帮助页面 azmiao
-- 初版：美化帮助页面 azmiao
-- 初版：优化帮助菜单 azmiao
-- 初版：更新优化基础服务和计时器实现 azmiao
-- 初版：更新基础功能 azmiao
-- 初版：更新部分基础功能 azmiao
-- 初版：更新服务配置至数据库 azmiao
-- 初版：更新gitignore azmiao
-- 初版：更改数据库实现 azmiao
-- 初版：更改command命令实现 azmiao
-- 初版：更新简易帮助页面 azmiao
-- 初版：更新群管功能 azmiao
-- 初版：新增授权管理系统 azmiao
-- 初版：去除LOG-2 azmiao
-- 初版：去除LOG-1 azmiao
-- 初版：修复过滤器异常 azmiao
-- 初版：更新全局异常拦截器 azmiao
-- 初版：更新内置版XQA azmiao
-- 初版：适配版本 azmiao
-- 初版：补充原始待合并插件 azmiao
-- 初版：基础框架开发完成 azmiao
+- 帮助图片也去除字体 @azmiao
+- 页面去除字体 @azmiao
+- 为获取bot所加的群列表增加异步锁 @azmiao
+- 修复戳一戳的接口调用问题 @azmiao
+- 【重要】修复文件路径错误 @azmiao
+- 优化代码 @azmiao
+- 默认文件名改为PNG @azmiao
+- 新增BOT的ID和群列表的缓存机制 @azmiao
+- 更换回原始路由 @azmiao
+- 修复BUG @azmiao
+- 修复广播错误 @azmiao
+- 更新帮助页面 @azmiao
+- 规范化代码 @azmiao
+- 代码优化 @azmiao
+- 修复重建会话未关闭完全的问题 @azmiao
+- 更新优化http请求工具 @azmiao
+- 修复key值问题 @azmiao
+- 更新修复 @azmiao
+- 新增B站封面提取功能和二维码识别功能，并优化代码 @azmiao
+- 停止git跟踪部分配置 @azmiao
+- 优化配置存储逻辑 @azmiao
+- 同步调整 @azmiao
+- 尝试优化漫画翻译功能 @azmiao
+- 修复广播问题 @azmiao
+- 修复广播问题 @azmiao
+- 更新gitignore @azmiao
+- 新增今日早报功能 @azmiao
+- 修复异步 @azmiao
+- 修复ssl问题 @azmiao
+- 新增基础功能：是啥翻译 @azmiao
+- XQA删除图片方式改为同步执行 @azmiao
+- XQA删除图片方式改为同步执行 @azmiao
+- 修复base64转换问题 @azmiao
+- 更新gitignore @azmiao
+- 更新gitignore @azmiao
+- 更新gitignore @azmiao
+- 优化漫画翻译保存图片 @azmiao
+- 优化全局的httpx请求超时参数 @azmiao
+- 尝试优化httpx请求参数 @azmiao
+- 尝试优化代理 @azmiao
+- 尝试优化漫画翻译功能 @azmiao
+- 修改PCR漫画为默认禁用 @azmiao
+- 定时器优化 @azmiao
+- 修复图片的正则问题 @azmiao
+- 修改竞技场识别精细度 @azmiao
+- 修复匹配 @azmiao
+- 修复图片URL获取 @azmiao
+- 修复DB问题 @azmiao
+- 优化PCR功能 @azmiao
+- 优化代码 @azmiao
+- 优化代码 @azmiao
+- 优化代码 @azmiao
+- 尝试修改台服新闻推送服务 @azmiao
+- 尝试修改台服新闻推送服务URL @azmiao
+- 尝试修改新闻推送服务 @azmiao
+- 尝试修改唯一删除图片逻辑 @azmiao
+- PCR台服和国服去除https @azmiao
+- 竞技场查询去除代理 @azmiao
+- 尝试修复更新PCR头像问题 @azmiao
+- 更新头像新增代理 @azmiao
+- 修复授权列表展示数量问题 @azmiao
+- 初版：更新依赖支持 @azmiao
+- 初版：更换finish实现 @azmiao
+- 初版：更新依赖版本 @azmiao
+- 初版：更新依赖文件 @azmiao
+- 初版：新增今天吃啥助手 @azmiao
+- 初版：新增塔罗牌，优化 @azmiao
+- 初版：新增人生重来配置 @azmiao
+- 初版：新增群空调 @azmiao
+- 初版：XQA更新特殊拦截 @azmiao
+- 更新正则规则和查询逻辑 @azmiao
+- 初版：帮助图片新增水印 @azmiao
+- 初版：绘制表格新增水印 @azmiao
+- 优化帮助图片 @azmiao
+- 初版：优化帮助页面 @azmiao
+- 初版：新增早安晚安插件 @azmiao
+- 初版：更新绘图工具 @azmiao
+- 初版：优化帮助文档生成方法 @azmiao
+- 初版：优化更新，暂时去除hoshino适配器，适配实现有点麻烦 @azmiao
+- 初版：更新内置配置加载方式，便于分支管理时的自定义 @azmiao
+- 初版：去除一些不必要的配置 @azmiao
+- 初版：更换PcrClient代理配置方式 @azmiao
+- 初版：修改默认不注册帮助，需手动注册 @azmiao
+- 初版：更新帮助功能至内置服务中 @azmiao
+- 初版：新增掷骰子功能 @azmiao
+- 初版：调整模块业务分配 @azmiao
+- 初版：优化权限逻辑 @azmiao
+- 初版：优化和修复授权BUG @azmiao
+- 初版：修复异步httpx数据流请求问题 @azmiao
+- 初版：更新帮助实现方法 @azmiao
+- 初版：更新优化自动帮助菜单图片生成功能 @azmiao
+- 更新本地markdown帮助文档命令 @azmiao
+- 初版：更新导出表格工具支持 @azmiao
+- 初版：更新优化 @azmiao
+- 初版：更新下表格生成器 @azmiao
+- 初版：更新基础绘制表格工具 @azmiao
+- 初版：翻译功能更换异步 @azmiao
+- 初版：修复PCR新闻BUG @azmiao
+- 初版：更换回httpx请求 @azmiao
+- 初版：BUG修复 @azmiao
+- 初版：小问题修复 @azmiao
+- 初版：更新更换HTTP请求工具 @azmiao
+- 初版：更新第二版PCR功能 @azmiao
+- 初版：更新第二版PCR功能，未完成 @azmiao
+- 初版：更新PCR功能 @azmiao
+- 初版：更新PCR添加角色名称功能和查询角色功能 @azmiao
+- 初版：更新PCR基础功能 @azmiao
+- 初版：第一版优化PCR功能，未完成 @azmiao
+- 初版：增加PCR功能，未完成 @azmiao
+- 初版：增加漫画翻译功能 @azmiao
+- 初版：增加漫画翻译功能，未完成 @azmiao
+- 初版：优化代码 @azmiao
+- 初版：新增部分基础功能 @azmiao
+- 初版：更新优化异常拦截和新增翻译功能 @azmiao
+- 初版：更新一版翻译功能和敏感词优化 @azmiao
+- 初版：页面修改全部字体的高亮效果 @azmiao
+- 初版：页面浮动符号点击穿透 @azmiao
+- 初版：更新不通同平台的页面展示 @azmiao
+- 初版：调整按钮渐变动效 @azmiao
+- 初版：新增页面点击效果和搜索重置功能已经背景 @azmiao
+- 初版：新优化页面字体和按钮颜色变化 @azmiao
+- 初版：新增帮助页面图标和字体 @azmiao
+- 初版：新增群服务管理功能 @azmiao
+- 初版：适应权限调整 @azmiao
+- 初版：权限和拦截器调整 @azmiao
+- 初版：简单调整下核心功能的帮助 @azmiao
+- 初版：帮助页面调整和精简 @azmiao
+- 初版：优化帮助页面 @azmiao
+- 初版：美化帮助页面 @azmiao
+- 初版：优化帮助菜单 @azmiao
+- 初版：更新优化基础服务和计时器实现 @azmiao
+- 初版：更新基础功能 @azmiao
+- 初版：更新部分基础功能 @azmiao
+- 初版：更新服务配置至数据库 @azmiao
+- 初版：更新gitignore @azmiao
+- 初版：更改数据库实现 @azmiao
+- 初版：更改command命令实现 @azmiao
+- 初版：更新简易帮助页面 @azmiao
+- 初版：更新群管功能 @azmiao
+- 初版：新增授权管理系统 @azmiao
+- 初版：去除LOG-2 @azmiao
+- 初版：去除LOG-1 @azmiao
+- 初版：修复过滤器异常 @azmiao
+- 初版：更新全局异常拦截器 @azmiao
+- 初版：更新内置版XQA @azmiao
+- 初版：适配版本 @azmiao
+- 初版：补充原始待合并插件 @azmiao
+- 初版：基础框架开发完成 @azmiao
 - Initial commit @azmiao

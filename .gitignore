@@ -4,6 +4,9 @@ __pycache__/
 *.pyc
 *.json
 *.json5
+!.vscode/
+!.vscode/git-nickname-username.json
+!.vscode/git-nickname-username.schema.json
 *.sqlite
 *.log
 *.npy
