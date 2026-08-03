@@ -36,7 +36,7 @@ dependencies = [
     "python-dateutil>=2.9.0.post0",
     "msgpack>=1.2.1",
     "pycryptodome>=3.23.0",
-    "feedparser>=6.0.13",
+    "feedparser>=6.0.14",
 ]
 
 [tool.uv]
