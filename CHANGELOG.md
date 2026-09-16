@@ -1,5 +1,55 @@
 # 更新日志
 
+## 1.0.2 (2026-09-16)
+
+### ✨ 新功能
+
+- 屏蔽aiocqhttp冗余事件日志并在DEBUG模式下打印事件真实内容 @azmiao
+
+### 🐛 Bug 修复
+
+- 修复Quart升级后WS握手访问日志不显示的问题 @azmiao
+- 修复ChangeLog用户名映射 @azmiao
+
+### 📚 文档
+
+- 更新文档 @azmiao
+
+### 🧩 依赖变更
+
+- *(deps)* bump python-levenshtein from 0.27.4 to 0.27.5 @dependabot[bot]
+- *(deps)* bump matplotlib from 3.11.1 to 3.11.2 @dependabot[bot]
+- *(deps)* bump gitpython from 3.1.61 to 3.1.62 @dependabot[bot]
+- *(deps)* bump lxml from 6.1.2 to 6.1.3 @dependabot[bot]
+- *(deps)* bump pygtrie from 2.5.0 to 2.6.1 @dependabot[bot]
+- *(deps)* bump quart from 0.22.0 to 0.23.1 @dependabot[bot]
+- *(deps)* bump gitpython from 3.1.60 to 3.1.61 @dependabot[bot]
+- *(deps)* bump websockets from 17.0.1 to 17.1 @dependabot[bot]
+- *(deps)* bump gitpython from 3.1.59 to 3.1.60 @dependabot[bot]
+- *(deps)* bump msgpack from 1.2.1 to 1.2.2 @dependabot[bot]
+- *(deps)* bump lxml from 6.1.1 to 6.1.2 @dependabot[bot]
+- *(deps)* bump quart from 0.21.0 to 0.22.0 @dependabot[bot]
+- *(deps)* bump apscheduler from 3.11.2 to 3.11.3 @dependabot[bot]
+- *(deps)* bump gitpython from 3.1.46 to 3.1.59 @dependabot[bot]
+- *(deps)* bump python-levenshtein from 0.27.3 to 0.27.4 @dependabot[bot]
+- *(deps)* bump websockets from 17.0 to 17.0.1 @dependabot[bot]
+- *(deps)* bump playwright from 1.61.0 to 1.62.0 @dependabot[bot]
+- *(deps)* bump feedparser from 6.0.13 to 6.0.14 @dependabot[bot]
+- *(deps)* bump websockets from 16.1.1 to 17.0 @dependabot[bot]
+- *(deps)* bump feedparser from 6.0.12 to 6.0.13 @dependabot[bot]
+
+### 🧹 日常维护
+
+- 优化Markdown图片水印页脚样式 @azmiao
+- 更新依赖 @azmiao
+- 优化Markdown转图片卡片样式 @azmiao
+- 更新 CHANGELOG @github-actions[bot]
+
+### 其他变更
+
+- v1.0.2 @azmiao
+- 更新gitignore @azmiao
+
 ## 1.0.1 (2026-07-24)
 
 ### ✨ 新功能
