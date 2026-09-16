@@ -83,21 +83,32 @@
         blockquote { margin: 22px 0; padding: 12px 18px; border-left: 4px solid var(--accent); background: #f5f7ff; color: var(--muted); }
         img { max-width: 100%; height: auto; border-radius: 12px; }
         @media (max-width: 640px) { body { padding: 16px 10px 44px; } .markdown-card { padding: 28px 22px; border-radius: 18px; } }
-        {# 水印 #}
-        .watermark {
-            position: absolute;
-            color: gray;
+        {# 页脚随正文排列，避免长文截图中水印覆盖内容 #}
+        .document-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 8px 24px;
+            margin-top: 32px;
+            padding-top: 16px;
+            border-top: 1px solid var(--line);
+            color: #7d899c;
             font-size: 12px;
-            opacity: 0.5;
-            pointer-events: none;
+            line-height: 1.6;
+            letter-spacing: 0;
         }
-        .watermark-left {
-            bottom: 10px;
-            left: 10px;
+        .document-footer strong {
+            color: #64748b;
+            font-weight: 500;
         }
-        .watermark-right {
-            bottom: 10px;
-            right: 10px;
+        @media (max-width: 480px) {
+            .document-footer {
+                justify-content: center;
+                column-gap: 16px;
+                margin-top: 24px;
+                text-align: center;
+            }
         }
     </style>
 </head>
@@ -108,9 +119,11 @@
         <article class="document-content">
             {{ help_body | safe }}
         </article>
+        <footer class="document-footer">
+            <span>Power By <strong>YuiChyanBot</strong></span>
+            <span>Author: <strong>AZMIAO</strong></span>
+        </footer>
     </main>
-    <span class="watermark watermark-left">Power By YuiChyanBot</span>
-    <span class="watermark watermark-right">Author: AZMIAO</span>
 </body>
 
 </html>
