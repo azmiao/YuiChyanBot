@@ -98,6 +98,10 @@ def create_instance() -> YuiChyan:
     yui_bot = YuiChyan(config)
 
     # 配置 Quart App
+    # 注意：Quart 0.22+ 起 access log 改由 app.logger 输出，而 Quart('') 的 app.logger
+    # 实际就是 root logger（默认 WARNING 级），会吞掉 WS 握手等 INFO 级别的访问日志，
+    # 因此这里显式指定为项目自己的 logger
+    yui_bot.server_app.logger = new_logger('YuiChyan.Server', config.DEBUG)
     yui_bot.server_app.static_folder = os.path.join(help_res_dir, 'static')
     yui_bot.server_app.jinja_env.loader = FileSystemLoader(os.path.join(help_res_dir, 'template'))
     yui_bot.server_app.secret_key = os.urandom(24)
