@@ -1,9 +1,9 @@
 {# 全局样式 #}
 body {
-    background-color: #f2f2f2;
+    background: linear-gradient(135deg, #eef3ff 0%, #f8faff 52%, #edf8f7 100%);
     margin: 0;
     text-align: center;
-    color: #333;
+    color: #243247;
     display: block;
 }
 {# 页面文档样式 #}
