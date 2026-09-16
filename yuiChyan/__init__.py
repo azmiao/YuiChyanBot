@@ -10,7 +10,7 @@ from nonebot import NoneBot, load_plugins, CQHttpError
 import yuiChyan.config
 from yuiChyan.config import ENABLE_AUTH
 from yuiChyan.exception import *
-from yuiChyan.log import new_logger
+from yuiChyan.log import new_logger, AioCqhttpEventFilter
 from yuiChyan.resources import *
 from yuiChyan.trigger import trigger_chain
 
@@ -101,7 +101,10 @@ def create_instance() -> YuiChyan:
     # 注意：Quart 0.22+ 起 access log 改由 app.logger 输出，而 Quart('') 的 app.logger
     # 实际就是 root logger（默认 WARNING 级），会吞掉 WS 握手等 INFO 级别的访问日志，
     # 因此这里显式指定为项目自己的 logger
-    yui_bot.server_app.logger = new_logger('YuiChyan.Server', config.DEBUG)
+    server_logger = new_logger('YuiChyan.Server', config.DEBUG)
+    # 屏蔽 aiocqhttp 自带的低信息量事件日志（received event: xxx）
+    server_logger.addFilter(AioCqhttpEventFilter())
+    yui_bot.server_app.logger = server_logger
     yui_bot.server_app.static_folder = os.path.join(help_res_dir, 'static')
     yui_bot.server_app.jinja_env.loader = FileSystemLoader(os.path.join(help_res_dir, 'template'))
     yui_bot.server_app.secret_key = os.urandom(24)
@@ -120,6 +123,18 @@ def create_instance() -> YuiChyan:
     @_message_preprocessor
     async def _handle_message(bot: YuiChyan, event: CQEvent, _):
         await _process_message(bot, event)
+
+    # DEBUG 模式下打印事件与消息的真实内容（仅在 DEBUG 级别下输出）
+    @yui_bot.before('message', 'notice', 'request', 'meta_event')
+    async def _log_event(event: CQEvent):
+        parts = [f'事件 [{event.name}]']
+        if event.get('group_id'):
+            parts.append(f'群 [{event.group_id}]')
+        if event.get('user_id'):
+            parts.append(f'用户 [{event.user_id}]')
+        if event.get('raw_message'):
+            parts.append(f'消息 [{event.raw_message}]')
+        logger.debug(' | '.join(parts))
 
     return yui_bot
 

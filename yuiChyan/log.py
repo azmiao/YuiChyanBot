@@ -17,6 +17,17 @@ error_handler.setLevel(logging.ERROR)
 error_handler.setFormatter(formatter)
 
 
+class AioCqhttpEventFilter(logging.Filter):
+    """过滤 aiocqhttp 自带的低信息量事件日志（`received event: xxx`）。
+
+    aiocqhttp 会复用 server_app.logger 输出该日志，但只包含事件类型、缺乏群号和消息内容，
+    屏蔽后由项目在 DEBUG 模式下打印事件与消息的真实内容。
+    """
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        return not record.getMessage().startswith('received event: ')
+
+
 def new_logger(name: str, debug: bool = True) -> logging.Logger:
     _logger = logging.getLogger(name)
     _logger.addHandler(default_handler)
