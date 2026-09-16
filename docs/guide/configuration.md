@@ -1,49 +1,59 @@
-# 配置文件详解
+# 配置说明
 
-所有配置文件位于 `yuiChyan/config/` 目录下，首次启动时自动生成。格式为 [JSON5](https://json5.org/)，支持注释。
+配置文件在 `yuiChyan/config/` 下，首次启动时生成。修改后需要重启机器人。
 
-## base_config.json5 — 基础配置
+文件使用 JSON5 格式：文字加引号，数字不加引号，`true` 表示开启，`false` 表示关闭，`null` 表示未设置。支持用 `//` 写注释。配置项名称要保持原样。
 
-| 字段 | 类型 | 默认值 | 说明 |
-|:-----|:-----|:-------|:-----|
-| HOST | string | `"0.0.0.0"` | 监听 IP 地址 |
-| PORT | int | `2333` | 监听端口，需与 LLOneBot 反向 WebSocket 地址中的端口一致 |
-| ACCESS_TOKEN | string | `""` | 签验 Token，需与协议实现客户端配置一致，为空则不校验 |
-| DEBUG | bool | `false` | 调试模式，开启后输出更详细的日志 |
-| SUPERUSERS | list[int] | `[12345678]` | 维护组（超级管理员）QQ 号列表 |
-| NICKNAME | string | `"优衣酱"` | 机器人昵称 |
-| PUBLIC_PROTOCOL | string | `"http"` | 外网访问协议（用于帮助网页等外部访问场景） |
-| PUBLIC_DOMAIN | string\|null | `null` | 外网域名，为 null 时使用本地地址 |
-| PROXY | string\|null | `null` | 全局网络代理地址，需要在插件代码中主动调用 |
-| MANAGER_PASSWORD | string | `"12345"` | 网页端后台管理密码，必填 |
+第一次使用，先改 `SUPERUSERS` 和 `MANAGER_PASSWORD`，再检查连接地址、端口和 `ACCESS_TOKEN`。其他设置大多可以先用默认值。
 
-## auth_config.json5 — 授权管理配置
+## base_config.json5：基本设置
 
-| 字段 | 类型 | 默认值 | 说明 |
-|:-----|:-----|:-------|:-----|
-| ENABLE_AUTH | bool | `true` | 授权系统总开关，关闭后所有群均可使用 |
-| REMIND_BEFORE_EXPIRED | int | `3` | 授权到期前多少天开始提醒，设为 0 则不提醒 |
-| GROUPS_IN_PAGE | int | `5` | 私聊查询授权列表时每页显示的群数量 |
-| GROUP_LEAVE_MSG | string | `"管理员操作"` | BOT 退群时的默认退群原因 |
+| 配置项 | 默认值 | 说明 |
+|:-------|:-------|:-----|
+| HOST | `"0.0.0.0"` | 接受连接的地址。只在本机使用时建议改为 `"127.0.0.1"`；默认值也允许其他电脑连接，能否访问还取决于网络和防火墙 |
+| PORT | `2333` | 连接端口，要与 LLOneBot 或 NapCat 中填写的一致 |
+| ACCESS_TOKEN | `""` | 连接验证密钥，两边必须一致；留空则不验证，建议设置 |
+| DEBUG | `false` | 是否记录详细日志；排查问题时再开启，分享日志前注意去除私人信息 |
+| SUPERUSERS | `[12345678]` | 管理机器人的 QQ 号。多个账号写成 `[11111111, 22222222]`，文档中的“维护组”就是这些账号 |
+| NICKNAME | `"优衣酱"` | 机器人昵称 |
+| PUBLIC_PROTOCOL | `"http"` | 帮助链接使用 `http` 还是 `https`；填写 `https` 不会自动开启加密访问 |
+| PUBLIC_DOMAIN | `null` | 帮助链接使用的域名，不带 `http://` 或 `https://`；留空时用 HOST 和 PORT 拼接地址 |
+| PROXY | `null` | 供代码读取的网络代理地址，不会自动让所有请求走代理 |
+| MANAGER_PASSWORD | `"12345"` | 网页后台密码，务必修改，不要使用默认值 |
 
-## xqa_config.json5 — XQA 问答配置
+`0.0.0.0` 不是用来在浏览器中打开的地址。同一台电脑上查看帮助，请访问 `http://127.0.0.1:2333/help`。填写域名也不会自动完成公网访问配置，不要直接把管理后台开放到公网。
 
-| 字段 | 类型 | 默认值 | 说明 |
-|:-----|:-----|:-------|:-----|
-| IS_SPILT_MSG | bool | `true` | 是否启用消息分段发送 |
-| MSG_LENGTH | int | `1000` | 消息分段长度限制，不宜设置过小 |
-| SPLIT_INTERVAL | int | `1` | 分段发送的时间间隔（秒） |
-| IS_FORWARD | bool | `false` | 是否使用转发消息发送（仅查询问题时生效） |
-| IS_JUDGE_LENGTH | bool | `false` | 设置问答时是否校验回答长度，最大长度与 MSG_LENGTH 一致 |
-| IS_DIRECT_SINGER | bool | `true` | 开启分段和转发时，若只有一条消息是否直接发送而非转发 |
-| SPLIT_MSG | string | `" \| "` | 查看问答时的分隔符，可改为 `\n` 或空格等 |
-| IS_BASE64 | bool | `false` | 是否使用 base64 格式发送图片 |
+## auth_config.json5：群授权
 
-## core_plugins.json5 — 核心插件注册
+群授权决定哪些群可以使用需要授权的功能，与 QQ 自身的权限无关。
 
-注册框架自带的核心插件。格式为 `"文件夹名": "显示名称"`。
+| 配置项 | 默认值 | 说明 |
+|:-------|:-------|:-----|
+| ENABLE_AUTH | `true` | 是否检查普通消息功能的群授权；关闭后这类功能不再要求群授权，但仍受各群功能开关限制 |
+| REMIND_BEFORE_EXPIRED | `3` | 提前多少天提醒授权到期，`0` 表示不提醒 |
+| GROUPS_IN_PAGE | `5` | 私聊查看授权列表时，每页显示几个群，填写大于 0 的整数 |
+| GROUP_LEAVE_MSG | `"管理员操作"` | 机器人退群时使用的默认原因 |
 
-默认内容：
+保持授权开启时，维护组可以私聊发送 `变更授权 123456789+30`，为该群增加 30 天授权。群内发送 `查询授权` 可以查看状态；关闭授权开关后，这条查询不会回复。
+
+注意：当前定时任务和 `Service.broadcast()` 仍会检查授权记录，不随 `ENABLE_AUTH` 一起关闭。使用这些功能时仍需给群添加授权。
+
+## xqa_config.json5：你问我答
+
+| 配置项 | 默认值 | 说明 |
+|:-------|:-------|:-----|
+| IS_SPILT_MSG | `true` | 是否把长消息拆成多条发送，名称中的 `SPILT` 是代码现有拼写，请勿改名 |
+| MSG_LENGTH | `1000` | 每段消息的长度上限，不要设得太小 |
+| SPLIT_INTERVAL | `1` | 每段消息之间间隔几秒 |
+| IS_FORWARD | `false` | 查看问答时，是否用合并转发消息发送 |
+| IS_JUDGE_LENGTH | `false` | 添加问答时是否限制回答长度，上限由 MSG_LENGTH 决定 |
+| IS_DIRECT_SINGER | `true` | 同时开启分段和转发时，只有一条消息就直接发送，不用合并转发 |
+| SPLIT_MSG | `" \| "` | 查看问答时用什么分隔内容，可改成 `"\n"` 换行 |
+| IS_BASE64 | `false` | 是否把图片转为 base64 后发送；没有图片发送问题时可保持默认 |
+
+## core_plugins.json5：自带功能
+
+保存主项目自带功能的文件夹名和显示名称：
 
 ```json5
 {
@@ -53,19 +63,8 @@
 }
 ```
 
-核心插件位于 `yuiChyan/core/` 目录下，大多数耦合较深，不建议删除。
+它们位于 `yuiChyan/core/`，包含帮助、管理等基础功能，建议保留。只想关闭某个群的功能，用群内的启用、禁用服务命令即可。
 
-## extra_plugins.json5 — 第三方插件注册
+## extra_plugins.json5：第三方插件
 
-注册第三方插件。格式与核心插件相同：`"文件夹名": "显示名称"`。
-
-```json5
-{
-    // key 是 yuiChyan/plugins/ 下的文件夹名
-    // value 是显示名称，会在帮助页面展示
-    "daily_news": "每日新闻",
-    "music": "点歌",
-}
-```
-
-添加或移除插件后需重启 BOT 生效。详见 [插件说明](plugins.md)。
+默认没有第三方插件。安装后，在这里添加 `"插件文件夹名": "显示名称"`，重启后加载。安装和卸载步骤见 [插件安装](plugins.md)。

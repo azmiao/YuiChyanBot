@@ -1,4 +1,8 @@
-# 插件开发说明
+# 插件开发
+
+本文介绍主项目提供的插件接口，不涉及任何第三方插件的实现。需要会写基本的 Python；只是安装插件的话，看 [插件安装](../guide/plugins.md) 即可。
+
+可以先写一个收到“你好”就回复的功能，确认能运行，再添加其他命令。
 
 ## 快速开始
 
@@ -11,7 +15,9 @@ yuiChyan/plugins/<插件名>/
 └── ...                # 其他模块文件
 ```
 
-### 最小可运行插件
+### 第一个回复
+
+在 `yuiChyan/plugins/my_plugin/__init__.py` 中写入：
 
 ```python
 from yuiChyan.service import Service
@@ -35,11 +41,11 @@ async def hello(bot, ev):
 }
 ```
 
-重启 BOT 即可生效。
+保留配置中原有的插件条目，添加后重启机器人。在已授权、已启用该服务的群里发送“你好”测试。这里的 `Service` 可以理解成一组能一起开关的功能，名字不能与其他服务重复。
 
-## Service 类 API 参考
+## Service 常用写法
 
-### 构造函数
+### 创建服务
 
 ```python
 Service(
@@ -53,11 +59,15 @@ Service(
 )
 ```
 
-### 消息触发装饰器
+### 收到什么消息时执行
+
+下面的 `@sv.on_...` 写在函数前面，指定什么消息会调用这个函数。`bot` 用来发送回复，`ev` 包含当前消息、发送人和群等信息。
+
+`on_prefix`、`on_match`、`on_suffix` 和 `on_rex` 只处理群消息。维护组私聊命令使用后面的 `on_command(..., force_private=True)`。
 
 #### on_prefix(prefixes, only_to_me=False)
 
-前缀匹配。匹配后前缀会从 `ev.message` 中剥离。
+消息以指定文字开头时执行。函数拿到的 `ev.message` 已去掉这段开头，剩下的就是参数。以下几种写法任选一种，不要把同名命令重复注册。
 
 ```python
 @sv.on_prefix('查询')
@@ -89,7 +99,7 @@ async def sign_in(bot, ev):
 
 #### on_suffix(suffixes, only_to_me=False)
 
-后缀匹配。匹配后后缀会从 `ev.message` 尾部剥离。
+消息以指定文字结尾时执行。函数拿到的 `ev.message` 已去掉这段结尾。
 
 ```python
 @sv.on_suffix('是什么')
@@ -129,6 +139,7 @@ async def clear_data(bot, ev):
 # 维护组私聊命令
 @sv.on_command('重载配置', force_private=True)
 async def reload_config(bot, ev):
+    ...
 
 # 自定义权限要求
 @sv.on_command('管理设置', cmd_permission=SUPERUSER)
@@ -143,12 +154,12 @@ async def admin_setting(bot, ev):
 
 #### on_message(message_type='group')
 
-消息监听。不经过触发器链，直接监听所有指定类型的消息。
+直接监听消息，不用先匹配命令。当前实现按群号检查服务开关，不会自动检查群授权；这里仅展示群消息用法，需要授权限制时自行检查。
 
 ```python
 @sv.on_message('group')
 async def on_group_msg(bot, ev):
-    # 每条群消息都会触发
+    # 本群启用了服务时执行
     ...
 ```
 
@@ -156,20 +167,13 @@ async def on_group_msg(bot, ev):
 
 #### scheduled_job(silence=False, custom_id=None, **kwargs)
 
-注册 CronTrigger 定时任务。kwargs 参数遵循 APScheduler CronTrigger 规范。
+按指定时间执行函数，时间按项目默认的上海时区计算。`hour=8, minute=0` 表示每天 8 点；更多参数可查 APScheduler 的 CronTrigger 文档。
 
 ```python
 # 每天 8:00 执行
 @sv.scheduled_job(hour=8, minute=0)
 async def daily_task():
-    bot = sv.bot
-    group_list = await sv.get_enable_groups()
-    for gid in group_list:
-        await bot.send_group_msg(
-            self_id=bot.get_self_id(),
-            group_id=gid,
-            message='早上好！'
-        )
+    await sv.broadcast('早上好！')
 
 # 每 30 分钟执行，静默模式（不打印日志）
 @sv.scheduled_job(silence=True, minute='*/30')
@@ -184,7 +188,9 @@ async def weekly_report():
 
 可用的 kwargs 参数：`year`、`month`、`day`、`week`、`day_of_week`、`hour`、`minute`、`second`。
 
-定时任务会自动过滤未启用服务或授权过期的群，异步锁保证同一服务的定时任务串行执行。
+没有任何已启用且有授权记录的群时，定时任务会跳过；否则调用一次任务函数。同一个服务的定时任务会依次执行。
+
+任务函数自己决定向哪些群发消息。`get_enable_groups()` 只检查功能开关，不检查授权；发送给所有可用群时，优先使用 `sv.broadcast()`。当前定时任务和广播都会检查授权记录，即使 `ENABLE_AUTH=False` 或 `need_auth=False` 也一样。
 
 ### 广播
 
@@ -254,9 +260,11 @@ Service 构造函数中的 `manage` 参数控制谁可以启用/禁用该服务�
 
 ## 异常处理
 
-所有通过 Service 装饰器注册的函数都会被 `exception_handler` 自动包装，无需手动 try-catch。
+Service 会处理下面几种项目自定义错误，并决定回复用户还是只记日志。这不代表所有错误都能自动处理；网络失败、数据格式不对等情况，仍要按需要使用 `try/except`。
 
-### 主动抛出异常
+### 返回错误提示
+
+下面的 `do_query()` 和 `parse_data()` 是示意函数，需要换成自己的查询和解析代码。
 
 ```python
 from yuiChyan.exception import (
@@ -299,9 +307,9 @@ async def query(bot, ev):
 
 ## HELP.md 编写规范
 
-在插件目录下创建 `HELP.md`，框架会自动收集并生成帮助菜单图片和帮助网页。
+在插件根目录下创建 `HELP.md`，加载插件时会把内容加入帮助网页。需要图片帮助时，再为 Service 设置 `help_cmd`。
 
-### 格式要求
+### 推荐格式
 
 - 标题使用三级标题 `###`
 - 命令列表使用 Markdown 表格
@@ -319,11 +327,11 @@ async def query(bot, ev):
 | @BOT帮助 | 查看本插件帮助 |
 ```
 
-如果在 Service 构造函数中设置了 `help_cmd`，框架会自动注册帮助命令，触发时将 HELP.md 渲染为图片发送。
+设置 `help_cmd` 后，框架会添加对应的帮助命令，读取创建该 Service 的 Python 文件旁边的 `HELP.md`，生成图片发送。帮助内容会缓存，修改后重启机器人。
 
 ## 完整示例插件
 
-以下是一个包含前缀触发、定时任务、权限校验、异常处理和 HELP.md 的完整插件示例。
+下面把查询回复、打招呼、定时消息和帮助放在同一个插件中。示例不会保存签到或查询数据。
 
 ### yuiChyan/plugins/example/__init__.py
 
@@ -356,17 +364,7 @@ async def example_sign(bot, ev):
 # 定时任务：每天 9:00 执行
 @sv.scheduled_job(hour=9, minute=0)
 async def daily_greeting():
-    bot = sv.bot
-    group_list = await sv.get_enable_groups()
-    for gid in group_list:
-        try:
-            await bot.send_group_msg(
-                self_id=bot.get_self_id(),
-                group_id=gid,
-                message='早上好！今天也要元气满满哦~'
-            )
-        except Exception as e:
-            sv.logger.error(f'向群 [{gid}] 发送早安失败：{e}')
+    await sv.broadcast('早上好！')
 ```
 
 ### yuiChyan/plugins/example/HELP.md

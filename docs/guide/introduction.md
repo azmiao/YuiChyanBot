@@ -1,39 +1,37 @@
-# BOT 说明介绍
+# 项目介绍
 
-## 项目简介
+YuiChyanBot（优衣酱）是一个主要在 Windows 上使用的 QQ 机器人框架，最初是自用项目，部分设计参考了 [HoshinoBot](https://github.com/Ice9Coffee/HoshinoBot)。
 
-YuiChyanBot（优衣酱）是一个基于 Windows 平台的 QQ 机器人框架，部分架构设计思想参考自 [HoshinoBot](https://github.com/Ice9Coffee/HoshinoBot)。
+## 能做什么
 
-项目于 2025-07-24 正式转为开源项目。
+- 设置你问我答，让机器人按设定的内容回复。
+- 使用翻译、文字识别、掷骰子、群抽奖等自带功能。
+- 为不同群开启或关闭功能，也可以在网页上管理。
+- 管理哪些群可以使用机器人，并在授权快到期时提醒。
+- 查看帮助网页；功能也可以提供图片形式的帮助。
 
-## 技术栈
+具体命令见 [自带功能](features.md)。第三方插件需要另行安装，不包含在上述自带功能中。
 
-- 运行框架：[NoneBot 1.x](https://github.com/nonebot/nonebot) + [aiocqhttp](https://github.com/nonebot/aiocqhttp)
-- 通信协议：[OneBot V11](https://github.com/botuniverse/onebot-11)（反向 WebSocket）
-- 协议实现：[LLOneBot](https://github.com/LLOneBot/LLOneBot)（推荐）/ [NapCat](https://github.com/NapNeko/NapCatQQ)
-- 包管理：[uv](https://docs.astral.sh/uv/)
-- 数据库：[RocksDB](https://rocksdb.org/)（通过 rocksdict）
-- 页面渲染：[Playwright](https://playwright.dev/)（Chromium）
-- Web 服务：[Quart](https://quart.palletsprojects.com/) + [Jinja2](https://jinja.palletsprojects.com/)
+## 使用前准备
 
-## 系统要求
+- 一台 Windows 电脑。现有启动脚本和绿色包面向 64 位 Windows，建议使用 Windows 10 或更新版本。
+- 一个用于机器人的 QQ 账号。
+- LLOneBot 或 NapCat：负责连接 QQ，再把消息交给本项目。请按它们各自的文档安装，并遵守相关平台的使用规则。
+- 从源码安装时需要 uv，Python 版本要求为 3.13 及以上。绿色包已经带有 Python，不用另装。
 
-| 项目 | 要求 |
+一个程序只连接一个机器人账号。不同连接工具的接口可能有差异，部分功能也依赖外部网站，不能保证一直可用。项目以自用为主，更新和修复时间不固定。
+
+准备好后，可以按 [安装说明](installation.md) 操作。
+
+## 开发时用到的工具
+
+普通使用可以跳过这一节。
+
+| 工具 | 用途 |
 |:-----|:-----|
-| 操作系统 | 仅限 64 位 Windows 10 及以上 |
-| Python | >= 3.13（推荐最新版本） |
-| 协议实现 | LLOneBot >= 5.0.0 或 NapCat >= 4.5.0 |
-
-## 框架局限性
-
-1. 仅支持单 BOT 实例，不支持同时使用多个 BOT 账户
-2. 虽然已做了很多兼容处理，但仍不保证所有协议实现客户端的接口兼容性，LLOneBot 测试稳定可用
-3. BOT 框架本意为纯自用，不保证更新和问题修复
-
-## 核心能力
-
-- **服务管理**：插件级别的服务启用/禁用控制，支持黑名单和白名单模式
-- **网页端管理**：通过 Web 界面管理服务状态
-- **帮助系统**：根据插件目录下的 `HELP.md` 自动生成帮助菜单图片和帮助网页
-- **授权系统**：独立的群授权管理，支持授权到期提醒
-- **XQA 问答**：支持正则回流的高级你问我答系统
+| NoneBot 1.x、aiocqhttp | 接收和发送机器人消息 |
+| OneBot V11 | 与 LLOneBot、NapCat 等工具交换消息 |
+| uv | 管理 Python 和项目依赖 |
+| rocksdict（RocksDB） | 保存问答、授权等数据 |
+| Playwright（Chromium） | 把帮助内容生成图片 |
+| Quart、Jinja2 | 提供帮助和管理网页 |

@@ -1,56 +1,44 @@
-# 插件说明
+# 插件安装
 
-## 插件机制
+主项目自带的功能放在 `yuiChyan/core/`，第三方插件放在 `yuiChyan/plugins/`，两者分开管理。
 
-YuiChyanBot 的插件分为两类：
+本文只介绍主项目提供的安装方式。第三方插件的功能、依赖和配置，请看各插件自己的说明。
 
-- **核心插件**：位于 `yuiChyan/core/` 目录下，通过 `core_plugins.json5` 注册，与框架耦合较深
-- **第三方插件**：位于 `yuiChyan/plugins/` 目录下，通过 `extra_plugins.json5` 注册，可自由安装和卸载
+## 哪里找插件
 
-两类插件的加载机制相同：框架启动时读取对应的 json5 配置文件，按注册顺序使用 nonebot 的 `load_plugins()` 加载。
+可以查看 [第三方插件列表](https://github.com/stars/azmiao/lists/yuichyanbot-plugins)。列表不代表兼容性保证，安装前请确认插件支持当前项目版本，并只运行可信来源的代码。
 
-## 官方插件列表
+## 安装步骤
 
-目前可用的第三方插件：https://github.com/stars/azmiao/lists/yuichyanbot-plugins
+1. 按插件说明下载文件，放入 `yuiChyan/plugins/`。
+2. 按插件说明安装额外依赖、填写它需要的配置。绿色包只带主项目依赖，不保证能直接运行所有插件。
+3. 在 `yuiChyan/config/extra_plugins.json5` 中添加插件文件夹名和显示名称。
+4. 重启机器人，检查日志中有没有加载错误。
 
-## 安装插件
+例如，假设插件文件夹叫 `my_plugin`，放好后应是：
 
-1. 下载插件文件夹，放入 `yuiChyan/plugins/` 目录下
-2. 在 `yuiChyan/config/extra_plugins.json5` 中注册插件：
+```text
+yuiChyan/plugins/my_plugin/__init__.py
+```
+
+对应配置写成：
 
 ```json5
 {
-    "插件文件夹名": "显示名称",
+    "my_plugin": "我的插件",
 }
 ```
 
-3. 重启 BOT
+这是安装格式示例，不是项目附带的插件。已有其他条目时，在原文件中添加，不要覆盖整份配置，也不要漏掉条目之间的英文逗号。
 
-### 示例
+## 停用或卸载
 
-假设要安装一个名为 `daily_news` 的插件：
+如果只想在某个群关闭一个功能，由有相应权限的账号在群里发送 `@BOT禁用服务 服务名`。服务名可以先用 `@BOT服务列表` 查询，它不一定与插件文件夹名相同。
 
-```
-yuiChyan/plugins/
-└── daily_news/
-    ├── __init__.py
-    └── HELP.md        # 可选，有则自动生成帮助菜单
-```
-
-在 `extra_plugins.json5` 中添加：
-
-```json5
-{
-    "daily_news": "每日新闻",
-}
-```
-
-## 卸载插件
-
-1. 从 `extra_plugins.json5` 中移除对应的注册行
-2. 重启 BOT
-3. 插件文件夹可以保留也可以删除，不注册就不会加载
+如果不再加载整个插件，从 `extra_plugins.json5` 中删除对应条目，然后重启机器人。确认不再需要后，可以删除插件文件夹；插件留下的数据要按它自己的说明处理。
 
 ## 帮助菜单
 
-如果插件目录下存在 `HELP.md` 文件，框架会自动收集并生成帮助菜单图片和帮助网页。编写规范详见 [插件开发说明](../develop/plugin-development.md#helpmd-编写规范)。
+已登记插件的根目录有 `HELP.md` 时，主项目会把它加入帮助网页。插件还可以设置帮助命令，把帮助内容作为图片发送。
+
+自己编写插件可参考 [插件开发](../develop/plugin-development.md)，帮助格式见 [HELP.md 编写规范](../develop/plugin-development.md#helpmd-编写规范)。
