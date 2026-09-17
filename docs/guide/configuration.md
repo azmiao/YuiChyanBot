@@ -20,8 +20,47 @@
 | PUBLIC_DOMAIN | `null` | 帮助链接使用的域名，不带 `http://` 或 `https://`；留空时用 HOST 和 PORT 拼接地址 |
 | PROXY | `null` | 供代码读取的网络代理地址，不会自动让所有请求走代理 |
 | MANAGER_PASSWORD | `"12345"` | 网页后台密码，务必修改，不要使用默认值 |
+| TRUSTED_PROXY_IPS | `[]` | 可信反向代理的直接对端 IP 列表。只有请求直接来自这些地址时，后台才会采用 `X-Real-IP` 和 `X-Forwarded-Proto`；不使用反代时保持空列表 |
 
 `0.0.0.0` 不是用来在浏览器中打开的地址。同一台电脑上查看帮助，请访问 `http://127.0.0.1:2333/help`。填写域名也不会自动完成公网访问配置，不要直接把管理后台开放到公网。
+
+### Nginx 反向代理配置
+
+如果通过 Nginx 使用 HTTPS 访问后台，Python 服务看到的直接来源通常是 Nginx 的地址，而不是访问者的公网 IP。请把这个地址写入 `TRUSTED_PROXY_IPS`，例如 Nginx 与 YuiChyanBot 在同一台电脑上时：
+
+```json5
+// yuiChyan/config/base_config.json5
+{
+    "HOST": "127.0.0.1",
+    "PORT": 2333,
+    "TRUSTED_PROXY_IPS": ["127.0.0.1"]
+}
+```
+
+Nginx 需要覆盖转发头，避免客户端自行伪造：
+
+```nginx
+location / {
+    proxy_pass http://127.0.0.1:2333;
+
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+}
+```
+
+安全注意事项：
+
+- `TRUSTED_PROXY_IPS` 填写的是 Python 服务看到的 Nginx 对端地址，不是访客公网 IP；跨机器部署时不要照抄 `127.0.0.1`。
+- 只有直接对端 IP 在列表中时，程序才信任 `X-Real-IP` 和 `X-Forwarded-Proto`；不要把它配置成任意用户可连接的地址范围。
+- 应用支持 HTTP 和 HTTPS：直接 HTTPS 或可信代理转发 HTTPS 时，认证 Cookie 会设置 `Secure`；普通 HTTP 访问时不设置 `Secure`。实际公网部署仍建议只开放 HTTPS。
+- 后端端口应通过防火墙限制为本机或 Nginx 可访问，避免攻击者绕过 Nginx 直接连接应用。
+- 修改配置后需要重启机器人。
 
 ## auth_config.json5：群授权
 
