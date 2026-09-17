@@ -34,6 +34,10 @@
         <div class="container text-center markdown-body">
             <!-- 标题 -->
             <h1><strong>✦ 服务功能开关 ✦</strong></h1>
+            <form method="POST" action="/logout" style="margin-bottom: 20px;">
+                <input type="hidden" name="csrf_token" value="{{ config.csrf_token }}">
+                <button type="submit" class="btn btn-secondary">退出登录</button>
+            </form>
             <!-- 服务列表 -->
             <div class="command-box">
                 <h2>群服务列表</h2>
@@ -91,8 +95,10 @@
                                             </td>
                                             <td style="vertical-align: middle;">
                                                 <form method="POST" action="/modify" style="display:inline;">
+                                                    <input type="hidden" name="csrf_token" value="{{ config.csrf_token }}">
                                                     <input type="hidden" name="group_id" value="{{ group_body.group_id }}">
                                                     <input type="hidden" name="name" value="{{ service.name }}">
+                                                    <input type="hidden" name="enabled" value="{{ '0' if service.enabled else '1' }}">
                                                     <button type="submit" class="btn btn-link">
                                                       {{ "禁用" if service.enabled else "启用" }}
                                                     </button>
