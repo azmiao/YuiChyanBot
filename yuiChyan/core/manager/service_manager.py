@@ -1,13 +1,14 @@
-import uuid
+import secrets
+import time
 from typing import List, Dict, Optional
 
-from quart import request, render_template, session, redirect, make_response
+from quart import request, render_template, redirect, make_response
 
 from yuiChyan.exception import FunctionException
 from yuiChyan.service import Service
 from .util import sv, get_group_services
 from yuiChyan.permission import check_permission
-from yuiChyan.config import SUPERUSERS, NICKNAME, MANAGER_PASSWORD
+from yuiChyan.config import SUPERUSERS, NICKNAME, MANAGER_PASSWORD, TRUSTED_PROXY_IPS
 from yuiChyan import YuiChyan, CQEvent, yui_bot
 from yuiChyan.util import truncate_string
 
@@ -106,42 +107,114 @@ async def construct_msg(is_enable: bool, success_list: List[str], failed_dict: D
     return msg.strip()
 
 
+# 后台认证状态（单进程部署）
+_AUTH_SESSIONS: Dict[str, Dict[str, float]] = {}
+_LOGIN_FAILURES: Dict[str, tuple] = {}
+_SESSION_TTL = 7200
+_MAX_PASSWORD_LENGTH = 256
+_FAILURE_WINDOW = 300
+_FAILURE_LIMIT = 5
+_LOCK_SECONDS = 60
+
+
+def _client_ip() -> str:
+    peer = request.remote_addr or ''
+    if peer in TRUSTED_PROXY_IPS:
+        forwarded = request.headers.get('X-Real-IP', '').strip()
+        if forwarded and ',' not in forwarded and ' ' not in forwarded:
+            return forwarded
+    return peer
+
+
+def _https_request() -> bool:
+    return request.scheme == 'https' or (
+        request.remote_addr in TRUSTED_PROXY_IPS
+        and request.headers.get('X-Forwarded-Proto', '').strip().lower() == 'https'
+    )
+
+
+def _set_auth_cookie(response, token: str):
+    response.set_cookie('user_id', token, max_age=_SESSION_TTL, httponly=True,
+                       secure=_https_request(), samesite='Lax', path='/')
+    return response
+
+
+def _csrf_cookie(response, token: str):
+    response.set_cookie('csrf_token', token, max_age=_SESSION_TTL, httponly=False,
+                       secure=_https_request(), samesite='Lax', path='/')
+    return response
+
+
+def _no_store(response):
+    response.headers['Cache-Control'] = 'no-store'
+    return response
+
+
+def _csrf_valid(form_token: Optional[str]) -> bool:
+    token = request.cookies.get('csrf_token')
+    return bool(token and form_token and secrets.compare_digest(token, form_token))
+
+
 # 登录校验
 @yui_bot.server_app.before_request
 async def _():
-    # 排除的请求
+    # 路由不存在时不参与认证跳转，保留正常 404
+    if request.url_rule is None:
+        return
+    if request.url_rule.endpoint == 'static':
+        return
     if request.path in ['/login', '/', '/help', '/clan']:
         return
-    # 排除静态文件
-    if request.path.startswith('/static'):
-        return
-    # cookie是否过期
-    user_id = request.cookies.get('user_id')
-    if user_id and session.get('user_id') == user_id:
-        return
-    return redirect('/login')
+    token = request.cookies.get('user_id')
+    record = _AUTH_SESSIONS.get(token or '')
+    if not record or record['expires'] <= time.time():
+        if token:
+            _AUTH_SESSIONS.pop(token, None)
+        return redirect('/login')
+    if request.method in {'POST', 'PUT', 'PATCH', 'DELETE'} and not _csrf_valid((await request.form).get('csrf_token')):
+        return ('CSRF 校验失败', 403)
 
 
 # 登录页面
-@yui_bot.server_app.route('/login', methods=['GET','POST'])
+@yui_bot.server_app.route('/login', methods=['GET', 'POST'])
 async def manager_login():
     if request.method == 'GET':
-        return await render_template('manager_login.html', config={'bot_name': NICKNAME})
-    else:
-        login_data = await request.form
-        username = login_data.get('username')
-        user_ip = request.remote_addr
-        if str(username) == MANAGER_PASSWORD:
-            sv.logger.info(f'> 来自 [{user_ip}] 的用户 [{str(username)}] 登录成功')
-            user_id = str(uuid.uuid4())
-            session['user_id'] = user_id
-            # 创建响应并设置 cookie
-            response = await make_response(redirect('/manager'))
-            response.set_cookie('user_id', user_id, max_age=7200)
-            return response
-        else:
-            sv.logger.error(f'> 来自 [{user_ip}] 的用户 [{str(username)}] 登录失败')
-            return redirect('/login')
+        csrf_token = secrets.token_urlsafe(32)
+        response = await make_response(await render_template('manager_login.html', config={'bot_name': NICKNAME, 'csrf_token': csrf_token}))
+        _csrf_cookie(response, csrf_token)
+        return _no_store(response)
+    login_data = await request.form
+    if not _csrf_valid(login_data.get('csrf_token')):
+        return _no_store(await make_response(('CSRF 校验失败', 403)))
+    username = str(login_data.get('username') or '')
+    user_ip = _client_ip()
+    now = time.time()
+    failures, first_at = _LOGIN_FAILURES.get(user_ip, (0, now))
+    if now - first_at >= _FAILURE_WINDOW:
+        failures, first_at = 0, now
+    if failures >= _FAILURE_LIMIT and now - first_at < _LOCK_SECONDS:
+        return _no_store(await make_response(redirect('/login')))
+    if len(username) > _MAX_PASSWORD_LENGTH or username != MANAGER_PASSWORD:
+        _LOGIN_FAILURES[user_ip] = (failures + 1, first_at)
+        sv.logger.error(f'> 来自 [{user_ip}] 的用户 [{username}] 登录失败')
+        return _no_store(await make_response(redirect('/login')))
+    _LOGIN_FAILURES.pop(user_ip, None)
+    token = secrets.token_urlsafe(32)
+    _AUTH_SESSIONS[token] = {'expires': now + _SESSION_TTL}
+    response = await make_response(redirect('/manager'))
+    _set_auth_cookie(response, token)
+    _csrf_cookie(response, secrets.token_urlsafe(32))
+    return _no_store(response)
+
+
+@yui_bot.server_app.route('/logout', methods=['POST'])
+async def manager_logout():
+    token = request.cookies.get('user_id')
+    _AUTH_SESSIONS.pop(token or '', None)
+    response = await make_response(redirect('/login'))
+    response.delete_cookie('user_id', path='/')
+    response.delete_cookie('csrf_token', path='/')
+    return _no_store(response)
 
 
 # 管理主页面
@@ -161,22 +234,29 @@ async def manager_page():
             'group_show': f'【{str(group_id)}】' + truncate_string(group_name),
             'service_list': service_list
         })
-    return await render_template('manager_page.html', config={'bot_name': NICKNAME, 'data': data})
+    csrf_token = request.cookies.get('csrf_token') or secrets.token_urlsafe(32)
+    response = await make_response(await render_template('manager_page.html', config={'bot_name': NICKNAME, 'data': data, 'csrf_token': csrf_token}))
+    if not request.cookies.get('csrf_token'):
+        _csrf_cookie(response, csrf_token)
+    return _no_store(response)
 
 
 @yui_bot.server_app.route('/modify', methods=['POST'])
 async def manager_modify():
-    # 获取表单数据
     modify_data = await request.form
-    group_id = modify_data.get('group_id')
-    service_name = modify_data.get('name')
+    try:
+        group_id = int(str(modify_data.get('group_id', '')).strip())
+    except ValueError:
+        return ('非法群号', 400)
+    service_name = str(modify_data.get('name') or '')
+    target_enabled = modify_data.get('enabled') == '1'
+    group_list = await yui_bot.get_cached_group_list()
+    if group_id not in {int(group['group_id']) for group in group_list}:
+        return ('非法群号', 400)
     enable_list, disable_list = await get_group_services(group_id, True)
-    # 检查服务在启用列表还是禁用列表，并切换状态
-    service: Optional[Service] = next((service for service in enable_list if service.name == service_name), None)
-    if service:
-        service.disable_service(group_id)
-        return redirect('/manager')
-    service: Optional[Service] = next((service for service in disable_list if service.name == service_name), None)
-    if service:
-        service.enable_service(group_id)
-        return redirect('/manager')
+    service: Optional[Service] = next((item for item in enable_list + disable_list if item.name == service_name), None)
+    if not service:
+        return ('非法服务', 400)
+    if target_enabled != service.judge_enable(group_id):
+        (service.enable_service if target_enabled else service.disable_service)(group_id)
+    return redirect('/manager')
