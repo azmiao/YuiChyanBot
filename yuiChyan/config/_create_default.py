@@ -35,7 +35,9 @@ _base_tmp = '''
     // 全局统一的网络代理配置 | 需要自己代码调用
     "PROXY": null,
     // 后台管理的密码 | 必填
-    "MANAGER_PASSWORD": "12345"
+    "MANAGER_PASSWORD": "12345",
+    // 可信反向代理地址；仅这些地址的转发头会被采用
+    "TRUSTED_PROXY_IPS": []
 }
 '''
 

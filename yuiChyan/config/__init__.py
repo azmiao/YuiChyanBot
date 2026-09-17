@@ -18,6 +18,7 @@ PUBLIC_PROTOCOL: str = _data.get('PUBLIC_PROTOCOL', 'http')
 PUBLIC_DOMAIN: Optional[str] = _data.get('PUBLIC_DOMAIN', None)
 PROXY: Optional[str] = _data.get('PROXY', None)
 MANAGER_PASSWORD: str = _data.get('MANAGER_PASSWORD', '12345')
+TRUSTED_PROXY_IPS: List[str] = _data.get('TRUSTED_PROXY_IPS', [])
 
 # 授权管理配置
 with open(auth_config, 'r', encoding='utf-8') as _config:
