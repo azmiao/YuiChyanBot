@@ -47,7 +47,29 @@
             </form>
             <!-- 命令文档 -->
             <div class="command-box">
-                <h2>命令文档</h2>
+                <div class="section-heading">
+                    <div>
+                        <span class="eyebrow">公开帮助中心</span>
+                        <h2>命令文档</h2>
+                    </div>
+                    <span class="section-count">{{ config.help_list | length }} 个插件</span>
+                </div>
+                <p class="section-intro">不知道从哪里开始？在聊天中发送下方的帮助命令，即可单独查看对应插件。</p>
+                <div class="plugin-command-grid">
+                    {% for help_body in config.help_list %}
+                    <div class="plugin-command-card">
+                        <strong>{{ help_body.name }}</strong>
+                        {% if help_body.help_commands %}
+                        <span>聊天中发送</span>
+                        <div class="command-list">
+                            {% for command in help_body.help_commands %}<code>{{ command }}</code>{% endfor %}
+                        </div>
+                        {% else %}
+                        <span class="muted">暂未配置单独帮助命令</span>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
                 <div class="highlight invisible-highlight"></div>
                 <div class="accordion" id="instructions">
                     {% for help_body in config.help_list %}
@@ -55,9 +77,10 @@
                         <div class="card-header" id="heading-{{help_body.id}}">
                             <h5 class="mb-0">
                                 <button class="btn btn-link" data-bs-toggle="collapse"
-                                    data-bs-target="#collapse-{{help_body.id}}" aria-expanded="true"
+                                    data-bs-target="#collapse-{{help_body.id}}" aria-expanded="false"
                                     aria-controls="collapse-{{help_body.id}}">
-                                    {{ help_body.name }}
+                                    <span>{{ help_body.name }}</span>
+                                    {% if help_body.help_commands %}<small>发送 {{ help_body.help_commands[0] }} 查看</small>{% endif %}
                                 </button>
                             </h5>
                         </div>

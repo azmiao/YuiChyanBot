@@ -39,8 +39,15 @@
                 <button type="submit" class="btn btn-secondary">退出登录</button>
             </form>
             <!-- 服务列表 -->
-            <div class="command-box">
-                <h2>群服务列表</h2>
+            <div class="command-box manager-panel">
+                <div class="section-heading">
+                    <div>
+                        <span class="eyebrow">仅管理员可见</span>
+                        <h2>群服务列表</h2>
+                    </div>
+                    <span class="section-count">{{ config.data | length }} 个群组</span>
+                </div>
+                <p class="section-intro">展开群组后可以查看服务状态，并按需启用或禁用功能。</p>
                 <div class="highlight invisible-highlight"></div>
                 <div class="accordion" id="instructions">
                     {% for group_body in config.data %}
@@ -56,7 +63,8 @@
                         </div>
                         <div id="collapse-{{ group_body.group_id }}" class="collapse" aria-labelledby="heading-{{ group_body.group_id }}">
                             <div class="card-body">
-                                <table class="table" style="margin-top: 20px;">
+                                <div class="table-scroll">
+                                <table class="table service-table" style="margin-top: 20px;">
                                     <thead>
                                         <tr>
                                             <th>服务名称</th>
@@ -108,6 +116,7 @@
                                         {% endfor %}
                                     </tbody>
                                 </table>
+                                </div>
                             </div>
                         </div>
                     </div>

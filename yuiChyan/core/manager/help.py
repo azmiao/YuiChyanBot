@@ -3,7 +3,9 @@ from quart import render_template, Markup, redirect
 
 import yuiChyan
 from yuiChyan.config import PUBLIC_PROTOCOL, PUBLIC_DOMAIN, HOST, PORT, NICKNAME
+from yuiChyan.service import Service
 from .util import sv
+from .help_utils import attach_help_commands
 
 # 帮助页面的参数
 config: dict = {}
@@ -29,8 +31,11 @@ async def help_view():
                 markdown_content = file.read()
             html_content = markdown2.markdown(markdown_content, extras=['fenced-code-blocks', 'tables'])
             help_['help'] = Markup(html_content)
-        # 放入帮助列表
-        config['help_list'] = self_help_list
+        # 把聊天帮助命令一并提供给网页，方便用户直接查询单个插件
+        config['help_list'] = attach_help_commands(
+            self_help_list,
+            Service.get_loaded_services().values(),
+        )
         # 放入BOT别称
         config['bot_name'] = NICKNAME
     # 通过 Quart 的 render_template 方法渲染 Jinja2 模板
