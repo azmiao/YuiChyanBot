@@ -1111,11 +1111,11 @@ wheels = [
 
 [[package]]
 name = "pygtrie"
-version = "2.6.1"
+version = "2.6.2"
 source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple/" }
-sdist = { url = "https://pypi.tuna.tsinghua.edu.cn/packages/b1/13/275484b51d6bcb18b372b65ece2a238e5e3b778f1b7b10b0930408819a88/pygtrie-2.6.1.tar.gz", hash = "sha256:1934613126070b4ec51a3cefcf0c94cebb0139043b444c0f02486caebd0d8011", size = 56334, upload-time = "2026-09-01T17:57:37.052Z" }
+sdist = { url = "https://pypi.tuna.tsinghua.edu.cn/packages/ff/06/31cf0821ada10cb65be108388ddf08d6c6990af90369db26b86776c3e86c/pygtrie-2.6.2.tar.gz", hash = "sha256:879264597743ef52bf80f2dff085364088c0848ae22544db95dad2bf52e06471", size = 60620, upload-time = "2026-09-14T15:02:38.474Z" }
 wheels = [
-    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/f5/a1/7dc65e8997fa3d46f52b94f753344a2c3d58f7fa2722f8827a8291f7f075/pygtrie-2.6.1-py3-none-any.whl", hash = "sha256:0ad593c596f938f0f468e05c5af174f25a7237b14fae6674843c60d63ae4313c", size = 31110, upload-time = "2026-09-01T17:57:35.717Z" },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/70/98/c3e488257ffe7f9caa90c56f0e79e6a2860cf5af763da7b4e7eadc008228/pygtrie-2.6.2-py3-none-any.whl", hash = "sha256:51dcc50ecb8291238e261b4e9f8ecca7313b763da258dd320d208ca2bc86b5f4", size = 33434, upload-time = "2026-09-14T15:02:37.047Z" },
 ]
 
 [[package]]
