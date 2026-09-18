@@ -1,5 +1,44 @@
 # 更新日志
 
+## 1.0.3 (2026-09-18)
+
+### ✨ 新功能
+
+- 加固后台登录认证 @azmiao
+
+### 🐛 Bug 修复
+
+- 补充帮助接口工具 @azmiao
+
+### 🚀 性能优化
+
+- 管理页面新增授权到期时间展示 @azmiao
+- 补充自身入群退群时间刷新群列表 @azmiao
+- 优化漫画翻译和本体的WS逻辑 @azmiao
+- 优化连接生命周期控制和退避重连 @azmiao
+
+### 📚 文档
+
+- 补充可信反代配置说明 @azmiao
+
+### 🧩 依赖变更
+
+- *(deps)* bump pygtrie from 2.6.1 to 2.6.2 @dependabot[bot]
+
+### 🧹 日常维护
+
+- 去除不再使用的PCR拓展插件页面模板 @azmiao
+- 重构管理页和帮助页的样式，更加简洁美观 @azmiao
+- 继续美化帮助页面UI样式 @azmiao
+- 美化帮助页面UI样式 @azmiao
+- 完善后台安全表单 @azmiao
+- 增加可信代理配置 @azmiao
+- 更新 CHANGELOG @github-actions[bot]
+
+### 其他变更
+
+- v1.0.3 @azmiao
+
 ## 1.0.2 (2026-09-16)
 
 ### ✨ 新功能
