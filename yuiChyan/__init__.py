@@ -1,7 +1,7 @@
 import importlib
 import os.path
 from time import monotonic
-from typing import List, LiteralString, Dict
+from typing import List, LiteralString, Dict, Any
 
 import nonebot
 from aiocqhttp import Message, MessageSegment
@@ -27,7 +27,49 @@ class YuiChyan(NoneBot):
         self._group_list_cache: Optional[list] = None
         self._group_list_cache_at: float = 0.0
         self._group_cache_lock = asyncio.Lock()
+        # WebSocket 连接观测状态
+        self._ws_connect_count: int = 0
+        self._ws_disconnect_count: int = 0
+        self._ws_connected_at: Optional[float] = None
+        self._ws_last_disconnect_at: Optional[float] = None
+        self._ws_last_disconnect_reason: Optional[str] = None
         logger.info('> YuiChyanBot实例 启动成功')
+
+    # 协议端建立连接时记录状态
+    def _record_ws_connected(self):
+        self._ws_connect_count += 1
+        self._ws_connected_at = monotonic()
+        logger.info(f'> 协议端已连接，当前连接数 [{len(self._wsr_api_clients)}]')
+
+    # 协议端断开连接时记录状态
+    def _record_ws_disconnected(self, reason: Optional[str] = None):
+        self._ws_disconnect_count += 1
+        self._ws_last_disconnect_at = monotonic()
+        self._ws_last_disconnect_reason = reason
+        logger.warning(f'> 协议端已断开，当前连接数 [{len(self._wsr_api_clients)}]')
+
+    # 覆盖 aiocqhttp 的连接登记，用于记录连接状态
+    def _add_wsr_api_client(self) -> None:
+        super()._add_wsr_api_client()
+        self._record_ws_connected()
+
+    def _remove_wsr_api_client(self) -> None:
+        super()._remove_wsr_api_client()
+        self._record_ws_disconnected()
+
+    # 获取当前 WebSocket 连接状态 | 用于观测与排障
+    def get_connection_status(self) -> Dict[str, Any]:
+        self_ids = [int(self_id) for self_id in self._wsr_api_clients.keys() if str(self_id) != '*']
+        return {
+            'connected': bool(self_ids),
+            'connection_count': len(self._wsr_api_clients),
+            'self_id': self_ids[0] if self_ids else None,
+            'connect_count': self._ws_connect_count,
+            'disconnect_count': self._ws_disconnect_count,
+            'connected_at': self._ws_connected_at,
+            'last_disconnect_at': self._ws_last_disconnect_at,
+            'last_disconnect_reason': self._ws_last_disconnect_reason,
+        }
 
     # 获取bot的QQ
     def get_self_id(self) -> int:
