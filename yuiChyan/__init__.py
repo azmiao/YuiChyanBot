@@ -1,5 +1,6 @@
 import importlib
 import os.path
+from time import monotonic
 from typing import List, LiteralString, Dict
 
 import nonebot
@@ -17,35 +18,44 @@ from yuiChyan.trigger import trigger_chain
 
 # 仅支持单个QQ号的YuiChyanBot
 class YuiChyan(NoneBot):
-    cached_self_id: Optional[int] = None
-    cached_group_list: Optional[list] = None
-    cache_lock = asyncio.Lock()
+    # 群列表缓存有效期（秒）
+    GROUP_CACHE_TTL: float = 300.0
 
     def __init__(self, config_object=None):
         super().__init__(config_object)
+        # 群列表缓存与状态 | 每个实例独立
+        self._group_list_cache: Optional[list] = None
+        self._group_list_cache_at: float = 0.0
+        self._group_cache_lock = asyncio.Lock()
         logger.info('> YuiChyanBot实例 启动成功')
 
     # 获取bot的QQ
     def get_self_id(self) -> int:
-        if self.cached_self_id is None:
-            qq_list = list(map(int, self._wsr_api_clients.keys()))
-            if not qq_list:
-                raise InterFunctionException('> 获取YuiChyan自身QQ号失败，可能是协议实现客户端未启动')
-            self.cached_self_id = qq_list[0]
-        return self.cached_self_id
+        # 每次读取当前连接，避免协议端重连或换号后仍返回旧值
+        qq_list = [int(self_id) for self_id in self._wsr_api_clients.keys() if str(self_id) != '*']
+        if not qq_list:
+            raise InterFunctionException('> 获取YuiChyan自身QQ号失败，可能是协议实现客户端未启动')
+        return qq_list[0]
 
-    # 获取bot所加的群列表
+    # 获取bot所加的群列表 | 带TTL缓存，失败不写入缓存，连接恢复后可自动重试
     async def get_cached_group_list(self, use_cache: bool = True) -> list:
-        async with self.cache_lock:
-            if (not use_cache) or (self.cached_group_list is None):
+        async with self._group_cache_lock:
+            now = monotonic()
+            cache_valid = (
+                self._group_list_cache is not None
+                and now - self._group_list_cache_at < self.GROUP_CACHE_TTL
+            )
+            if (not use_cache) or (not cache_valid):
                 self_id = self.get_self_id()
                 try:
-                    self.cached_group_list = await yui_bot.get_group_list(self_id=self_id)
-                except CQHttpError:
-                    self.cached_group_list = []
-            if not self.cached_group_list:
-                raise InterFunctionException('> 获取YuiChyan群列表失败，可能是协议实现客户端未启动')
-            return self.cached_group_list
+                    group_list = await self.get_group_list(self_id=self_id)
+                except CQHttpError as e:
+                    # 失败不污染缓存，抛出后由调用方决定是否降级
+                    raise InterFunctionException(
+                        f'> 获取YuiChyan群列表失败，可能是协议实现客户端未启动：{e}')
+                self._group_list_cache = group_list
+                self._group_list_cache_at = monotonic()
+            return self._group_list_cache
 
 
 # 全局唯一的BOT实例

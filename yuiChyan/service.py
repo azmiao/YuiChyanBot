@@ -172,7 +172,9 @@ class Service:
     async def get_enable_groups(self) -> List[int]:
         try:
             self_group_list = await self.bot.get_cached_group_list()
-        except CQHttpError:
+        except (CQHttpError, InterFunctionException):
+            # 协议端未连接或获取群列表失败时降级为空，避免定时任务反复抛错
+            self.logger.warning('> 获取群列表失败，本次跳过需要群列表的操作')
             self_group_list = []
         self_group_id_list: list[int] = list(int(x['group_id']) for x in self_group_list)
         if self.use_exclude:
