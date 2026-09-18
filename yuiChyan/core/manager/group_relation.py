@@ -28,7 +28,9 @@ async def kick_me_alert(session: NoticeSession):
 async def leave_notice(session: NoticeSession):
     ev = session.event
     name = ev.user_id
+    # 自己退群：刷新群列表缓存 | 覆盖非命令途径的自身退群（如被解散/协议端操作）
     if ev.user_id == ev.self_id:
+        await get_bot().get_cached_group_list(False)
         return
     try:
         info = await session.bot.get_stranger_info(self_id=ev.self_id, user_id=ev.user_id)
@@ -43,8 +45,9 @@ async def leave_notice(session: NoticeSession):
 @on_notice('group_increase')
 async def group_welcome(session: NoticeSession):
     ev = session.event
-    # 排除自己
+    # 自己入群：刷新群列表缓存 | 覆盖被群成员拉入但未走邀请流程的场景
     if ev.user_id == ev.self_id:
+        await get_bot().get_cached_group_list(False)
         return
 
     # 查询陌生人信息
