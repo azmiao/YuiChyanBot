@@ -65,10 +65,17 @@
                 </aside>
                 <section class="group-documents" id="groupDocuments">
                     {% for group_body in config.data %}
-                    <article class="group-document{% if loop.first %} active{% endif %}" id="group-{{ group_body.group_id }}" data-search-text="{{ group_body.group_name }} 群号 {{ group_body.group_id }} {% for service in group_body.service_list %}{{ service.name }} {{ service.manage }} {% endfor %}">
+                    <article class="group-document{% if loop.first %} active{% endif %}" id="group-{{ group_body.group_id }}" data-search-text="{{ group_body.group_name }} 群号 {{ group_body.group_id }} {% if group_body.auth %}{{ group_body.auth.label }} {{ group_body.auth.expires_at }} {% endif %}{% for service in group_body.service_list %}{{ service.name }} {{ service.manage }} {% endfor %}">
                         <header class="document-header">
                             <div><span class="eyebrow">GROUP {{ '%02d'|format(loop.index) }}</span><h2>{{ group_body.group_name }}</h2><small class="group-id">群号：{{ group_body.group_id }}</small></div>
-                            <span class="document-status">服务管理</span>
+                            <div class="document-status-group">
+                                {% if group_body.auth %}
+                                <span class="auth-badge auth-{{ group_body.auth.state }}">{{ group_body.auth.label }}</span>
+                                {% if group_body.auth.expires_at %}
+                                <span class="auth-badge auth-date">到期 {{ group_body.auth.expires_at }}</span>
+                                {% endif %}
+                                {% endif %}
+                            </div>
                         </header>
                         <div class="group-document-body">
                             <table class="table service-table">

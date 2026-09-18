@@ -6,9 +6,10 @@ from quart import request, render_template, redirect, make_response
 
 from yuiChyan.exception import FunctionException
 from yuiChyan.service import Service
-from .util import sv, get_group_services
+from .help_utils import build_auth_view
+from .util import sv, get_group_services, get_database
 from yuiChyan.permission import check_permission
-from yuiChyan.config import SUPERUSERS, NICKNAME, MANAGER_PASSWORD, TRUSTED_PROXY_IPS
+from yuiChyan.config import SUPERUSERS, NICKNAME, MANAGER_PASSWORD, TRUSTED_PROXY_IPS, ENABLE_AUTH
 from yuiChyan import YuiChyan, CQEvent, yui_bot
 from yuiChyan.util import truncate_string
 
@@ -221,6 +222,7 @@ async def manager_logout():
 @yui_bot.server_app.route('/manager', methods=['GET'])
 async def manager_page():
     group_list = await yui_bot.get_cached_group_list()
+    auth_db = await get_database() if ENABLE_AUTH else {}
     data = []
     for group in group_list:
         group_id = group['group_id']
@@ -228,10 +230,12 @@ async def manager_page():
         enable_list, disable_list = await get_group_services(group_id, True)
         service_list = [_service.to_simple_dict(True) for _service in enable_list]
         service_list += [_service.to_simple_dict(False) for _service in disable_list]
+        auth = build_auth_view(auth_db.get(group_id)) if ENABLE_AUTH else None
         data.append({
             'group_id': group_id,
             'group_name': group_name,
             'group_show': f'【{str(group_id)}】' + truncate_string(group_name),
+            'auth': auth,
             'service_list': service_list
         })
     csrf_token = request.cookies.get('csrf_token') or secrets.token_urlsafe(32)

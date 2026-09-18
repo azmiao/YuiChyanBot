@@ -58,7 +58,7 @@ async def process_group_msg(self_id, group_id, group_name, expiration, title: st
         group_name = group_info['group_name']
     # 授权到期时间
     if expiration:
-        time_format = expiration.strftime("%Y-%m-%d %H:%S:%M")
+        time_format = expiration.strftime("%Y-%m-%d %H:%M:%S")
     else:
         time_format = '【未授权或已到期】'
     return f'{title}群名：{group_name}\n群号：{group_id}\n到期时间：{time_format}{end}'

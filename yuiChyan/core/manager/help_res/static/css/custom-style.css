@@ -105,6 +105,13 @@ h1, h2, h3 { color: var(--text-main); background: none; -webkit-text-fill-color:
 .document-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; padding-bottom: 19px; border-bottom: 1px solid var(--line); }
 .document-header h2 { margin: 5px 0 0; font-size: 25px; letter-spacing: -.02em; }
 .document-status { padding: 5px 8px; color: var(--blue-deep); background: var(--blue-soft); border-radius: 5px; font-size: 11px; white-space: nowrap; }
+.document-status-group { display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 6px; }
+.auth-badge { padding: 5px 10px; border-radius: 999px; border: 1px solid transparent; font-size: 11px; font-weight: 700; white-space: nowrap; }
+.auth-valid { color: #3f6f9a; background: #eaf4fc; border-color: #cfe4f5; }
+.auth-warning { color: #9a6412; background: #fdf1dc; border-color: #f4dcae; }
+.auth-danger, .auth-expired { color: #a33a45; background: #fdeaec; border-color: #f5c9ce; }
+.auth-none { color: var(--text-muted); background: #f1f4f8; border-color: #e0e6ee; }
+.auth-date { color: var(--blue-deep); background: #f4f7fb; border-color: #e0e8f2; font-weight: 400; }
 .command-callout { display: flex; justify-content: space-between; align-items: center; gap: 14px; margin: 20px 0 24px; padding: 14px 16px; background: var(--pink-soft); border: 1px solid #f3d5e3; border-radius: 10px; }
 .command-callout span, .command-callout strong { display: block; }
 .command-callout span { color: var(--pink); font-size: 11px; font-weight: 700; }
