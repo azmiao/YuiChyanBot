@@ -28,43 +28,50 @@
     </style>
 </head>
 
-<body>
+<body class="admin-page manager-page">
     <div class="background-image"></div>
-    <div id="content">
-        <div class="container text-center markdown-body">
-            <!-- 标题 -->
-            <h1><strong>✦ 服务功能开关 ✦</strong></h1>
-            <form method="POST" action="/logout" style="margin-bottom: 20px;">
-                <input type="hidden" name="csrf_token" value="{{ config.csrf_token }}">
-                <button type="submit" class="btn btn-secondary">退出登录</button>
-            </form>
-            <!-- 服务列表 -->
-            <div class="command-box manager-panel">
-                <div class="section-heading">
-                    <div>
-                        <span class="eyebrow">仅管理员可见</span>
-                        <h2>群服务列表</h2>
-                    </div>
-                    <span class="section-count">{{ config.data | length }} 个群组</span>
+    <main id="content" class="admin-content">
+        <div class="container admin-shell">
+            <header class="admin-hero admin-hero-manager">
+                <div class="brand-mark"><img src="../static/yuiChyan.jpg" alt="YuiChyanBot"></div>
+                <div>
+                    <span class="eyebrow">YuiChyanBot / ADMIN</span>
+                    <h1>{{ config.bot_name }}服务管理</h1>
+                    <p>按群组查看并调整服务功能状态。</p>
                 </div>
-                <p class="section-intro">展开群组后可以查看服务状态，并按需启用或禁用功能。</p>
-                <div class="highlight invisible-highlight"></div>
-                <div class="accordion" id="instructions">
+                <form method="POST" action="/logout" class="logout-form">
+                    <input type="hidden" name="csrf_token" value="{{ config.csrf_token }}">
+                    <button type="submit" class="admin-secondary-button">退出登录</button>
+                </form>
+            </header>
+            <form class="help-search manager-search" id="groupSearchForm" onsubmit="return searchGroups();">
+                <span class="search-symbol">⌕</span>
+                <input id="groupSearchInput" placeholder="搜索群名或群号" type="text" autocomplete="off">
+                <button type="button" class="reset-button" onclick="resetGroupSearch();" aria-label="清除搜索" title="清除搜索">×</button>
+                <button type="submit" id="groupSearchSubmit">搜索</button>
+            </form>
+            <div class="manager-layout" data-highlight-root="true">
+                <aside class="group-nav" aria-label="群组目录">
+                    <div class="nav-title"><span>群组目录</span><span>{{ config.data | length }}</span></div>
+                    <div id="groupNavItems">
+                        {% for group_body in config.data %}
+                        <button class="group-nav-item{% if loop.first %} active{% endif %}" data-group-id="group-{{ group_body.group_id }}" type="button">
+                            <span class="plugin-dot"></span>
+                            <span class="plugin-nav-copy"><strong class="group-name">{{ group_body.group_name }}</strong><small class="group-id">群号：{{ group_body.group_id }}</small></span>
+                            <span class="nav-arrow">›</span>
+                        </button>
+                        {% endfor %}
+                    </div>
+                </aside>
+                <section class="group-documents" id="groupDocuments">
                     {% for group_body in config.data %}
-                    <div class="transparent-card">
-                        <div class="card-header" id="heading-{{group_body.group_id}}">
-                            <h5 class="mb-0">
-                                <button class="btn btn-link" data-bs-toggle="collapse"
-                                    data-bs-target="#collapse-{{group_body.group_id}}" aria-expanded="true"
-                                    aria-controls="collapse-{{group_body.group_id}}">
-                                    {{ group_body.group_show }}
-                                </button>
-                            </h5>
-                        </div>
-                        <div id="collapse-{{ group_body.group_id }}" class="collapse" aria-labelledby="heading-{{ group_body.group_id }}">
-                            <div class="card-body">
-                                <div class="table-scroll">
-                                <table class="table service-table" style="margin-top: 20px;">
+                    <article class="group-document{% if loop.first %} active{% endif %}" id="group-{{ group_body.group_id }}" data-search-text="{{ group_body.group_name }} 群号 {{ group_body.group_id }} {% for service in group_body.service_list %}{{ service.name }} {{ service.manage }} {% endfor %}">
+                        <header class="document-header">
+                            <div><span class="eyebrow">GROUP {{ '%02d'|format(loop.index) }}</span><h2>{{ group_body.group_name }}</h2><small class="group-id">群号：{{ group_body.group_id }}</small></div>
+                            <span class="document-status">服务管理</span>
+                        </header>
+                        <div class="group-document-body">
+                            <table class="table service-table">
                                     <thead>
                                         <tr>
                                             <th>服务名称</th>
@@ -78,7 +85,7 @@
                                     <tbody>
                                         {% for service in group_body.service_list %}
                                         <tr>
-                                            <td style="vertical-align: middle;">{{ service.name }}</td>
+                                            <td class="service-name-cell" title="{{ service.name }}">{{ service.name }}</td>
                                             <td style="vertical-align: middle;">
                                                 {% if service.visible %}
                                                     <span class="icon-circle check-circle"></span>
@@ -116,18 +123,17 @@
                                         {% endfor %}
                                     </tbody>
                                 </table>
-                                </div>
-                            </div>
                         </div>
-                    </div>
+                    </article>
                     {% endfor %}
-                </div>
+                </section>
             </div>
         </div>
-    </div>
+    </main>
     <!-- 页面所需的JS -->
     <script src="../static/js/jquery.min.js"></script>
     <script src="../static/js/bootstrap.bundle.min.js"></script>
+    <script src="../static/js/search.js"></script>
 </body>
 
 </html>
