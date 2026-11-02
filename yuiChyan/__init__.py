@@ -1,7 +1,8 @@
+import asyncio
 import importlib
 import os.path
 from time import monotonic
-from typing import List, LiteralString, Dict, Any
+from typing import List, LiteralString, Dict, Any, Optional
 
 import nonebot
 from aiocqhttp import Message, MessageSegment
@@ -79,25 +80,58 @@ class YuiChyan(NoneBot):
             raise InterFunctionException('> 获取YuiChyan自身QQ号失败，可能是协议实现客户端未启动')
         return qq_list[0]
 
-    # 获取bot所加的群列表 | 带TTL缓存，失败不写入缓存，连接恢复后可自动重试
-    async def get_cached_group_list(self, use_cache: bool = True) -> list:
-        async with self._group_cache_lock:
-            now = monotonic()
-            cache_valid = (
-                self._group_list_cache is not None
-                and now - self._group_list_cache_at < self.GROUP_CACHE_TTL
+    # 请求群列表 | LuckyLilliaBot支持no_cache，确保绕过协议端群列表缓存
+    async def _request_group_list(self, self_id: int) -> list:
+        try:
+            return await self.call_action(
+                'get_group_list',
+                self_id=self_id,
+                no_cache=True
             )
-            if (not use_cache) or (not cache_valid):
-                self_id = self.get_self_id()
-                try:
-                    group_list = await self.get_group_list(self_id=self_id)
-                except CQHttpError as e:
-                    # 失败不污染缓存，抛出后由调用方决定是否降级
-                    raise InterFunctionException(
-                        f'> 获取YuiChyan群列表失败，可能是协议实现客户端未启动：{e}')
+        except CQHttpError as e:
+            raise InterFunctionException(
+                f'> 获取YuiChyan群列表失败，可能是协议实现客户端未启动：{e}')
+
+    # 刷新群列表缓存 | expected_group_id不在结果中时不覆盖现有缓存
+    async def _refresh_group_list(self, expected_group_id: Optional[int] = None) -> list:
+        async with self._group_cache_lock:
+            group_list = await self._request_group_list(self.get_self_id())
+            if (
+                    expected_group_id is None
+                    or any(int(group['group_id']) == int(expected_group_id) for group in group_list)
+            ):
                 self._group_list_cache = group_list
                 self._group_list_cache_at = monotonic()
-            return self._group_list_cache
+            return group_list
+
+    # 获取bot所加的群列表 | 带TTL缓存，失败不写入缓存，连接恢复后可自动重试
+    async def get_cached_group_list(self, use_cache: bool = True) -> list:
+        now = monotonic()
+        cache_valid = (
+            self._group_list_cache is not None
+            and now - self._group_list_cache_at < self.GROUP_CACHE_TTL
+        )
+        if (not use_cache) or (not cache_valid):
+            await self._refresh_group_list()
+        return self._group_list_cache or []
+
+    # 入群后等待协议端完成同步，再刷新群列表
+    async def refresh_group_list_after_join(self, group_id: int) -> list:
+        last_group_list = self._group_list_cache or []
+        for delay in (0, 2, 5, 10):
+            if delay:
+                await asyncio.sleep(delay)
+            try:
+                group_list = await self._refresh_group_list(group_id)
+            except InterFunctionException as e:
+                logger.warning(str(e))
+                continue
+            last_group_list = group_list
+            if any(int(group['group_id']) == int(group_id) for group in group_list):
+                logger.info(f'> 入群群 [{group_id}] 已同步至群列表')
+                return group_list
+        logger.warning(f'> 入群群 [{group_id}] 暂未出现在群列表，保留原有群列表缓存')
+        return last_group_list
 
 
 # 全局唯一的BOT实例

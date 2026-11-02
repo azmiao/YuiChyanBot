@@ -45,9 +45,9 @@ async def leave_notice(session: NoticeSession):
 @on_notice('group_increase')
 async def group_welcome(session: NoticeSession):
     ev = session.event
-    # 自己入群：刷新群列表缓存 | 覆盖被群成员拉入但未走邀请流程的场景
+    # 自己入群：等待协议端同步后刷新群列表 | 覆盖被群成员拉入但未走邀请流程的场景
     if ev.user_id == ev.self_id:
-        await get_bot().get_cached_group_list(False)
+        await get_bot().refresh_group_list_after_join(ev.group_id)
         return
 
     # 查询陌生人信息
@@ -73,8 +73,8 @@ async def group_welcome(session: NoticeSession):
 async def handle_group_invite(session: RequestSession):
     if session.ctx.user_id in SUPERUSERS:
         await session.approve()
-        # 这时候重新刷新一下群缓存
-        await get_bot().get_cached_group_list(False)
+        # 等待协议端完成入群同步后刷新群缓存
+        await get_bot().refresh_group_list_after_join(session.ctx.group_id)
     else:
         await session.reject(reason=f'邀请{NICKNAME}入群请联系维护组哦~')
 
